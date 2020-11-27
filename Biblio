@@ -202,3 +202,19 @@ Indisponibilité suite à une maintenance preventive :non
 Optimisation de la politique de maintenance : oui 
 Estimation des paramètres : non
 Etude du temps d’atteinte : proba conditionnelle de maintenance
+
+
+
+NOM DU FICHIER : DBM_Gaudoin_RESS2015.pdf
+Modèle de dégradation : Wiener
+Maintenance Preventive préciser le type :parfait et imparfait  
+Maintenance Corrective : CBM remplacement  
+Maintenance prédictive : non
+Maintenance imparfaite aléatoire : oui une variable suivant une loi beta impacte le taux de dégradation (ou plutôt le paramètre d'échelle) 
+Maintenance imparfaite déterministe :non
+Indisponibilité suite à une défaillance : non 
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : non
+Estimation des paramètres : oui
+Etude du temps d’atteinte : non 
+Observation: maintenance et dégrdataion, Filtrage d'état via Kalman

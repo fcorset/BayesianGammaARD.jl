@@ -191,17 +191,32 @@ Etude du temps d’atteinte : oui proba de remplacement
 
 
 NOM DU FICHIER : DBM_ImperfectRepair_RESS2015.pdf
-Modèle de dégradation : cumulative degrdataion avec incréments exponentiels
+Modèle de dégradation : cumulative degradation avec incréments exponentiels
 Maintenance Preventive préciser le type :CBM imparfiat et le cout est une fonction de la réduction 
 Maintenance Corrective : CBM remplacement  
 Maintenance prédictive : non
-Maintenance imparfaite aléatoire : oui dans l'exemple une loi uniforme est proposé
+Maintenance imparfaite aléatoire : oui dans l'exemple une loi uniforme est proposée
 Maintenance imparfaite déterministe :non
 Indisponibilité suite à une défaillance : non 
 Indisponibilité suite à une maintenance preventive :non
 Optimisation de la politique de maintenance : oui 
 Estimation des paramètres : non
 Etude du temps d’atteinte : proba conditionnelle de maintenance
+
+
+NOM DU FICHIER : A value-based maintenance strategy for systems under imperfect repair and continuous degradation_2017.pdf
+Modèle de dégradation : cumulative degradation avec aléa en puissance  
+Maintenance Preventive préciser le type : imparfait  et prédictive selon la proba conditionnelle de dépassement de seuil
+Maintenance Corrective : AGAN
+Maintenance prédictive : oui
+Maintenance imparfaite aléatoire : oui 
+Maintenance imparfaite déterministe :non
+Indisponibilité suite à une défaillance : non 
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : oui en controlant la moyenne de la réduction  cout dépend de la correction 
+Estimation des paramètres : non
+Etude du temps d’atteinte : proba conditionnelle de maintenance
+
 
 
 
@@ -218,3 +233,6 @@ Optimisation de la politique de maintenance : non
 Estimation des paramètres : oui
 Etude du temps d’atteinte : non 
 Observation: maintenance et dégrdataion, Filtrage d'état via Kalman
+
+
+

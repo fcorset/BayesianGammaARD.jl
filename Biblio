@@ -147,3 +147,30 @@ Optimisation de la politique de maintenance : oui
 Estimation des paramètres : oui
 Etude du temps d’atteinte : non
 Plusieures variantes selon la politique d'inspection 
+
+
+NOM DU FICHIER :   KijimaShock_1991.pdf
+Modèle de dégradation : Cumulative damage (combinaison de Poisson composé):Poisson chocs
+Maintenance Preventive préciser le type :planned replacement 
+Maintenance Corrective : oui 
+Maintenance prédictive : non
+Maintenance imparfaite aléatoire : non
+Maintenance imparfaite déterministe :non 
+Indisponibilité suite à une défaillance : oui mais intégré dans le cout de défaillance 
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : oui et son approximation 
+Estimation des paramètres : non
+Etude du temps d’atteinte : non
+
+NOM DU FICHIER : Khale.pdf 
+Modèle de dégradation : Wiener
+Maintenance Preventive préciser le type :peut être des dépassements de seuils  
+Maintenance Corrective : peut être des dépassements de seuils 
+Maintenance prédictive : non
+Maintenance imparfaite aléatoire : non
+Maintenance imparfaite déterministe :réduction de la dégrdataion ou de l'age en multipliant pas une constante Kij I et II
+Indisponibilité suite à une défaillance : non 
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : non
+Estimation des paramètres : oui
+Etude du temps d’atteinte : impact de la maintenance imparfaite sur le temsp d'atteinte 

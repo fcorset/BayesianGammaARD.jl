@@ -10,4 +10,19 @@ Optimisation de la politique de maintenance
 Estimation des paramètres 
 Etude du temps d’atteinte 
 
-NOM DU FICHIER : XXX
+NOM DU FICHIER :  qre.2166.pdf (Letot et al. QRE 2017)
+
+Modèle de dégradation : Gamma Process
+Maintenance Preventive préciser le type : 2 types :
+    - perfect (AGAN)
+    - imperfect : processus est réduit à un z_0
+    Pour le choix, on définit un critère de comparaison de coût
+Maintenance Corrective : AGAN
+Maintenance prédictive : Au temps d'inspection, on décide de reporter si dégradation faible ou AGAN si dégradation élevée
+Maintenance imparfaite aléatoire : Le processus de dégradation est ramené à un z_O (proportionnel au nombre d'inspections déjà réalisées)
+Maintenance imparfaite déterministe : 
+Indisponibilité suite à une défaillance : non
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : oui
+Estimation des paramètres : non
+Etude du temps d’atteinte : non

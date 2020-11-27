@@ -174,3 +174,31 @@ Indisponibilité suite à une maintenance preventive :non
 Optimisation de la politique de maintenance : non
 Estimation des paramètres : oui
 Etude du temps d’atteinte : impact de la maintenance imparfaite sur le temsp d'atteinte 
+
+
+NOM DU FICHIER : DiscountedCostModel.pdf 
+Modèle de dégradation : Modèle chocs  ou damage (chocs additifs)
+Maintenance Preventive préciser le type :CBM ou age  remplacement
+Maintenance Corrective : CBM remplacement  
+Maintenance prédictive : non
+Maintenance imparfaite aléatoire : non
+Maintenance imparfaite déterministe :non
+Indisponibilité suite à une défaillance : non 
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : oui discounted cost
+Estimation des paramètres : non
+Etude du temps d’atteinte : oui proba de remplacement 
+
+
+NOM DU FICHIER : DBM_ImperfectRepair_RESS2015.pdf
+Modèle de dégradation : cumulative degrdataion avec incréments exponentiels
+Maintenance Preventive préciser le type :CBM imparfiat et le cout est une fonction de la réduction 
+Maintenance Corrective : CBM remplacement  
+Maintenance prédictive : non
+Maintenance imparfaite aléatoire : oui dans l'exemple une loi uniforme est proposé
+Maintenance imparfaite déterministe :non
+Indisponibilité suite à une défaillance : non 
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : oui 
+Estimation des paramètres : non
+Etude du temps d’atteinte : proba conditionnelle de maintenance

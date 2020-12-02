@@ -15,6 +15,21 @@ Fichier : ASequentialInspectionandReplacementPolicyforDegradation_2017.pdf (Zhu 
 
 Modèle de dégradation : Gamma process
 Maintenance Preventive : AGAN
+Maintenance Corrective : Minimal
+Maintenance prédictive : NON
+Maintenance imparfaite aléatoire : NON
+Maintenance imparfaite déterministe : NON
+Indisponibilité suite à une défaillance :  NON
+Indisponibilité suite à une maintenance preventive : NON
+Optimisation de la politique de maintenance : OUI 
+Estimation des paramètres : non
+Etude du temps d’atteinte : non
+
+Fichier : BayesianReplacementStrategies.pdf (hors sujet)
+
+
+Modèle de dégradation : NON
+Maintenance Preventive : AGAN
 Maintenance Corrective : AGAN
 Maintenance prédictive : inspection dépend de la dégradation du système, le seuil aussi !
 Maintenance imparfaite aléatoire : non
@@ -24,7 +39,6 @@ Indisponibilité suite à une maintenance preventive : non
 Optimisation de la politique de maintenance : oui par simulation en considérant 3 coûts : Préventive, Correctif, Inspection 
 Estimation des paramètres : non
 Etude du temps d’atteinte : non
-
 
 
 NOM DU FICHIER :  qre.2166.pdf (Letot et al. QRE 2017)

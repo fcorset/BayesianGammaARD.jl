@@ -10,6 +10,23 @@ Optimisation de la politique de maintenance
 Estimation des paramètres 
 Etude du temps d’atteinte 
 
+
+Fichier : ASequentialInspectionandReplacementPolicyforDegradation_2017.pdf (Zhu et al.)
+
+Modèle de dégradation : Gamma process
+Maintenance Preventive : AGAN
+Maintenance Corrective : AGAN
+Maintenance prédictive : inspection dépend de la dégradation du système
+Maintenance imparfaite aléatoire : non
+Maintenance imparfaite déterministe : non
+Indisponibilité suite à une défaillance :  
+Indisponibilité suite à une maintenance preventive
+Optimisation de la politique de maintenance : oui par simulation en considérant 3 coûts : Préventive, Correctif, Inspection 
+Estimation des paramètres : non
+Etude du temps d’atteinte : non
+
+
+
 NOM DU FICHIER :  qre.2166.pdf (Letot et al. QRE 2017)
 
 Modèle de dégradation : Gamma Process

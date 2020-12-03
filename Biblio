@@ -41,6 +41,24 @@ Estimation des paramètres : non
 Etude du temps d’atteinte : non
 
 
+Fichier :  ConditionBasedMaintenance_ImperfectRepair_IEEE2019.pdf (système série... un peu hors sujet)
+
+
+Modèle de dégradation : Random Fuzzy Accelerated Degradation (RFAD) for multicomponent systems (système série) + ADT model
+RFAD : Y(t) = d*t + sigma B(t), avec B Brownien et variable aléatoire (random effect)
+ADT sert pour la loi de la dégradation lors de la prochaine inspection
+Maintenance Preventive : réduit par un coefficient supposé connu ???
+Maintenance Corrective : AGAN
+Maintenance prédictive : non
+Maintenance imparfaite aléatoire :non
+Maintenance imparfaite déterministe :
+Indisponibilité suite à une inspection : oui
+Optimisation de la politique de maintenance : oui
+Estimation des paramètres : oui (updating à chaque inspection)
+Etude du temps d’atteinte : non
+
+
+
 NOM DU FICHIER :  qre.2166.pdf (Letot et al. QRE 2017)
 
 Modèle de dégradation : Gamma Process

@@ -76,6 +76,24 @@ Optimisation de la politique de maintenance : oui
 Estimation des paramètres : non
 Etude du temps d’atteinte : non
 
+
+
+
+NOM DU FICHIER :  OmshiGrallShemehsavar2020.pdf (EJOR 2020)
+
+Modèle de dégradation : Général mais font avec IG pour l'application.
+Maintenance Preventive préciser le type : AGAN
+Maintenance Corrective : AGAN
+Maintenance prédictive : non
+Maintenance imparfaite aléatoire : NON
+Maintenance imparfaite déterministe : NON
+Indisponibilité suite à une défaillance : oui avec coût associé
+Indisponibilité suite à une maintenance preventive :non
+Optimisation de la politique de maintenance : oui, optimise selon le seuil (pour les MP) et p-quantile de RUL
+Estimation des paramètres : Font du bayésien, ré-estimation après chaque inspection et après chaque cycle de renouvellement
+Etude du temps d’atteinte : non
+
+
 NOM DU FICHIER :  TBM-and-CBM-2012 
 
 review très GENERAL comparaison TBM et CBM

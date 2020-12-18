@@ -2,6 +2,10 @@
 \documentclass[review]{elsarticle}
 \usepackage{dsfont}
 \usepackage{lineno,hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+
 \modulolinenumbers[5]
 
 \journal{Journal of \LaTeX\ Templates}
@@ -44,24 +48,38 @@
 
 \begin{frontmatter}
 
-\title{Elsevier \LaTeX\ template\tnoteref{mytitlenote}}
-\tnotetext[mytitlenote]{Fully documented templates are available in the elsarticle package on \href{http://www.ctan.org/tex-archive/macros/latex/contrib/elsarticle}{CTAN}.}
+\title{Maintenance optimization with imperfect maintenance of a Gamma Process}
+
 
 %% Group authors per affiliation:
-\author{Elsevier\fnref{myfootnote}}
-\address{Radarweg 29, Amsterdam}
-\fntext[myfootnote]{Since 1880.}
+%\author{Elsevier\fnref{myfootnote}}
+%\address{Radarweg 29, Amsterdam}
+%\fntext[myfootnote]{Since 1880.}
 
 %% or include affiliations in footnotes:
-\author[mymainaddress,mysecondaryaddress]{Elsevier Inc}
-\ead[url]{www.elsevier.com}
+%\ead[url]{www.elsevier.com}
 
-\author[mysecondaryaddress]{Global Customer Service\corref{mycorrespondingauthor}}
+
+
+
+
+
+\author[adressFC]{Franck Corset\corref{mycorrespondingauthor}}
 \cortext[mycorrespondingauthor]{Corresponding author}
-\ead{support@elsevier.com}
+\ead{email}
 
-\address[mymainaddress]{1600 John F Kennedy Boulevard, Philadelphia}
-\address[mysecondaryaddress]{360 Park Avenue South, New York}
+
+\author[adressMF]{Mitra Fouladirad}
+
+\author[adressCP]{Christian Paroissin}
+
+
+
+
+
+\address[adressFC]{LJK - UGA}
+\address[adressMF]{UTT}
+\address[adressCP]{UPPA}
 
 \begin{abstract}
 This template helps you to create a properly formatted \LaTeX\ manuscript.
@@ -76,20 +94,88 @@ This template helps you to create a properly formatted \LaTeX\ manuscript.
 
 \linenumbers
 
-\section{The Elsevier article class}
-Maintenance avec $a$, $b$ $\rho$
-$C(T)$
-$X_t$: X à l’instant t
-$Y_t$ le processus maintenu à l’instant t
-$Z_i$ réduction à l’instant i $Z_i=(\rho) Y_i\tau$
-$G_i$ increment de gamma 
-$T$ durée de cycle de renouvellement
+\section{Introduction}
+
+\section{Degradation process and maintenance model}
+\subsection{Degradation process}
+We assume that the deterioration process is a Gamma process, $\{X_t,t\geq 0\}$, with shape parameter $a(t)=\alpha t^\beta$ and scale parameter $b$.
+The gamma process $\{X_t,t\geq 0\}$ is a continuous-time stochastic process such that:
+\begin{itemize}
+	\item $X(0) = 0$ with probability $1$
+	\item $X(t)-X(s)\sim G(a(t)-a(s),b)$ for all $t>s\geq0$, with density function $\forall x\in \mathbb R^+$:
+	$$
+f(x) = \dfrac{b^{a(t)-a(s)}}{\Gamma(a(t)-a(s))}x^{a(t)-a(s)-1}e^{-bx}
+	$$
+	\item $X(t)$ has independent increments 
+\end{itemize}
+
+Let $\{Y_t,t\geq 0\}$ denotes the stochastic process of the maintained system. We consider that the system is inspected at time $\tau,2\tau,\ldots$. At each inspection ($t_j=j\tau$), a decision is taken in respect to the level of degradation:
+\begin{itemize}
+	\item if $Y_{t_j} \geq M$ then a Corrective Maintenance (CM) is performed and the system is replaced by a new one (As Good As New);
+	\item if $L\leq Y_{t_j} < M$ then a Preventive Maintenance (PM) is performed. We consider here an imperfect PM, and more precisely, an $ARD_1$ model, parameterized by $\rho$, i.e. the degradation level just after the inspection (at time $t_j$) is reduced by a proportional quantity of the degradation level just before the inspection: $Y_{{t_j}^+} = (1-\rho)Y_{{t_j}^-}$;
+	\item if $Y_{t_j} < L$ no action is performed,
+\end{itemize}
+where $L$ and $M$ are fixed thresholds ($0<L<M$).
+
+Let $U_i = {\mathds 1}_{L \leq Y_{i \tau}< M} $ and 
+
+Between the inspection at time $(i-1)\tau$ and the inspection at time $i\tau$, the system is assumed to evolve according to i.i.d. copies $(X_t^{(i)})_{t\geq0}$ of the gamma process $(X_t)_{t\geq0}$ and we denote $W_i = X_{i\tau}^{(i)}-X_{(i-1)\tau}^{(i)}$ its increment between these two inspections.
+
+Thus, before the first inspection, we have
+
+$\forall t\in[0,\tau),\, Y_t = X_t^{(1)}$
+
+At the first inspection, we could have:
+\begin{itemize}
+	\item if $Y_{\tau^-} <L$, no action is performed and then $Y_{\tau} = Y_{\tau^-} = X_{\tau^-}^{(1)}$.
+	\item if $L \leq Y_{\tau^-} <M$, an imperfect PM ($ARD_1$) is performed and then the degradation level is reduced of $\rho X_{\tau}^{(1)}$ and thus $Y_{\tau} = (1-\rho) X_{\tau^-}^{(1)}$.
+	\item if $Y_\tau^->M$ then the system is replaced by a new one.
+\end{itemize}
+
+After the first inspection without replacement, we have $\forall t\in [\tau,2\tau)$, 
 $$
-C(T)= C_c+ [T/\tau] N_i+ N_p C_P=C_c+ [T/\tau] C_i+ \sum_{i=1}^ {T/\tau} {\mathds 1}_{M \leq Y_i \tau< L} C_P
+Y_t = Y_\tau + X_t^{(2)} - X_\tau^{(2)} = (1-\rho)^{U_1} X_\tau^{(1)}+X_t^{(2)} - X_\tau^{(2)} 
 $$
+
+At the second inspection at time $2\tau$, we have
+\begin{itemize}
+	\item if $Y_{2\tau^-} <L$, no action is performed, and $Y_{2\tau} = Y_{2\tau^-} = (1-\rho)^{U_1} X_\tau^{(1)}+X_{2\tau}^{(2)} - X_\tau^{(2)}$.
+	\item if $L \leq Y_{2\tau^-} <M$, an imperfect PM ($ARD_1$) is performed and then the degradation level is reduced of $\rho (X_{2\tau}^{(2)}-X_\tau^{(2)})$ and thus 
+	$$
+	Y_{2\tau} = Y_{2\tau^{-}} -\rho (X_{2\tau^-}^{(2)}-X_\tau^{(2)}) = (1-\rho)^{U_1} X_\tau^{(1)}+(1-\rho)(X_{2\tau^-}^{(2)}-X_\tau^{(2)})
+	$$
+	\item if $Y_{2\tau^-} >M$ then the system is replaced.
+\end{itemize}
+
+By induction, we can conclude that after $i$ inspections without replacement, we have $\forall t\in [i\tau,(i+1)\tau)$
 $$
-C(T)= C_c+ [T/\tau] N_i+ N_p C_P=C_c+ [T/\tau] N_i+ \sum_{i=1}^ {T/\tau} {\mathds 1}_{P(Y_{(i+1)\tau} > L| Y_i \tau=x)>1-\epsilon} C_P=
+Y_t = Y_{i\tau} + (X_t^{(i+1)}-X_{i\tau}^{(i+1)})
 $$
+and if we denote $i=\lfloor t/\tau\rfloor$, then we get
+$$
+Y_t = \displaystyle\sum_{j=1}^{i} (1-\rho)^{1-U_j}(X_{j\tau}^{(j)}-X_{(j-1)\tau}^{(j)}) + X_t^{(i+1)}-X_{i\tau}^{(i+1)}
+$$
+Finally, we obtain
+\begin{align}
+Y_{(i+1)\tau} & = Y_{i\tau} + (1-\rho)^{U_{i+1}}(X_{(i+1)\tau}^{(i+1)}-X_{i\tau}^{(i+1)}\nonumber\\
+& = \displaystyle\sum_{j=1}^{i+1} (1-\rho)^{U_{j}} (X_{j\tau}^{(j)}-X_{(j-1)\tau}^{(j)})
+\end{align}
+
+
+
+
+\subsection{Maintenance Optimization}
+Let $C_I$, $C_P$ anc $C_C$ denote respectively the cost of an Inspection, a Preventive Maintenance and a Corrective Maintenance.
+As the corrective maintenances are perfect (replacement), we can compute the total cost on a renewal cycle $[0,T]$:
+$$
+C(T) = C_C + [T/\tau] C_I + N_p C_p  = C_C + [T/\tau] C_I + \sum_{i=1}^ {T/\tau} {\mathds 1}_{L \leq Y_{i \tau}< M}  C_p
+$$
+and the expectation of the length of a renewal cycle is:
+$$
+E(T)=\int P(Y_t>M) dt
+$$
+
+
 
 $E(C(T))/E(T)$
 

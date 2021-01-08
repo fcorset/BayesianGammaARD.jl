@@ -168,8 +168,15 @@ Y_{(i+1)\tau} & = Y_{i\tau} + (1-\rho)^{U_{i+1}}(X_{(i+1)\tau}^{(i+1)}-X_{i\tau}
 Let $C_I$, $C_P$ anc $C_C$ denote respectively the cost of an Inspection, a Preventive Maintenance and a Corrective Maintenance.
 As the corrective maintenances are perfect (replacement), we can compute the total cost on a renewal cycle $[0,T]$:
 $$
-C(T) = C_C + [T/\tau] C_I + N_p C_p  = C_C + [T/\tau] C_I + \sum_{i=1}^ {T/\tau} {\mathds 1}_{L \leq Y_{i \tau}< M}  C_p
+C(T) = C_C + [T/\tau] C_I + N_p C_p  = C_C + [T/\tau] C_I + \sum_{i=1}^ {T/\tau} {\mathds 1}_{L \leq Y_{i \tau}< M}  C_p.
 $$
+The length of a cycle is 
+$$
+T = \inf \{t>0,\,Y_t\geq M\}
+$$
+
+
+
 and the expectation of the length of a renewal cycle is:
 $$
 E(T)=\int P(Y_t>M) dt

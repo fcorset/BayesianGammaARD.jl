@@ -1,0 +1,89 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  esrel2021-abstract-latex.tex   :   12/10/2021                          %%
+%%  Text file to use with esrel2020-abstract-latex.tex written in LaTex2e. %%
+%%  The content, structure, format and layout of this style file is the         %%
+%%  property of Research Publishing Services                                    %%
+%%  Copyright (c) 2019-2021 Research Publishing, Singapore,                     %%
+%%  All rights are reserved.                                                    %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{rps-esrel2021}
+
+%\documentclass[draft]{rps-esrel2021} 
+
+\def\papername{\jobname}
+
+\def\ds{\displaystyle}
+
+\copyline{Proceedings of the 31th European Safety and Reliability Conference\\  
+{\itshape Edited by} Bruno Castanier, Marko Cepin, David Bigaud and Christophe Berenguer}{2021}{981-973-0000-00-0}
+
+\markboth{Franck Corset and Mitra Fouladirad and Christian Paroissin}{Instructions for Preparing Manuscripts}
+
+
+\begin{document}
+
+\title{CONDITIONAL IMPERFECT MAINTENANCE OF A DETERIORATION PROCESS}
+
+\author{Franck Corset$^{1}$ and Mitra Fouladirad$^{2}$ and Christian Paroissin$^{3}$}
+
+\address{$^{1}$Univ. Grenoble Alpes, CNRS, Grenoble INP, LJK, 38000 Grenoble, France \email{franck.corset@univ-grenoble-alpes.fr}}
+
+\address{$^{2}$Institut Charles Delaunay – LM2S, UMR 6281, CNRS, Université de Technologie de Troyes, 12 rue Marie Curie, CS 42060, 10004 Troyes, France. \email{mitra.fouladirad@utt.fr}}
+
+\address{$^{3}$Université de Pau et des Pays de l'Adour, E2S UPPA, CNRS, LMAP, UMR 5142, 64000 Pau, France. \email{christian.paroissin@univ-pau.fr}}
+
+\vspace*{18pt}
+
+We consider a gamma process for degradation modeling of a system, which is periodically inspected. At each inspection, a decision is taken in respect to the level of the degradation process. We consider the following maintenance framework:
+\begin{itemize}
+\item The system degradation indicator is more related to a service quality than a health indicator and the system failure is not considered in this paper;
+\item A perfect preventive maintenance is performed if the degradation level exceeds a fixed safety threshold $L$: the operation leads to a "as good as new" system;
+\item An imperfect preventive maintenance is performed if the degradation level is between $L$ and a preventive threshold $M$: the imperfect action is modelling to an arithmetic reduction of degradation of order $1$. In this later case, the improvement is proportional to the degradation level at the inspection time (with a reduction factor $\rho$ with $0\leq\rho\leq 1$);
+\item No action is performed if the degradation level is lower than $M$;
+\item The safety threshold exceeding is not self-announced and this event is detected only during an inspection;
+\item Maintenance actions do not induce a delay.
+\end{itemize}
+
+Considering the cost of the inspections, of the perfect and imperfect preventive maintenances, we derive the closed form expression of the average long run cost of the maintenance policy in order to optimize the expected total cost between two CM (thanks to the renewal theory). A sensitivity analysis is performed and the robustness of the optimal parameters with respect to uncertainty. 
+
+%\noindent Contributions to the 31th European Safety and Reliability Conference, {\it Angers, France, 19 -- 23 September 2021} are to be in American English. 
+
+%The abstract should summarize the context, content and conclusions of the paper and {\bf must not exceed one page including references} with a minimum of 200 words. Typeset the abstract in 10pt Times New Roman with line spacing of 11pt. Suggest approximately 6--12 keywords for indexing purposes (separated by commas) as below.  
+
+%A4/US letter size paper can be used.  The trim size is 24cm (height) x 17cm (width).  Text area includes running title; the footer at the bottom is 211mm deep and 132mm wide. The entire text is in a single column format. 
+
+%Authors are encouraged to have their contribution checked for grammar.  American spelling should be used.  Abbreviations are allowed but should be spelt out in full when first used. Integers ten and below are to be spelt out.  Italicize foreign language phrases(e.g.~Latin, French). Authors are required to submit their manuscripts both in PDF and the typeset source (MS-Word or LaTex) formats, and should check their formatting before submission.
+
+
+%\begin{figure}[h]
+%\epsfxsize=.20\hsize
+%\centerline{\epsfbox{ch01f01.eps}}
+%\caption{This is the caption for the figure in font 9pt. The short-line caption must be centered, and the long caption can be left justified.}
+%\end{figure}
+
+%Final pagination and insertion of running titles will be done by the publisher.   Authors are encouraged to use this style
+%template in MS-WORD or LaTeX provided. If you're not using this template, please ensure the page dimensions are followed accurately, as your manuscript will be reduced electronically if it exceeds the page dimensions.
+
+\vspace*{10pt}
+
+
+\noindent {\it Keywords:} Imperfect Maintenance, Gamma Process, Maintenance Optimization, Degradation Process.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{}G. Salles and S. Mercier and L. Bordes, Semiparametric estimate of the efficiency of imperfect maintenance actions for a gamma deteriorating system, \Journal{Journal of Statistical Planning and Inference.}{206}{278-297}{2020}.
+
+\bibitem{}W. Kahle, Imperfect repair in degradation processes: A Kijima‐type approach, \Journal{Applied Stochastic Models in Business and Industry}{35(2)}{211-220}{2019}.
+
+\bibitem{}W. Kahle and S. Mercier and C. Paroissin, Degradation processes in reliability, \Journal{John Wiley \& Sons}{}{}{2016}.
+
+
+\end{thebibliography}
+
+
+\end{document}
+
+
+

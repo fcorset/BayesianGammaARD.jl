@@ -1,6 +1,6 @@
 compile_pdf:
   stage: build
-  image: martisak/texlive  # use a Docker image for LaTeX from https://hub.docker.com/
+  image: aergus/latex  # use a Docker image for LaTeX from https://hub.docker.com/
   script: latexmk -pdf main.tex  # build the pdf just as you would on your computer
   artifacts:
     paths: 

@@ -70,26 +70,54 @@ abline(h=M,col="red")
 
 # se donner une grille pour les abscisses
 
-K<-10 # nb itérations de l'algo de point fixe
+K<- 20 # nb itérations de l'algo de point fixe
 grid_abs <- seq(0.01,8,0.01)
-w<-matrix(nrow = K,ncol = length(grid_abs))
+nb_abs <- length(grid_abs)
+w<-matrix(nrow = K,ncol = nb_abs )
 
 pi<-list()
-pi[[1]]<-function(x) x*dexp(x)
+pi[[1]]<-function(x) dexp(x)
 
 w[1,]<-pi[[1]](grid_abs)
-
+curve(pi[[1]](x), from = 0, to = max(grid_abs), lwd = 2)
 
 for(k in 2:K){
-  for (abs in grid_abs){
-    w[2,abs]<-integrate(function(x) pi[[k-1]](x)*dgamma(abs-x,rate=beta,shape=alpha*tau),0,min(c(L,abs))) + ifelse(abs<(1-rho)*L,0,integrate(function(x) pi[[k-1]](x)*dgamma(abs-(1-rho)*x,rate=beta,shape=alpha*tau),L,min(c(M,abs/(1-rho)))))
+  for (j in 1:nb_abs){
+    abs <- grid_abs[j]
+    fn_aux1 <- function(x) {
+      res <- pi[[k-1]](x)*dgamma(abs-x,rate=beta,shape=alpha*tau)
+      return(res)
+    }
+    fn_aux2 <- function(x) {
+      res <- pi[[k-1]](x)*dgamma(abs-(1-rho)*x,rate=beta,shape=alpha*tau)
+      return(res)
+    }
+    fn_aux3 <- function(x) {
+      res <- pi[[k-1]](x)
+      return(res)
+    }
+    w[k,j] <- integrate(f = fn_aux1, lower = 0, upper = min(L,abs))$value 
+    + integrate(f = fn_aux2, lower = L, upper = min(M,abs/(1-rho)))$value
+    + integrate(f = fn_aux3, lower = M, upper = Inf)$value * dgamma(abs,rate=beta,shape=alpha*tau)
   }
-  pi[[k]]<-function(x){}
+  aux <- w[k,]
+  fn_w <- function(x) {
+    res <- splinefun(x = grid_abs, y = aux)(x)*((0 < x) & (x<=max(grid_abs)))
+    return(res)
+  }
+  pi[[k]] <- fn_w
+  curve(pi[[k]](x), from = 0, to = max(grid_abs), lwd = 2, add = TRUE, col = k)
 }
 
 
 
+
+
 # initialisation
+
+
+
+
 
 
 

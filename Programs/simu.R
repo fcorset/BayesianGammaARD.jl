@@ -22,7 +22,7 @@ nb.inspection<- floor(tps.final/tau)
 obs<-numeric(nb.inspection)
 
 for(i in 2:n){
-  x[i] = x[i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
+  x[i] = x[i-1] + rgamma(1,scale = beta, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
 }
 
 plot(temps,x,type="l")

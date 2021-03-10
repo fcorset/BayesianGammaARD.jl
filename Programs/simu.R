@@ -82,6 +82,7 @@ w[1,]<-pi[[1]](grid_abs)
 curve(pi[[1]](x), from = 0, to = max(grid_abs), lwd = 2)
 
 for(k in 2:K){
+<<<<<<< ours
   for (j in 1:nb_abs){
     abs <- grid_abs[j]
     fn_aux1 <- function(x) {
@@ -104,6 +105,33 @@ for(k in 2:K){
   fn_w <- function(x) {
     res <- splinefun(x = grid_abs, y = aux)(x)*((0 < x) & (x<=max(grid_abs)))
     return(res)
+||||||| base
+  for (abs in grid_abs){
+    w[2,abs]<-integrate(function(x) pi[[k-1]](x)*dgamma(abs-x,rate=beta,shape=alpha*tau),0,min(c(L,abs))) + ifelse(abs<(1-rho)*L,0,integrate(function(x) pi[[k-1]](x)*dgamma(abs-(1-rho)*x,rate=beta,shape=alpha*tau),L,min(c(M,abs/(1-rho)))))
+=======
+  for (j in 1:nb_abs){
+    abs <- grid_abs[j]
+    fn_aux1 <- function(x) {
+      res <- pi[[k-1]](x)*dgamma(abs-x,rate=beta,shape=alpha*tau)
+      return(res)
+    }
+    fn_aux2 <- function(x) {
+      res <- pi[[k-1]](x)*dgamma(abs-(1-rho)*x,rate=beta,shape=alpha*tau)
+      return(res)
+    }
+    fn_aux3 <- function(x) {
+      res <- pi[[k-1]](x)
+      return(res)
+    }
+    w[k,j] <- integrate(f = fn_aux1, lower = 0, upper = min(L,abs))$value 
+    + integrate(f = fn_aux2, lower = L, upper = min(M,abs/(1-rho)))$value
+    + integrate(f = fn_aux3, lower = M, upper = Inf)$value * dgamma(abs,rate=beta,shape=alpha*tau)
+  }
+  aux <- w[k,]
+  fn_w <- function(x) {
+    res <- splinefun(x = grid_abs, y = aux)(x)*((0 < x) & (x<=max(grid_abs)))
+    return(res)
+>>>>>>> theirs
   }
   pi[[k]] <- fn_w
   curve(pi[[k]](x), from = 0, to = max(grid_abs), lwd = 2, add = TRUE, col = k)
@@ -114,6 +142,10 @@ for(k in 2:K){
 
 
 # initialisation
+
+
+
+
 
 
 

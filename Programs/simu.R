@@ -98,7 +98,7 @@ for(k in 2:K){
     }
     w[k,j] <- integrate(f = fn_aux1, lower = 0, upper = min(L,abs))$value 
     + integrate(f = fn_aux2, lower = L, upper = min(M,abs/(1-rho)))$value
-    + integrate(f = fn_aux3, lower = M, upper = Inf)$value * dgamma(abs,rate=beta,shape=alpha*tau)
+    + integrate(f = fn_aux3, lower = M, upper = 2*M)$value * dgamma(abs,rate=beta,shape=alpha*tau)
   }
   aux <- w[k,]
   fn_w <- function(x) {

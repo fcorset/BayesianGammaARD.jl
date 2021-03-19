@@ -1,6 +1,6 @@
 library(ggplot2)
 library(tidyverse)
-tau = 0.2 # intervalle inter-inspection
+tau = 0.5 # intervalle inter-inspection
 rho = 0.8 # parametre ARD1
 L=3 # seuil pour MP
 M=6 # seuil pout MC

@@ -11,7 +11,7 @@ pas = 0.01 # pas de temps pour simuler le processus
 
 temps = seq(from = 0,to = tps.final,by = pas)
 alpha = 1 # paramètre de forme de Gamma a = alpha t
-beta = 2 # paramètre d'échelle de Gamma
+beta = 1.5 # paramètre d'échelle de Gamma
 b=1
 n=length(temps)
 x=numeric(n) # processus Gamma simulé

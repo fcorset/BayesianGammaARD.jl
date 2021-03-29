@@ -33,7 +33,7 @@ y[1:(tau/pas)]<-x[1:(tau/pas)]
 
 # Décision à chaque inspection
 
-ifelse(x[tau/pas+1]<L,y[tau/pas+1]<-x[tau/pas+1],ifelse(x[tau/pas+1]<M,y[tau/pas+1]<-(1-rho)*x[tau/pas+1],^))
+ifelse(x[tau/pas+1]<L,y[tau/pas+1]<-x[tau/pas+1],ifelse(x[tau/pas+1]<M,y[tau/pas+1]<-(1-rho)*x[tau/pas+1]))
 
 obs[1]<-y[tau/pas+1]
 

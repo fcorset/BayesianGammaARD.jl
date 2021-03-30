@@ -1,3 +1,6 @@
+#### Programme de simulation lorsqu'on observe uniquement la dégradation juste avant l'inspection
+
+
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
@@ -5,7 +8,7 @@ tau = 0.5 # intervalle inter-inspection
 rho = 0.5 # parametre ARDinf
 L=3 # seuil pour MP
 M=6 # seuil pout MC
-tps.final <-8 # fenêtre d'observation du processus
+tps.final <-12 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -67,38 +70,30 @@ while (j<=nb.inspections) {
   }
   j<-j+1
 }
-  
-  
-  
-  
-  
-  
 
 
-
-plot(temps,x[1,],type="l")
-plot(temps,x[2,],type="l")
-
-
-
-
-
-df <- data.frame(temps,x,y)
-mygraph <- ggplot(df,aes(x = temps)) +  
-  geom_line(aes(y = y), color = "darkred") +
-  geom_line(aes(y = x), color="steelblue", linetype="twodash") +
-  geom_abline(slope = 0,intercept = L,color="blue") +
-  geom_abline(slope = 0,intercept = M,color="red")
+#df <- data.frame(temps,x,y)
+#mygraph <- ggplot(df,aes(x = temps)) +  
+#  geom_line(aes(y = y), color = "darkred") +
+#  geom_line(aes(y = x), color="steelblue", linetype="twodash") +
+#  geom_abline(slope = 0,intercept = L,color="blue") +
+#  geom_abline(slope = 0,intercept = M,color="red")
 
 
+temps.cycle<-c(0,tau*which(obs>M),tps.final)
+indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
 
-plot(temps,x[1,],col="red",type="l",ylim = c(0,max(x[1,])),xlim = c(0,8))
+
+for (k in 1:nb.cycles){
+  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,2*M),xlim = c(0,tps.final),xlab="",ylab="")
+  par(new=T)
+}
+
+plot(temps,y,type="l",ylim=c(0,2*M),xlim = c(0,tps.final),ylab="",xlab="")
+
+
 par(new=T)
-plot(temps,x[2,],col="green",type="l",ylim = c(0,max(x[1,])),xlim = c(0,8))
-par(new=T)
-plot(temps,y,type="l",ylim=c(0,max(x[1,])),xlim = c(0,8))
-par(new=T)
-plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(x[1,])),type="p",xlim = c(0,8))
+plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,2*M),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
 abline(h=L,col="blue")
 abline(h=M,col="red")
 

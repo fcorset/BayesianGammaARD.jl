@@ -1,11 +1,21 @@
+# Programme de simulation lorsqu'on observe la dégradation juste avant la maintenance et juste après
+# On simule rho, l'efficacité de la maintenance
+
+
+
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
 tau = 0.5 # intervalle inter-inspection
-rho = 0.5 # parametre ARDinf
+#rho = 0.5 # parametre ARDinf
+mean.rho <- 0.5
+var.rho <- 0.05
+a.rho <- (1-mean.rho)*mean.rho^2/var.rho-mean.rho
+b.rho <-a.rho*(1-mean.rho)/mean.rho
+
 L=3 # seuil pour MP
 M=6 # seuil pout MC
-tps.final <-8 # fenêtre d'observation du processus
+tps.final <-12 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -24,8 +34,11 @@ n=length(temps)
 
 nb.inspections<- floor(tps.final/tau) # nombre d'inspections max pendant la fenêtre d'observation.
 
-obs<-numeric(nb.inspections) # données observées (pendant les inspections)
+obs.av<-numeric(nb.inspections) # données observées juste avant l'inspection
+obs.ap<-numeric(nb.inspections) # données observées juste après l'inspection
 
+rho.tire <- rep(0,nb.inspections)
+  
 j<-1 # indicateur prochaine inspection
 j.newcycle <- 0 # identifier le j où nouveau cycle
 nb.cycles <- 1 # compteur de cycles
@@ -51,15 +64,16 @@ while (j<=nb.inspections) {
   
   y[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-j.newcycle-1)*tau/pas+2):((j-j.newcycle)*(tau/pas)+1)]- x[nb.cycles,(j-j.newcycle-1)*tau/pas+1]
   
-  obs[j]<-y[j*tau/pas+1] # état dégradation à l'inspection (t_j^-)
+  obs.av[j]<-y[j*tau/pas+1] # état dégradation à l'inspection (t_j^-)
   
-  if (obs[j] < L) {
-    print("no action")
+  if (obs.av[j] < L) {
+    obs.ap[j]<-obs.av[j]
   } else {
-    if (obs[j]<M) {
-      y[j*tau/pas+1]<-(1-rho)*y[j*tau/pas+1] # on écrase (ARD infini)
+    if (obs.av[j]<M) {
+      rho.tire[j] <-rbeta(1,a.rho,b.rho)
+      obs.ap[j]<-y[j*tau/pas+1]<-(1-rho.tire[j])*y[j*tau/pas+1] # on écrase (ARD infini)
     } else {
-      y[j*tau/pas+1]<-0
+      obs.ap[j]<-y[j*tau/pas+1]<-0
       id.newcycle <- TRUE
       j.newcycle <- j
       nb.cycles <- nb.cycles+1
@@ -67,40 +81,35 @@ while (j<=nb.inspections) {
   }
   j<-j+1
 }
-  
-  
-  
-  
-  
-  
 
 
-
-plot(temps,x[1,],type="l")
-plot(temps,x[2,],type="l")
-
-
-
-
-
-df <- data.frame(temps,x,y)
-mygraph <- ggplot(df,aes(x = temps)) +  
-  geom_line(aes(y = y), color = "darkred") +
-  geom_line(aes(y = x), color="steelblue", linetype="twodash") +
-  geom_abline(slope = 0,intercept = L,color="blue") +
-  geom_abline(slope = 0,intercept = M,color="red")
+#df <- data.frame(temps,x,y)
+#mygraph <- ggplot(df,aes(x = temps)) +  
+#  geom_line(aes(y = y), color = "darkred") +
+#  geom_line(aes(y = x), color="steelblue", linetype="twodash") +
+#  geom_abline(slope = 0,intercept = L,color="blue") +
+#  geom_abline(slope = 0,intercept = M,color="red")
 
 
+temps.cycle<-c(0,tau*which(obs.av>M),tps.final)
+indice.temps.cycle <- c(1,tau/pas*(which(obs.av>M))+1,length(temps))
 
-plot(temps,x[1,],col="red",type="l",ylim = c(0,max(x[1,])),xlim = c(0,8))
+
+for (k in 1:nb.cycles){
+  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,2*M),xlim = c(0,tps.final),xlab="",ylab="")
+  par(new=T)
+}
+
+plot(temps,y,type="l",ylim=c(0,2*M),xlim = c(0,tps.final),ylab="",xlab="")
+
+
 par(new=T)
-plot(temps,x[2,],col="green",type="l",ylim = c(0,max(x[1,])),xlim = c(0,8))
-par(new=T)
-plot(temps,y,type="l",ylim=c(0,max(x[1,])),xlim = c(0,8))
-par(new=T)
-plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(x[1,])),type="p",xlim = c(0,8))
+plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,2*M),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
 abline(h=L,col="blue")
 abline(h=M,col="red")
+
+rbind(obs.av,obs.ap,rho.tire)
+
 
 #abline(v = tau*(1:nb.inspection))
 

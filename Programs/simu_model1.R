@@ -96,6 +96,7 @@ par(new=T)
 plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,2*M),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
 abline(h=L,col="blue")
 abline(h=M,col="red")
+abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 
 #abline(v = tau*(1:nb.inspection))
 

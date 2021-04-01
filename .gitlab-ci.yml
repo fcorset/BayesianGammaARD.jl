@@ -7,3 +7,15 @@ compile_pdf:
   artifacts:
     paths: 
       - main.pdf  # instruct GitLab to keep the main.pdf file
+
+pages:
+  stage: test
+  image: python:3.8.5-slim-buster
+  script:
+  - apt update && apt install -y -qq pandoc
+  - mkdir html ; mv article.pdf html
+  - pandoc docs/index.md -t html -o html/index.html
+  - mv html public/
+  artifacts:
+    paths:
+    - public

@@ -13,7 +13,7 @@ pages:
   image: python:3.8.5-slim-buster
   script:
   - apt update && apt install -y -qq pandoc
-  - mkdir html ; mv article.pdf html
+  - mkdir html ; mv main.pdf html
   - pandoc docs/index.md -t html -o html/index.html
   - mv html public/
   artifacts:

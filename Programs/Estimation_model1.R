@@ -14,7 +14,7 @@ tau <- 0.5 # intervalle inter-inspection
 rho <- 0.5 # parametre ARDinf
 L <- 3 # seuil pour MP
 M <- 4 # seuil pout MC
-tps.final <- 18 # fenêtre d'observation du processus
+tps.final <- 500 # fenêtre d'observation du processus
 
 # Simulation d'un processus gamma jusqu'au temps final
 pas <- 0.01 # pas de temps pour simuler le processus
@@ -90,30 +90,23 @@ while (j<=nb.inspections) {
 DeltaImperf <- ((L <= obs) & (obs < M))
 DeltaPerf <- (obs >= M)
 
-plot(temps,x[1,],type="l")
-plot(temps,x[2,],type="l")
+temps.cycle<-c(0,tau*which(obs>M),tps.final)
+indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
 
-df <- data.frame(temps,x,y)
-mygraph <- ggplot(df,aes(x = temps)) +  
-  geom_line(aes(y = y), color = "darkred") +
-  geom_line(aes(y = x), color="steelblue", linetype="twodash") +
-  geom_abline(slope = 0,intercept = L,color="blue") +
-  geom_abline(slope = 0,intercept = M,color="red")
 
-plot(temps,x[1,],col="red",type="l",ylim = c(0,max(x[1,])),xlim = c(0,8))
+for (k in 1:nb.cycles){
+  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,2*M),xlim = c(0,tps.final),xlab="",ylab="")
+  par(new=T)
+}
+
+plot(temps,y,type="l",ylim=c(0,2*M),xlim = c(0,tps.final),ylab="",xlab="")
+
+
 par(new=T)
-plot(temps,x[2,],col="green",type="l",ylim = c(0,max(x[1,])),xlim = c(0,8))
-par(new=T)
-plot(temps,y,type="l",ylim=c(0,max(x[1,])),xlim = c(0,8))
-par(new=T)
-clr <- rep(x = "black", length = nb.inspections)
-clr[DeltaImperf] <- "blue"
-clr[DeltaPerf] <- "red"
-plot(tau*(1:nb.inspections), numeric(length = nb.inspections), ylim=c(0,max(x[1,])),
-     type="p", xlim = c(0,8), col = clr)
+plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,2*M),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
 abline(h=L,col="blue")
 abline(h=M,col="red")
-
+abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 
 
 ##################
@@ -163,7 +156,7 @@ Log.Lik <- function(parms) {
   alpha <- parms[1]
   beta <- parms[2]
   b <- parms[3]
-  rho <- pnorm(parms[4])
+  rho <- parms[4]
   # Pseudo-observations
   AccrObs <- data.frame()
   for (i in 1:nb.cycles) {
@@ -172,7 +165,7 @@ Log.Lik <- function(parms) {
     tps2 <- Obs[[i]]$tps[2:nb]
     accr <- vector(mode = "numeric", length = nb-1)
     for (j in 2:nb) {
-      if (!Obs[[i]]$action[j]) {
+      if (!Obs[[i]]$action[j-1]) {
         accr[j-1] <- Obs[[i]]$obs[j] - Obs[[i]]$obs[j-1]
       } else {
         accr[j-1] <- Obs[[i]]$obs[j] - (1-rho)*Obs[[i]]$obs[j-1]
@@ -183,14 +176,14 @@ Log.Lik <- function(parms) {
   }
   # Computation of the likelihood
   nb.acc <- nrow(AccrObs)
-  res <- 0
+  res <- vector(mode = "numeric", length = nb.acc)
   for (i in 1:nb.acc) {
-    res = res + dgamma(x = AccrObs$accr[i], shape = alpha*AccrObs$tps2[i]^beta - alpha*AccrObs$tps1[i]^beta, scale = b, log = TRUE)
+    res[i] <- dgamma(x = AccrObs$accr[i], shape = alpha*AccrObs$tps2[i]^beta - alpha*AccrObs$tps1[i]^beta, scale = b, log = TRUE)
   }
-  return(-res)
+  return(-sum(res))
 }
 
-parms <- c(alpha, beta, b, 0)
-optim(par = parms, fn = Log.Lik, method = "SANN")
-optim(par = parms, fn = Log.Lik, method = "CG")
+parms <- c(alpha, beta, b, rho)
+# optim(par = parms, fn = Log.Lik, method = "SANN")
+# optim(par = parms, fn = Log.Lik, method = "L-BFGS-B", lower = rep(1e-1, 4), upper = c(2,2,2,1))
 

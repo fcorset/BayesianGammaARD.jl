@@ -1,18 +1,21 @@
 compile_pdf:
   stage: build
-  image: aergus/latex  # use a Docker image for LaTeX from https://hub.docker.com/
-  script: latexmk -pdf main.tex  # build the pdf just as you would on your computer
+  image: aergus/latex:latest  # use a Docker image for LaTeX from https://hub.docker.com/
+  script: 
+    - ls
+    - latexmk -pdf main.tex  # build the pdf just as you would on your computer
   artifacts:
     paths: 
       - main.pdf  # instruct GitLab to keep the main.pdf file
 
 pages:
-  stage: deploy
+  stage: test
+  image: python:3.8.5-slim-buster
   script:
-    - mkdir public  # create a folder called public
-    - cp main.pdf public  # copy the pdf file into the public folder
+  - apt update && apt install -y -qq pandoc
+  - mkdir html ; mv main.pdf html
+  - pandoc docs/index.md -t html -o html/index.html
+  - mv html public/
   artifacts:
-    paths: 
-      - public  # instruct GitLab to keep the public folder
-  only: 
-    - master  # deploy the pdf only for commits made to the master branch 
+    paths:
+    - public

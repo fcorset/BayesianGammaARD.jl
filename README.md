@@ -24,3 +24,8 @@ git push
 
 git pull
 
+# Pour commit sans faire les jobs (compiler le .tex)
+
+faire [skip CI] dans le commit
+
+# La page web créée est visible [ici](https://fcorset.gricad-pages.univ-grenoble-alpes.fr/degradation/)

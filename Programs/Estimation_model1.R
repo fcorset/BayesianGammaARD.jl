@@ -11,16 +11,16 @@ library(tidyverse)
 set.seed(123)
 
 tau <- 0.5 # intervalle inter-inspection
-rho <- 0.5 # parametre ARDinf
-L <- 3 # seuil pour MP
+rho <- 0.75 # parametre ARDinf
+L <- 2 # seuil pour MP
 M <- 4 # seuil pout MC
-tps.final <- 500 # fenêtre d'observation du processus
+tps.final <- 10 # fenêtre d'observation du processus
 
 # Simulation d'un processus gamma jusqu'au temps final
 pas <- 0.01 # pas de temps pour simuler le processus
 
 alpha <- 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta <- 1 # paramètre de forme  de Gamma
+beta <- 1.2 # paramètre de forme  de Gamma
 b <- 1   # paramètre d'échelle du Gamma
 temps <- seq(from = 0,to = tps.final,by = pas)
 
@@ -133,6 +133,10 @@ for (i in 1:nb.cycles) {
   Obs[[i]] <- data.frame(aux_tps, aux_obs, action)
   colnames(Obs[[i]]) <- c("tps", "obs", "action")
 }
+if (nrow(Obs[[nb.cycles]])==1) {
+  Obs <- Obs[-nb.cycles]
+  nb.cycles <- nb.cycles - 1
+}
 
 AccrObs <- data.frame()
 for (i in 1:nb.cycles) {
@@ -186,4 +190,15 @@ Log.Lik <- function(parms) {
 parms <- c(alpha, beta, b, rho)
 # optim(par = parms, fn = Log.Lik, method = "SANN")
 # optim(par = parms, fn = Log.Lik, method = "L-BFGS-B", lower = rep(1e-1, 4), upper = c(2,2,2,1))
+
+Eff <- NULL
+for (i in 1:nb.cycles) {
+  idx <- which(Obs[[i]]$action)
+  if (length(idx)>0) {
+    for (j in idx) {
+      Eff <- c(Eff, (Obs[[i]]$obs[j] - Obs[[i]]$obs[j+1])/Obs[[i]]$obs[j])
+    }    
+  }
+}
+rho.estimate <- max(Eff)
 

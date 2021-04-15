@@ -10,17 +10,17 @@ library(tidyverse)
 
 set.seed(123)
 
-tau <- 0.5 # intervalle inter-inspection
-rho <- 0.75 # parametre ARDinf
-L <- 2 # seuil pour MP
-M <- 4 # seuil pout MC
+tau <- 0.1 # intervalle inter-inspection
+rho <- 0.5 # parametre ARDinf
+L <- 1 # seuil pour MP
+M <- 3 # seuil pout MC
 tps.final <- 10 # fenêtre d'observation du processus
 
 # Simulation d'un processus gamma jusqu'au temps final
 pas <- 0.01 # pas de temps pour simuler le processus
 
-alpha <- 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta <- 1.2 # paramètre de forme  de Gamma
+alpha <- 0.8 # paramètre de forme de Gamma a = alpha (t)^beta
+beta <- 2 # paramètre de forme  de Gamma
 b <- 1   # paramètre d'échelle du Gamma
 temps <- seq(from = 0,to = tps.final,by = pas)
 
@@ -45,7 +45,7 @@ nb.cycles <- 1 # compteur de cycles
 x <- matrix(nrow=nb.inspections,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles
 x[nb.cycles,1] <- 0     # initialisation du processus Gamma = 0 à t=0
 for(i in 2:n){
-  x[nb.cycles,i] <- x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
+  x[nb.cycles,i] <- x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
 }
 y <- numeric(n) # processus Gamma maintenu
 y[1] <- 0
@@ -56,7 +56,7 @@ while (j<=nb.inspections) {
     # on resimule un x depuis 0
     x[nb.cycles,1]  <- 0     # initialisation du processus Gamma = 0 à t=0
     for(i in 2:n){
-      x[nb.cycles,i]  <- x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
+      x[nb.cycles,i]  <- x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
     }
     id.newcycle <- FALSE
   }
@@ -187,9 +187,6 @@ Log.Lik <- function(parms) {
   return(-sum(res))
 }
 
-parms <- c(alpha, beta, b, rho)
-# optim(par = parms, fn = Log.Lik, method = "SANN")
-# optim(par = parms, fn = Log.Lik, method = "L-BFGS-B", lower = rep(1e-1, 4), upper = c(2,2,2,1))
 
 Eff <- NULL
 for (i in 1:nb.cycles) {
@@ -200,5 +197,12 @@ for (i in 1:nb.cycles) {
     }    
   }
 }
-rho.estimate <- max(Eff)
+rho.guess <- max(0,max(Eff))
+
+parms <- c(alpha, beta, b, rho)
+parms <- c(alpha, 1, b, rho.guess)
+# optim(par = parms, fn = Log.Lik, method = "SANN")
+# optim(par = parms, fn = Log.Lik, method = "L-BFGS-B", lower = rep(1e-1, 4), upper = c(2,2,2,1))
+
+
 

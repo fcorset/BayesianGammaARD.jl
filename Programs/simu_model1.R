@@ -4,22 +4,20 @@
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
-tau = 0.5 # intervalle inter-inspection
+tau = 0.1 # intervalle inter-inspection
 rho = 0.5 # parametre ARDinf
-L=3 # seuil pour MP
-M=6 # seuil pout MC
-tps.final <-12 # fenêtre d'observation du processus
+L=1 # seuil pour MP
+M=3 # seuil pout MC
+tps.final <-10 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
+set.seed(123)
 # Simulation d'un processus gamma jusqu'au temps final
 pas = 0.01 # pas de temps pour simuler le processus
 
-
-
-
-alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1.5 # paramètre de forme  de Gamma
+alpha = .8 # paramètre de forme de Gamma a = alpha (t)^beta
+beta = 2 # paramètre de forme  de Gamma
 b=1   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
@@ -27,7 +25,7 @@ n=length(temps)
 
 nb.inspections<- floor(tps.final/tau) # nombre d'inspections max pendant la fenêtre d'observation.
 
-obs<-numeric(nb.inspections) # données observées (pendant les inspections)
+obs<-numeric(nb.inspections) # données observées (pendant les inspections, à t_j^-)
 
 j<-1 # indicateur prochaine inspection
 j.newcycle <- 0 # identifier le j où nouveau cycle
@@ -36,10 +34,13 @@ nb.cycles <- 1 # compteur de cycles
 x=matrix(nrow=nb.inspections,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles
 x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
 for(i in 2:n){
-  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
+  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
 }
 y=numeric(n) # processus Gamma maintenu
+y.tilde=numeric(n) # processus Gamma maintenu
+
 y[1]<-0
+y.tilde[1]<-0
 
 while (j<=nb.inspections) {
   # boucle sur un cycle de renouvellement
@@ -47,13 +48,13 @@ while (j<=nb.inspections) {
     # on resimule un x depuis 0
     x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
     for(i in 2:n){
-      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
+      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
     }
     id.newcycle <- FALSE
   }
   
-  y[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-j.newcycle-1)*tau/pas+2):((j-j.newcycle)*(tau/pas)+1)]- x[nb.cycles,(j-j.newcycle-1)*tau/pas+1]
-  
+  y.tilde[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-j.newcycle-1)*tau/pas+2):((j-j.newcycle)*(tau/pas)+1)]- x[nb.cycles,(j-j.newcycle-1)*tau/pas+1]
+
   obs[j]<-y[j*tau/pas+1] # état dégradation à l'inspection (t_j^-)
   
   if (obs[j] < L) {
@@ -85,15 +86,15 @@ indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
 
 
 for (k in 1:nb.cycles){
-  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,2*M),xlim = c(0,tps.final),xlab="",ylab="")
+  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
   par(new=T)
 }
 
-plot(temps,y,type="l",ylim=c(0,2*M),xlim = c(0,tps.final),ylab="",xlab="")
+plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
 
 
 par(new=T)
-plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,2*M),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
+plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
 abline(h=L,col="blue")
 abline(h=M,col="red")
 abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)

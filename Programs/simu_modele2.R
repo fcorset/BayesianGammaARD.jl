@@ -46,7 +46,7 @@ nb.cycles <- 1 # compteur de cycles
 x=matrix(nrow=nb.inspections,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles
 x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
 for(i in 2:n){
-  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
+  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
 }
 y=numeric(n) # processus Gamma maintenu
 y[1]<-0
@@ -57,7 +57,7 @@ while (j<=nb.inspections) {
     # on resimule un x depuis 0
     x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
     for(i in 2:n){
-      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta)-temps[i-1]^beta)
+      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
     }
     id.newcycle <- FALSE
   }

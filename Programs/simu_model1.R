@@ -16,8 +16,8 @@ set.seed(123)
 # Simulation d'un processus gamma jusqu'au temps final
 pas = 0.01 # pas de temps pour simuler le processus
 
-alpha = .8 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 2 # paramètre de forme  de Gamma
+alpha = 1.2 # paramètre de forme de Gamma a = alpha (t)^beta
+beta = 1 # paramètre de forme  de Gamma
 b=1   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
@@ -108,26 +108,26 @@ abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 
 # se donner une grille pour les abscisses
 
-K<- 20 # nb itérations de l'algo de point fixe
-grid_abs <- seq(0.01,8,0.01)
+K<- 100 # nb itérations de l'algo de point fixe
+grid_abs <- seq(0.01,10,0.01)
 nb_abs <- length(grid_abs)
 w<-matrix(nrow = K,ncol = nb_abs )
 
 pi<-list()
 pi[[1]]<-function(x) dexp(x)
 
-w[1,]<-pi[[1]](grid_abs)
+
 curve(pi[[1]](x), from = 0, to = max(grid_abs), lwd = 2)
 
 for(k in 2:K){
   for (j in 1:nb_abs){
     abs <- grid_abs[j]
     fn_aux1 <- function(x) {
-      res <- pi[[k-1]](x)*dgamma(abs-x,rate=beta,shape=alpha*tau)
+      res <- pi[[k-1]](x)*dgamma(abs-x,scale = b,shape=alpha*tau^beta)
       return(res)
     }
     fn_aux2 <- function(x) {
-      res <- pi[[k-1]](x)*dgamma(abs-(1-rho)*x,rate=beta,shape=alpha*tau)
+      res <- pi[[k-1]](x)*dgamma(abs-(1-rho)*x,scale=b,shape=alpha*tau^beta)
       return(res)
     }
     fn_aux3 <- function(x) {
@@ -135,8 +135,8 @@ for(k in 2:K){
       return(res)
     }
     w[k,j] <- integrate(f = fn_aux1, lower = 0, upper = min(L,abs))$value 
-    + integrate(f = fn_aux2, lower = L, upper = min(M,abs/(1-rho)))$value
-    + integrate(f = fn_aux3, lower = M, upper = 2*M)$value * dgamma(abs,rate=beta,shape=alpha*tau)
+    + integrate(f = fn_aux2, lower = min(y/(1-rho),L), upper = min(y/(1-rho),M))$value
+    + integrate(f = fn_aux3, lower = M, upper = Inf)$value * dgamma(abs,scale=b,shape=alpha*tau^beta)
   }
   aux <- w[k,]
   fn_w <- function(x) {
@@ -145,6 +145,7 @@ for(k in 2:K){
   }
   pi[[k]] <- fn_w
   curve(pi[[k]](x), from = 0, to = max(grid_abs), lwd = 2, add = TRUE, col = k)
+  print(paste("L'intégrale de la fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
 }
 
 

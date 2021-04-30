@@ -17,7 +17,7 @@ M <- 3 # seuil pout MC
 tps.final <- 10 # fenêtre d'observation du processus
 
 # Simulation d'un processus gamma jusqu'au temps final
-pas <- 0.001 # pas de temps pour simuler le processus
+pas <- 0.01 # pas de temps pour simuler le processus
 
 alpha <- 0.8 # paramètre de forme de Gamma a = alpha (t)^beta
 beta <- 2 # paramètre de forme  de Gamma
@@ -52,7 +52,7 @@ y.tilde=numeric(n) # processus Gamma maintenu
 
 y[1]<-0
 y.tilde[1]<-0
-
+ 
 while (j<=nb.inspections) {
   # boucle sur un cycle de renouvellement
   if (id.newcycle){

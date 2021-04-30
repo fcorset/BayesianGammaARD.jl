@@ -134,9 +134,16 @@ for(k in 2:K){
       res <- pi[[k-1]](x)
       return(res)
     }
-    w[k,j] <- integrate(f = fn_aux1, lower = 0, upper = min(L,abs))$value 
-    + integrate(f = fn_aux2, lower = min(y/(1-rho),L), upper = min(y/(1-rho),M))$value
-    + integrate(f = fn_aux3, lower = M, upper = Inf)$value * dgamma(abs,scale=b,shape=alpha*tau^beta)
+
+    # aux1 <- integrate(f = fn_aux1, lower = 0, upper = min(L,abs))$value 
+    U <- runif(n = 1e4, min = 0, max = min(L,abs))
+    aux1 <- mean(fn_aux1(U))
+    # aux2 <- integrate(f = fn_aux2, lower = min(y/(1-rho),L), upper = min(y/(1-rho),M))$value
+    U <- runif(n = 1e4, min = min(y/(1-rho),L), max = min(y/(1-rho),M))
+    aux2 <- mean(fn_aux2(U))
+    aux3 <- integrate(f = fn_aux3, lower = M, upper = Inf)$value * dgamma(abs,scale=b,shape=alpha*tau^beta)
+
+    w[k,j] <- aux1 + aux2 + aux3
   }
   aux <- w[k,]
   fn_w <- function(x) {
@@ -145,7 +152,7 @@ for(k in 2:K){
   }
   pi[[k]] <- fn_w
   curve(pi[[k]](x), from = 0, to = max(grid_abs), lwd = 2, add = TRUE, col = k)
-  print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
+  # print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
 }
 
 

@@ -10,7 +10,7 @@ library(tidyverse)
 
 set.seed(123)
 
-tau <- 0.1 # intervalle inter-inspection
+tau <- 0.5 # intervalle inter-inspection
 rho <- 0.5 # parametre ARDinf
 L <- 1 # seuil pour MP
 M <- 3 # seuil pout MC

@@ -135,7 +135,7 @@ for(k in 2:K){
       return(res)
     }
     w[k,j] <- integrate(f = fn_aux1, lower = 0, upper = min(L,abs))$value 
-    + integrate(f = fn_aux2, lower = min(y/(1-rho),L), upper = min(y/(1-rho),M))$value
+    + ifelse(min(abs/(1-rho),L)==min(abs/(1-rho),M),0,integrate(f = fn_aux2, lower = min(abs/(1-rho),L), upper = min(abs/(1-rho),M))$value)
     + integrate(f = fn_aux3, lower = M, upper = Inf)$value * dgamma(abs,scale=b,shape=alpha*tau^beta)
   }
   aux <- w[k,]

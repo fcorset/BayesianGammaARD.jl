@@ -205,7 +205,7 @@ $Y_{i\tau}^+=(\rho)^{I_{M \leq Y_i \tau< L}} Y_{i\tau}^-$
 
 
 \subsection{Stationary law of the Maintained System}
-Let consider the Markov renewal cycle $[\tau_{i-1}^-,\tau_i^-]$, $x$ and $y$ respectively the deterioration level of maintained system at the beginning and the end of the cycle, the stationary law, $\pi$ is the solution of :
+Let consider the Markov renewal cycle $[t_{i-1}^-,t_i^-]$, $x$ and $y$ respectively the deterioration level of maintained system at the beginning and the end of the cycle, the stationary law, $\pi$ is the solution of :
 \begin{equation}
     \pi(y) = \int_0^{+\infty} \pi(x) p(y|x)\,dx
 \end{equation}
@@ -215,7 +215,7 @@ where $p(y|x)$ is the transition law from the state $x$ to the state $y$. This t
 \end{equation}
 where $f$ is the density function of gamma distribution :
 $$
-f(x) = \dfrac{\beta^{\alpha (\tau_i^\beta - \tau_{i-1}^\beta )}}{\Gamma(\alpha (\tau_i^\beta - \tau_{i-1}^\beta ))}x^{\alpha (\tau_i^\beta - \tau_{i-1}^\beta )-1}e^{-b x}
+f(x) = \dfrac{\beta^{\alpha (t_i^\beta - t_{i-1}^\beta )}}{\Gamma(\alpha (t_i^\beta - t_{i-1}^\beta ))}x^{\alpha (t_i^\beta - t_{i-1}^\beta )-1}e^{-b x}
 $$
 
 Thus, we have

@@ -109,7 +109,7 @@ abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 # se donner une grille pour les abscisses
 
 K<- 20 # nb itérations de l'algo de point fixe
-grid_abs <- seq(0.01,10,0.001)
+grid_abs <- seq(0.01,10,0.01)
 nb_abs <- length(grid_abs)
 w<-matrix(nrow = K,ncol = nb_abs )
 

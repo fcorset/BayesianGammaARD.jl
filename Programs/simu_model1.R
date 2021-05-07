@@ -4,10 +4,10 @@
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
-tau = 0.1 # intervalle inter-inspection
+tau = 0.2 # intervalle inter-inspection
 rho = 0.5 # parametre ARDinf
-L=1 # seuil pour MP
-M=3 # seuil pout MC
+L=2 # seuil pour MP
+M=4 # seuil pout MC
 tps.final <-10 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
@@ -108,8 +108,8 @@ abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 
 # se donner une grille pour les abscisses
 
-K<- 100 # nb itérations de l'algo de point fixe
-grid_abs <- seq(0.01,10,0.01)
+K<- 20 # nb itérations de l'algo de point fixe
+grid_abs <- seq(0.01,10,0.001)
 nb_abs <- length(grid_abs)
 w<-matrix(nrow = K,ncol = nb_abs )
 
@@ -147,13 +147,6 @@ for(k in 2:K){
   curve(pi[[k]](x), from = 0, to = max(grid_abs), lwd = 2, add = TRUE, col = k)
   print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
 }
-
-
-
-
-
-# initialisation
-
 
 
 

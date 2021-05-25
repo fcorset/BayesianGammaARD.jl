@@ -131,14 +131,14 @@ ntrap <- function(abs,ord){
 
 
 # vecteur de l'état x
-level.x <- seq(0.01,M+1,0.01)
+level.x <- seq(0.01,M+2,0.01)
 n.level.x <-length(level.x)
 
 ind.L <- which( level.x == L)
 ind.M <- which( level.x == M)
 
 
-level.y <- seq(0.01,M+1,0.01)
+level.y <- seq(0.01,M+2,0.01)
 n.level.y <-length(level.y)
 
 mat.trans <- matrix(0,ncol=n.level.y,nrow = n.level.x)
@@ -149,7 +149,7 @@ for(i in 1:(n.level.x-1)){
   mat.trans.rho[i,(i+1):n.level.y]<-dgamma(level.y[(i+1):n.level.y]-(1-rho)*level.x[i],scale=b,shape = alpha*tau^beta)
 }
 
-K<-200
+K<-5
 w<-matrix(0,nrow=K,ncol=n.level.y)
 w[1,]<-dgamma(level.y,scale = b,shape=alpha*tau^beta)
 
@@ -174,13 +174,14 @@ for(k in 2:K){
   
   Q3 <- dgamma(level.y,scale=b,shape=alpha*tau^beta) * ntrap(level.x[(ind.M+1):n.level.y],w[(ind.M+1):n.level.y])
   
-  aux <- w[k,] <- Q1+Q2+Q3
+  aux <- w[k,] <- (Q1+Q2+Q3)/ntrap(level.x,Q1+Q2+Q3)
   fn_w <- function(x) {
     res <- splinefun(x = level.x, y = aux)(x)*((0 < x) & (x<=max(level.x)))
     return(res)
   }
   pi[[k]] <- fn_w
   curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k)
+  print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
 }
 
 

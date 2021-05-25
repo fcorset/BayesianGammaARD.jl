@@ -182,6 +182,7 @@ for(k in 2:K){
   pi[[k]] <- fn_w
   curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k)
   print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
+  scan()
 }
 
 

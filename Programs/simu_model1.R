@@ -6,8 +6,8 @@ library(ggplot2)
 library(tidyverse)
 tau = 0.5 # intervalle inter-inspection
 rho = 0.5 # parametre ARDinf
-L=1 # seuil pour MP
-M=2 # seuil pout MC
+L=2 # seuil pour MP
+M=4 # seuil pout MC
 tps.final <-10 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
@@ -18,7 +18,7 @@ pas = 0.01 # pas de temps pour simuler le processus
 
 alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
 beta = 1 # paramètre de forme  de Gamma
-b=1   # paramètre d'échelle du Gamma
+b=2   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
 n=length(temps)
@@ -149,14 +149,14 @@ for(i in 1:(n.level.x-1)){
   mat.trans.rho[i,(i+1):n.level.y]<-dgamma(level.y[(i+1):n.level.y]-(1-rho)*level.x[i],scale=b,shape = alpha*tau^beta)
 }
 
-K<-5
+K<-10
 w<-matrix(0,nrow=K,ncol=n.level.y)
 w[1,]<-dgamma(level.y,scale = b,shape=alpha*tau^beta)
 
 
 pi<-list()
 pi[[1]]<-function(x) dgamma(x,scale = b,shape=alpha*tau^beta)
-
+curve(pi[[1]](x), from = 0, to = max(level.x), lwd = 2, col = k)
 
 for(k in 2:K){
   

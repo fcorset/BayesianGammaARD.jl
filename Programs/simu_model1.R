@@ -181,8 +181,9 @@ for(k in 2:K){
   print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
   scan()
 }
-
-
+######################
+###   fin update   ###
+###################### 
 
 
 K<- 20 # nb itérations de l'algo de point fixe

@@ -149,7 +149,7 @@ for(i in 1:(n.level.x-1)){
   mat.trans.rho[i,(i+1):n.level.y]<-dgamma(level.y[(i+1):n.level.y]-(1-rho)*level.x[i],scale=b,shape = alpha*tau^beta)
 }
 
-K<-10
+K<-100
 w<-matrix(0,nrow=K,ncol=n.level.y)
 w[1,]<-dgamma(level.y,scale = b,shape=alpha*tau^beta)
 
@@ -161,17 +161,14 @@ curve(pi[[1]](x), from = 0, to = max(level.x), lwd = 2, col = k)
 for(k in 2:K){
   
   # Contribution à la première intégrale :
-  # Remplacer pi par la valeur ancienne de la loi stationnaire
-  
+
   Q1 <- ntrap(level.x[1:ind.L],t(mat.trans[1:ind.L,]) * matrix(rep(w[k-1,1:ind.L],n.level.y),byrow = T,ncol = ind.L)) 
   # Contribution à la deuxième intégrale :
-  # Remplacer pi par la valeur ancienne de la loi stationnaire
-  
+
   Q2 <- ntrap(level.x[(ind.L+1):ind.M],t(mat.trans.rho[(ind.L+1):ind.M,]) *matrix(rep(w[k-1,(ind.L+1):ind.M],n.level.y),byrow = T,ncol = ind.M-ind.L) )
   
   # Contribution à la troisième intégrale :
-  # Remplacer pi par la valeur ancienne de la loi stationnaire
-  
+
   Q3 <- dgamma(level.y,scale=b,shape=alpha*tau^beta) * ntrap(level.x[(ind.M+1):n.level.y],w[(ind.M+1):n.level.y])
   
   aux <- w[k,] <- (Q1+Q2+Q3)/ntrap(level.x,Q1+Q2+Q3)

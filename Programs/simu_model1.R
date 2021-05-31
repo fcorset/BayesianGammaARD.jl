@@ -4,11 +4,11 @@
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
-tau = 0.5 # intervalle inter-inspection
-rho = 0.5 # parametre ARDinf
-L=2 # seuil pour MP
+tau = .5 # intervalle inter-inspection
+rho = 0.2 # parametre ARDinf
+L=3 # seuil pour MP
 M=4 # seuil pout MC
-tps.final <-10 # fenêtre d'observation du processus
+tps.final <-100 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -18,7 +18,7 @@ pas = 0.01 # pas de temps pour simuler le processus
 
 alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
 beta = 1 # paramètre de forme  de Gamma
-b=2   # paramètre d'échelle du Gamma
+b=1   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
 n=length(temps)
@@ -115,8 +115,12 @@ ntrap <- function(abs,ord){
   # Cette fonction renvoie un vecteur de taille nc (pour différentes valeurs de y)
   # abscisse abs : vecteur de taille nl
   # ordonnée ord : matrice de taille nc*nl
+  # (abs_i+1-abs_i)*(f(abs_i,ord)+f(abs_i,ord)/2
+  # (matrix(1,ncol=1,nrow=nc)%*%diff(abs)) = (x_2-x_1 x_3-x_2 ...
+  #                                           x_2-x_1 x_3-x_2 ...)
+  
   nl<- length(abs)
-  if (is.matrix(ord) == T){
+  if (is.matrix(ord)){
     nc <- nrow(ord)
     res <- rowSums((matrix(1,ncol=1,nrow=nc)%*%diff(abs))*(ord[,-ncol(ord)]+ord[,-1])/2)
     } else {
@@ -149,7 +153,7 @@ for(i in 1:(n.level.x-1)){
   mat.trans.rho[i,(i+1):n.level.y]<-dgamma(level.y[(i+1):n.level.y]-(1-rho)*level.x[i],scale=b,shape = alpha*tau^beta)
 }
 
-K<-100
+K<-1000
 w<-matrix(0,nrow=K,ncol=n.level.y)
 w[1,]<-dgamma(level.y,scale = b,shape=alpha*tau^beta)
 
@@ -169,7 +173,7 @@ for(k in 2:K){
   
   # Contribution à la troisième intégrale :
 
-  Q3 <- dgamma(level.y,scale=b,shape=alpha*tau^beta) * ntrap(level.x[(ind.M+1):n.level.y],w[(ind.M+1):n.level.y])
+  Q3 <- dgamma(level.y,scale=b,shape=alpha*tau^beta) * ntrap(level.x[(ind.M+1):n.level.y],w[k-1,(ind.M+1):n.level.y])
   
   aux <- w[k,] <- (Q1+Q2+Q3)/ntrap(level.x,Q1+Q2+Q3)
   fn_w <- function(x) {
@@ -179,7 +183,7 @@ for(k in 2:K){
   pi[[k]] <- fn_w
   curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k)
   print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
-  scan()
+#  scan()
 }
 ######################
 ###   fin update   ###

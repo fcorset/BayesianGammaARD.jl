@@ -167,31 +167,32 @@ Y_{(i+1)\tau} & = Y_{i\tau} + (1-\rho)^{U_{i+1}}(X_{(i+1)\tau}^{(i+1)}-X_{i\tau}
 
 \subsection{Maintenance Optimization}
 Let $C_I$, $C_P$ anc $C_C$ denote respectively the cost of an Inspection, a Preventive Maintenance and a Corrective Maintenance.
-As the corrective maintenances are perfect (replacement), we can compute the total cost on a renewal cycle $[0,T]$:
-$$
-C(T) = C_C + [T/\tau] C_I + N_p C_p  = C_C + [T/\tau] C_I + \sum_{i=1}^ {T/\tau} {\mathds 1}_{L \leq Y_{i \tau}< M}  C_p.
-$$
-The length of a cycle is 
+The maintenance cost at time $t$ is given as follows:
+$$C(t)=C_I [\frac{t}{\tau}] +C_P \sum_{i=1}^{[t/\tau]}{\mathds 1}_{L\leq Y_{i\tau^-}< M}+ C_C \sum_{i=1}^{[t/\tau]}{\mathds 1}_{ Y_{i\tau^-}\geq M}$$
+As the corrective maintenances are perfect (replacement), by the renewal theory we can compute the long run average maintenance cost as follows:
+\begin{align}\label{eq-Ct-ECT}
+\frac{C(t)}{t}&=\frac{{\mathds E}(C(T))}{{\mathds E}(T)}=\frac{ {\mathds E}(C_C + [T/\tau] C_I + \sum_{i=1}^ {T/\tau} {\mathds 1}_{L \leq Y_{i \tau^-}< M}  C_p)
+}{{\mathds E}(T)}\nonumber\\
+&\frac{C_c+ {\mathds E}([T/\tau]) C_i+ \sum_{i=1}^ {T/\tau} {\mathds P}({M \leq Y_{i \tau}< L}) C_P}{{\mathds E}(T)}
+\end{align}
+where $T$ is the length of a renewal cycle which means the period between two corrective maintenance:
 $$
 T = \inf \{t>0,\,Y_t\geq M\}
 $$
-
-
-
 and the expectation of the length of a renewal cycle is:
-$$
-E(T)=\int P(Y_t>M) dt
-$$
+\begin{equation}\label{eq-ET}
+{\mathds E}(T)=\int {\mathds P}(Y_t>M) dt
+\end{equation}
 
+However, the due to presence of imperfect maintenance actions, deriving the probabilities in equations (\ref{eq-Ct-ECT}) and (\ref{eq-ET}) is not an easy task. To bypass this problem, the markovian renewal property of the mainetianed degradation process between two inspection is used to calculate the long run average maintenance cost as follows:
 
+\begin{align}\label{eq-Ct-Epi}
+\frac{C(t)}{t}&=\frac{{\mathds E}_{pi}(C(T))}{{\mathds E}_{pi}(T)}=\frac{ C_I +  C_p{\mathds P}_{pi}(L \leq Y_{ \tau^-}< M) +C_C {\mathds P}_{pi}( Y_{ \tau^-}\geq M)
+}{{\mathds E}_{pi}(\tau)}\nonumber\\
+&\frac{ C_I +  C_p{\mathds P}_{pi}(L \leq Y_{ \tau^-}< M) +C_C {\mathds P}_{pi}( Y_{ \tau^-}\geq M)}{\tau}
+\end{align}
+where ${\mathds E}_{pi}$ and and {\mathds P}_{pi} are the expectation and the probability under the steady-stae distribution $\pi$ respectively.
 
-$E(C(T))/E(T)$
-
-$$
-E(C(T)=C_c+ E[T/\tau] C_i+ E\sum_{i=1}^ {T/\tau} P({M \leq Y_{i \tau}< L}) C_P
-$$
-
-$E(T)=\int P(Y_t>L) dt$
 
 $F_T(t)= P$
 $T=\inf\{t>0, Y_t>L\}$

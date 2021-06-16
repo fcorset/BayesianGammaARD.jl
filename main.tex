@@ -187,9 +187,9 @@ and the expectation of the length of a renewal cycle is:
 However, the due to presence of imperfect maintenance actions, deriving the probabilities in equations (\ref{eq-Ct-ECT}) and (\ref{eq-ET}) is not an easy task. To bypass this problem, the markovian renewal property of the mainetianed degradation process between two inspection is used to calculate the long run average maintenance cost as follows:
 
 \begin{align}\label{eq-Ct-Epi}
-\lim_{t\to\infty}\frac{C(t)}{t}&=\frac{{\mathds E}_{\pi}(C(T))}{{\mathds E}_{\pi}(T)}=\frac{ C_I +  C_p{\mathds P}_{\pi}(L \leq Y_{ \tau^-}< M) +C_C {\mathds P}_{\pi}( Y_{ \tau^-}\geq M)
-}{{\mathds E}_{pi}(\tau)}\nonumber\\
-&\frac{ C_I +  C_p{\mathds P}_{\pi}(L \leq Y_{ \tau^-}< M) +C_C {\mathds P}_{\pi}( Y_{ \tau^-}\geq M)}{\tau}
+\lim_{t\to\infty}\frac{C(t)}{t}&=\frac{{\mathds E}_{\pi}(C(\tau))}{{\mathds E}_{\pi}(\tau)}=\frac{ C_I +  C_p{\mathds P}_{\pi}(L \leq Y_{ \tau^-}< M) +C_C {\mathds P}_{\pi}( Y_{ \tau^-}\geq M)
+}{{\mathds E}_{\pi}(\tau)}\nonumber\\
+ & = \frac{ C_I +  C_p{\mathds P}_{\pi}(L \leq Y_{ \tau^-}< M) +C_C {\mathds P}_{\pi}( Y_{ \tau^-}\geq M)}{\tau}
 \end{align}
 where ${\mathds E}_{\pi}$ and ${\mathds P}_{\pi}$  are the expectation and the probability under the steady-state distribution $\pi$ respectively.
 

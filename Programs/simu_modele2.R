@@ -7,7 +7,7 @@ rm(list=ls())
 library(ggplot2)
 library(tidyverse)
 tau = 0.5 # intervalle inter-inspection
-#rho = 0.5 # parametre ARDinf
+rho = 0 # parametre ARDinf
 mean.rho <- 0.5
 var.rho <- 0.05
 a.rho <- (1-mean.rho)*mean.rho^2/var.rho-mean.rho
@@ -160,7 +160,14 @@ for(k in 2:K){
   curve(pi[[k]](x), from = 0, to = max(grid_abs), lwd = 2, add = TRUE, col = k)
 }
 
+# 1ere intégrale \int_0^L \int_L^M f(y-x) pi(dx)
 
+
+f2<- function(y) {
+  res <- integrate(f=function(x) {dgamma(y-x,rate=beta,shape=alpha*tau)} *pi[[K]](x),0,L)
+}
+
+integrate(f2,L,M)
 
 
 

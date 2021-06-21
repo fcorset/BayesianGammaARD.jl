@@ -153,7 +153,7 @@ for(i in 1:(n.level.x-1)){
   mat.trans.rho[i,(i+1):n.level.y]<-dgamma(level.y[(i+1):n.level.y]-(1-rho)*level.x[i],scale=b,shape = alpha*tau^beta)
 }
 
-K<-1000
+K<-100
 w<-matrix(0,nrow=K,ncol=n.level.y)
 w[1,]<-dgamma(level.y,scale = b,shape=alpha*tau^beta)
 
@@ -188,6 +188,30 @@ for(k in 2:K){
 ######################
 ###   fin update   ###
 ###################### 
+
+
+# 1ere intégrale \int_0^L \int_L^M f(y-x) pi(dx)
+
+PI <- Vectorize(function(u) integrate(pi[[k]],0,u)$value)
+
+# Tirer selon loi stationnaire :
+
+# Tirer un u selon U[0,1]
+samplePi <- function(n) replicate(n,uniroot(function(u) PI(u) - runif(1),c(0,M))$root)
+
+yPi <- runif(10000,L,M)
+xPi <- runif(10000,0,L)
+
+mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M-L)*L
+
+yPi <- runif(10000,0,M)
+1-mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M)*L
+
+
+
+
+
+
 
 
 K<- 20 # nb itérations de l'algo de point fixe

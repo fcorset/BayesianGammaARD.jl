@@ -181,7 +181,7 @@ for(k in 2:K){
     return(res)
   }
   pi[[k]] <- fn_w
-  curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k)
+  curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k,ylab = "w_k")
   print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
 #  scan()
 }
@@ -192,26 +192,24 @@ for(k in 2:K){
 
 # 1ere intégrale \int_0^L \int_L^M f(y-x) pi(dx)
 
-PI <- Vectorize(function(u) integrate(pi[[k]],0,u)$value)
+PI <- Vectorize(function(u) integrate(pi[[K]],0,u)$value)
 
 # Tirer selon loi stationnaire :
 
 # Tirer un u selon U[0,1]
-samplePi <- function(n) replicate(n,uniroot(function(u) PI(u) - runif(1),c(0,M))$root)
+#samplePi <- function(n) replicate(n,uniroot(function(u) PI(u) - runif(1),c(0,100))$root)
+# Ne semble pas fonctionner quand on compare l'histo avec la densité ! 23/06/2021.
 
-yPi <- runif(10000,L,M)
-xPi <- runif(10000,0,L)
+
+yPi <- runif(100000,L,M)
+xPi <- runif(100000,0,L)
 
 mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M-L)*L
 
-yPi <- runif(10000,0,M)
+yPi <- runif(100000,0,M)
 1-mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M)*L
 
-
-
-
-
-
+# Peut-être choisir une méthode plus efficace... car tous les x>y ne contribuent pas à l'intégrale
 
 
 K<- 20 # nb itérations de l'algo de point fixe

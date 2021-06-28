@@ -12,7 +12,7 @@ tps.final <-100 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
-set.seed(123)
+#set.seed(123)
 # Simulation d'un processus gamma jusqu'au temps final
 pas = 0.01 # pas de temps pour simuler le processus
 

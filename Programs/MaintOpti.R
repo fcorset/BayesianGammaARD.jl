@@ -136,14 +136,14 @@ MaintOpti <- function(tau,L=1){
   
   
   # vecteur de l'état x
-  level.x <- seq(0.01,max(y.tilde),0.01)
+  level.x <- seq(0.01,2*M,0.01)
   n.level.x <-length(level.x)
   
   ind.L <- which( level.x == L)
   ind.M <- which( level.x == M)
   
   
-  level.y <- seq(0.01,max(y.tilde),0.01)
+  level.y <- seq(0.01,2*M,0.01)
   n.level.y <-length(level.y)
   
   mat.trans <- matrix(0,ncol=n.level.y,nrow = n.level.x)
@@ -154,7 +154,7 @@ MaintOpti <- function(tau,L=1){
     mat.trans.rho[i,(i+1):n.level.y]<-dgamma(level.y[(i+1):n.level.y]-(1-rho)*level.x[i],scale=b,shape = alpha*tau^beta)
   }
   
-  K<-100
+  K<-200
   w<-matrix(0,nrow=K,ncol=n.level.y)
   w[1,]<-dgamma(level.y,scale = b,shape=alpha*tau^beta)
   

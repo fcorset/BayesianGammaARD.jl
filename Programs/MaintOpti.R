@@ -8,9 +8,10 @@ C_I <- 5
 C_P <- 50
 C_C <- 100
 
-MaintOpti <- function(tau,L=3){
-  rho = 0.2 # parametre ARDinf
-  M=5 # seuil pout MC
+MaintOpti <- function(tau,L=1){
+  set.seed(123)
+  rho = 0.8 # parametre ARDinf
+  M=10 # seuil pout MC
   tps.final <-100 # fenêtre d'observation du processus
   id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
   
@@ -160,7 +161,7 @@ MaintOpti <- function(tau,L=3){
   
   pi<-list()
   pi[[1]]<-function(x) dgamma(x,scale = b,shape=alpha*tau^beta)
-  #curve(pi[[1]](x), from = 0, to = max(level.x), lwd = 2, col = k)
+  curve(pi[[1]](x), from = 0, to = max(level.x), lwd = 2, col = k)
   
   for(k in 2:K){
     
@@ -169,11 +170,21 @@ MaintOpti <- function(tau,L=3){
     Q1 <- ntrap(level.x[1:ind.L],t(mat.trans[1:ind.L,]) * matrix(rep(w[k-1,1:ind.L],n.level.y),byrow = T,ncol = ind.L)) 
     # Contribution à la deuxième intégrale :
     
-    Q2 <- ntrap(level.x[(ind.L+1):ind.M],t(mat.trans.rho[(ind.L+1):ind.M,]) *matrix(rep(w[k-1,(ind.L+1):ind.M],n.level.y),byrow = T,ncol = ind.M-ind.L) )
+    if(length(ind.M) == 0){
+      Q2 <- ntrap(level.x[(ind.L+1):length(level.x)],t(mat.trans.rho[(ind.L+1):length(level.x),]) *matrix(rep(w[k-1,(ind.L+1):length(level.x)],n.level.y),byrow = T,ncol = length(level.x)-ind.L) )
+    } else {
+      Q2 <- ntrap(level.x[(ind.L+1):ind.M],t(mat.trans.rho[(ind.L+1):ind.M,]) *matrix(rep(w[k-1,(ind.L+1):ind.M],n.level.y),byrow = T,ncol = ind.M-ind.L) )
+    }
+    
     
     # Contribution à la troisième intégrale :
+    if(length(ind.M) == 0){
+      Q3 <- 0
+    } else {
+      Q3 <- dgamma(level.y,scale=b,shape=alpha*tau^beta) * ntrap(level.x[(ind.M+1):n.level.y],w[k-1,(ind.M+1):n.level.y])
+    }
     
-    Q3 <- dgamma(level.y,scale=b,shape=alpha*tau^beta) * ntrap(level.x[(ind.M+1):n.level.y],w[k-1,(ind.M+1):n.level.y])
+    
     
     aux <- w[k,] <- (Q1+Q2+Q3)/ntrap(level.x,Q1+Q2+Q3)
     fn_w <- function(x) {
@@ -181,13 +192,17 @@ MaintOpti <- function(tau,L=3){
       return(res)
     }
     pi[[k]] <- fn_w
-    #curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k,ylab = "w_k")
-    #print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
+    if(k%%10 == 0){
+      curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k,ylab = "w_k")
+    }
+    
+    print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
     #  scan()
   }
   ######################
   ###   fin update   ###
   ###################### 
+  curve(pi[[K]](x), from = 0, to = max(level.x), add=T,lwd = 2, col = K)
   
   
   # 1ere intégrale \int_0^L \int_L^M f(y-x) pi(dx)
@@ -228,23 +243,35 @@ MaintOpti <- function(tau,L=3){
   yPi <- runif(100000,L,M)
   xPi <- runif(100000,0,M)
   
-  int.1 <- mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M-L)*M
+  int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
   print(paste("la proba que Y soit entre L et M vaut ",int.1))
-  xPi <- runif(100000,0,L)
+  xPi <- rexp(100000,1)
   yPi <- runif(100000,0,M)
-  int.2 <- 1-mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M)*L
+  int.2 <- 1-mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)/dexp(xPi))*(M)
   print(paste("la proba que Y soit plus grand que M vaut ",int.2))
   
   res <- (C_I+C_P*int.1+C_C*int.2)/tau
   return(res)
 }
 
-seq.tau<-seq(from = 0.2,to = 8,by = 0.2)
-cout.tau <-numeric(length(seq.tau))
+#seq.tau<-seq(from = 0.1,to = 1,by = 0.01)
+#cout.tau <-numeric(length(seq.tau))
+cout.tau<-MaintOpti(0.2)
 
-for(ii in 1:length(seq.tau)){
-  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii])
-}
 
-plot(seq.tau,cout.tau)
+#for(ii in 1:length(seq.tau)){
+#  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii])
+#}
+
+#plot(seq.tau,cout.tau)
+
+
+#seq.L<-seq(from = 0.5,to = 3.5,by = 0.1)
+#cout.L <-numeric(length(seq.L))
+
+#for(ii in 1:length(seq.L)){
+#  cout.L[ii] <- MaintOpti(tau = 0.5,L=seq.L[ii])
+#}
+
+#plot(seq.L,cout.L)
 

@@ -4,10 +4,10 @@
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
-tau = .5 # intervalle inter-inspection
+tau = 1 # intervalle inter-inspection
 rho = 0.2 # parametre ARDinf
-L=3 # seuil pour MP
-M=4 # seuil pout MC
+L=5 # seuil pour MP
+M=10 # seuil pout MC
 tps.final <-100 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
@@ -220,7 +220,7 @@ samplePi.aux <- function() {
 
 ech<-replicate(10000,samplePi.aux())
 yPi <- runif(10000,L,M)
-mean(dgamma(yPi-ech,rate=beta,shape=alpha*tau)*(M-L))*PI(M)
+mean(dgamma(yPi-ech,scale=b,shape=alpha*tau^beta)*(M-L))*PI(M)
   
   
   # Ne semble pas fonctionner quand on compare l'histo avec la densité ! 23/06/2021.
@@ -228,14 +228,14 @@ mean(dgamma(yPi-ech,rate=beta,shape=alpha*tau)*(M-L))*PI(M)
 yPi <- runif(100000,L,M)
 xPi <- runif(100000,0,M)
 
-mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M-L)*M
+mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
 
 
 
 
 xPi <- runif(100000,0,L)
 yPi <- runif(100000,0,M)
-1-mean(dgamma(yPi-xPi,rate=beta,shape=alpha*tau)*pi[[K]](xPi))*(M)*L
+1-mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M)*L
 
 # Peut-être choisir une méthode plus efficace... car tous les x>y ne contribuent pas à l'intégrale
 

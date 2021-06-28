@@ -231,7 +231,7 @@ xPi <- runif(100000,0,M)
 mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
 
 
-
+# A re
 
 xPi <- runif(100000,0,L)
 yPi <- runif(100000,0,M)

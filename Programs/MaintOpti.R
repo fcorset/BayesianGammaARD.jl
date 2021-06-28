@@ -11,7 +11,7 @@ C_C <- 100
 MaintOpti <- function(tau,L=1){
   set.seed(123)
   rho = 0.8 # parametre ARDinf
-  M=10 # seuil pout MC
+  M=5 # seuil pout MC
   tps.final <-100 # fenêtre d'observation du processus
   id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
   

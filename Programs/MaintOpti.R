@@ -5,7 +5,7 @@ library(tidyverse)
 
 # Définition des coûts d'inspections et  de maintenances.
 C_I <- 5
-C_P <- 50
+C_P <- 20
 C_C <- 100
 
 MaintOpti <- function(tau,L=1,col){
@@ -139,7 +139,7 @@ MaintOpti <- function(tau,L=1,col){
   level.x <- seq(0.01,2*M,0.01)
   n.level.x <-length(level.x)
   
-  ind.L <- which( level.x == L)
+  ind.L <- which( level.x >= L)[1]
   ind.M <- which( level.x == M)
   
   
@@ -255,25 +255,25 @@ MaintOpti <- function(tau,L=1,col){
 }
 
 #seq.tau<-seq(from = 0.1,to = 5,by = 0.05)
-seq.tau<-c(0.5,2,5)
+#seq.tau<-c(0.5,2,5)
 
-cout.tau <-numeric(length(seq.tau))
+#cout.tau <-numeric(length(seq.tau))
 #cout.tau<-MaintOpti(0.2)
 
 
-for(ii in 1:length(seq.tau)){
-  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii],col=ii)
-}
-
-plot(seq.tau,cout.tau)
-
-
-#seq.L<-seq(from = 0.5,to = 3.5,by = 0.1)
-#cout.L <-numeric(length(seq.L))
-
-#for(ii in 1:length(seq.L)){
-#  cout.L[ii] <- MaintOpti(tau = 0.5,L=seq.L[ii])
+#for(ii in 1:length(seq.tau)){
+#  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii],col=ii)
 #}
 
-#plot(seq.L,cout.L)
+#plot(seq.tau,cout.tau)
+
+
+seq.L<-seq(from = 0.1,to = 4.5,by = 0.1)
+cout.L <-numeric(length(seq.L))
+
+for(ii in 1:length(seq.L)){
+  cout.L[ii] <- MaintOpti(tau = 0.5,L=seq.L[ii],col=ii)
+}
+
+plot(seq.L,cout.L)
 

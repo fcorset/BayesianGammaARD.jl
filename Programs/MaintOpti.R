@@ -154,7 +154,7 @@ MaintOpti <- function(tau,L=1){
     mat.trans.rho[i,(i+1):n.level.y]<-dgamma(level.y[(i+1):n.level.y]-(1-rho)*level.x[i],scale=b,shape = alpha*tau^beta)
   }
   
-  K<-200
+  K<-50
   w<-matrix(0,nrow=K,ncol=n.level.y)
   w[1,]<-dgamma(level.y,scale = b,shape=alpha*tau^beta)
   
@@ -196,7 +196,7 @@ MaintOpti <- function(tau,L=1){
       curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k,ylab = "w_k")
     }
     
-    print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
+    #print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
     #  scan()
   }
   ######################
@@ -254,16 +254,16 @@ MaintOpti <- function(tau,L=1){
   return(res)
 }
 
-#seq.tau<-seq(from = 0.1,to = 1,by = 0.01)
-#cout.tau <-numeric(length(seq.tau))
-cout.tau<-MaintOpti(0.2)
+seq.tau<-seq(from = 0.1,to = 1,by = 0.05)
+cout.tau <-numeric(length(seq.tau))
+#cout.tau<-MaintOpti(0.2)
 
 
-#for(ii in 1:length(seq.tau)){
-#  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii])
-#}
+for(ii in 1:length(seq.tau)){
+  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii])
+}
 
-#plot(seq.tau,cout.tau)
+plot(seq.tau,cout.tau)
 
 
 #seq.L<-seq(from = 0.5,to = 3.5,by = 0.1)

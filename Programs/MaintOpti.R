@@ -5,12 +5,12 @@ library(tidyverse)
 
 # Définition des coûts d'inspections et  de maintenances.
 C_I <- 5
-C_P <- 20
+C_P <- 10
 C_C <- 100
 
 MaintOpti <- function(tau,L=1,col){
   set.seed(123)
-  rho = 0.8 # parametre ARDinf
+  rho = 0.5 # parametre ARDinf
   M=5 # seuil pour MC et renouvellement
   tps.final <-100 # fenêtre d'observation du processus
   id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement

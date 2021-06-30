@@ -8,7 +8,7 @@ C_I <- 5
 C_P <- 50
 C_C <- 100
 
-MaintOpti <- function(tau,L=1){
+MaintOpti <- function(tau,L=1,col){
   set.seed(123)
   rho = 0.8 # parametre ARDinf
   M=5 # seuil pour MC et renouvellement
@@ -88,19 +88,19 @@ MaintOpti <- function(tau,L=1){
   indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
   
   
-  for (k in 1:nb.cycles){
-    plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
-    par(new=T)
-  }
+#  for (k in 1:nb.cycles){
+#    plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
+#    par(new=T)
+#  }
   
-  plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
+  #plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
   
   
-  par(new=T)
-  plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
-  abline(h=L,col="blue")
-  abline(h=M,col="red")
-  abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
+  #par(new=T)
+  #plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
+  #abline(h=L,col="blue")
+  #abline(h=M,col="red")
+  #abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
   
   #abline(v = tau*(1:nb.inspection))
   #####################################
@@ -161,7 +161,7 @@ MaintOpti <- function(tau,L=1){
   
   pi<-list()
   pi[[1]]<-function(x) dgamma(x,scale = b,shape=alpha*tau^beta)
-  curve(pi[[1]](x), from = 0, to = max(level.x), lwd = 2, col = k)
+ # curve(pi[[1]](x), from = 0, to = max(level.x), lwd = 2, col = k)
   
   for(k in 2:K){
     
@@ -193,7 +193,7 @@ MaintOpti <- function(tau,L=1){
     }
     pi[[k]] <- fn_w
     if(k%%10 == 0){
-      curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k,ylab = "w_k")
+#      curve(pi[[k]](x), from = 0, to = max(level.x), lwd = 2, add = TRUE, col = k,ylab = "w_k")
     }
     
     #print(paste("L'intégrale de la", k,"-ième fonction vaut",integrate(fn_w,0,Inf)$value,sep=" "))
@@ -202,7 +202,7 @@ MaintOpti <- function(tau,L=1){
   ######################
   ###   fin update   ###
   ###################### 
-  curve(pi[[K]](x), from = 0, to = max(level.x), add=T,lwd = 2, col = K)
+  curve(pi[[K]](x), from = 0, to = max(level.x), add=T,lwd = 2, col = col,ylab = "Stationary Law")
   
   
   # 1ere intégrale \int_0^L \int_L^M f(y-x) pi(dx)
@@ -254,13 +254,15 @@ MaintOpti <- function(tau,L=1){
   return(res)
 }
 
-seq.tau<-seq(from = 0.1,to = 1,by = 0.05)
+#seq.tau<-seq(from = 0.1,to = 5,by = 0.05)
+seq.tau<-c(0.5,2,5)
+
 cout.tau <-numeric(length(seq.tau))
 #cout.tau<-MaintOpti(0.2)
 
 
 for(ii in 1:length(seq.tau)){
-  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii])
+  cout.tau[ii] <- MaintOpti(tau = seq.tau[ii],col=ii)
 }
 
 plot(seq.tau,cout.tau)

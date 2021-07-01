@@ -4,9 +4,11 @@ compile_pdf:
   script: 
     - ls
     - latexmk -pdf main.tex  # build the pdf just as you would on your computer !
+    - latexmk -pdf ./MIMAR2021/presentation-mimar-2021.tex
   artifacts:
     paths: 
       - main.pdf  # instruct GitLab to keep the main.pdf file !
+      - ./MIMAR2021/presentation-mimar-2021.pdf
 
 pages:
   stage: test

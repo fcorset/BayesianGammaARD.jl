@@ -10,7 +10,7 @@ compile_pdf:
   artifacts:
     paths: 
       - main.pdf  # instruct GitLab to keep the main.pdf file !
-      - ./MIMAR2021/presentation-mimar-2021.pdf
+      - presentation-mimar-2021.pdf
 
 pages:
   stage: test

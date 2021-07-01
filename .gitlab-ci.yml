@@ -15,7 +15,7 @@ pages:
   image: python:3.8.5-slim-buster
   script:
   - apt update && apt install -y -qq pandoc
-  - mkdir html ; mv main.pdf html
+  - mkdir html ; mv main.pdf html ; mv ./presentation-mimar-2021.pdf html
   - pandoc docs/index.md -t html -o html/index.html
   - mv html public/
   artifacts:

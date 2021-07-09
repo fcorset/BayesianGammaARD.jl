@@ -282,9 +282,12 @@ for(ii in 1:length(seq.L)){
 
 plot(seq.L, cout.L, type = "l")
 
-cout.L.smooth <- loess(cout.L~seq.L,span=0.3)
+cout.L.smooth <- loess(cout.L~seq.L,span=0.8)
 
 xfit <- seq(from=min(seq.L),to=max(seq.L),by = 0.01)
 yfit1 <- predict(cout.L.smooth,newdata=xfit)
 plot(x = xfit, y = yfit1, col = "red", type = "l", lwd = 3)
+idx <- which.min(yfit1)
+cat("Coût optimal : ", yfit1[idx], "\n")
+cat("L optimal : ", xfit[idx], "\n")
 

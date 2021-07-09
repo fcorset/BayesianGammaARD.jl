@@ -9,7 +9,6 @@ C_P <- 10
 C_C <- 100
 
 MaintOpti <- function(tau,L=1,col){
-  set.seed(123)
   rho = 0.5 # parametre ARDinf
   M=5 # seuil pour MC et renouvellement
   tps.final <-100 # fenêtre d'observation du processus
@@ -240,13 +239,18 @@ MaintOpti <- function(tau,L=1,col){
   
   # Ne semble pas fonctionner quand on compare l'histo avec la densité ! 23/06/2021.
   
-  yPi <- runif(100000,L,M)
-  xPi <- runif(100000,0,M)
+  # yPi <- runif(1e7,L,M)
+  # xPi <- runif(1e7,0,M)
+  xPi <- runif(1e6,0,M)
+  yPi <- runif(1e6,max(L,xPi),M)
   
-  int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
+  # int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
+  # int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*((M-L)*L + (M-L)^2/2)
+  int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)*(M *(M- pmax(xPi,L))))
+  
   print(paste("la proba que Y soit entre L et M vaut ",int.1))
-  xPi <- rexp(100000,1)
-  yPi <- runif(100000,0,M)
+  xPi <- rexp(1e7,1)
+  yPi <- runif(1e7,0,M)
   int.2 <- 1-mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)/dexp(xPi))*(M)
   print(paste("la proba que Y soit plus grand que M vaut ",int.2))
   
@@ -271,9 +275,16 @@ MaintOpti <- function(tau,L=1,col){
 seq.L<-seq(from = 0.1,to = 4.5,by = 0.1)
 cout.L <-numeric(length(seq.L))
 
+#set.seed(123)
 for(ii in 1:length(seq.L)){
   cout.L[ii] <- MaintOpti(tau = 0.5,L=seq.L[ii],col=ii)
 }
 
-plot(seq.L,cout.L)
+plot(seq.L, cout.L, type = "l")
+
+cout.L.smooth <- loess(cout.L~seq.L,span=0.3)
+
+xfit <- seq(from=min(seq.L),to=max(seq.L),by = 0.01)
+yfit1 <- predict(cout.L.smooth,newdata=xfit)
+plot(x = xfit, y = yfit1, col = "red", type = "l", lwd = 3)
 

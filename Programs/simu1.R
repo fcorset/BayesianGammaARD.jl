@@ -12,6 +12,11 @@
 # tpsfinal : fenêtre d'observation du processus [0,tpsfinal]
 # pas : pas pour effectuer la simulation
 
+# La fonction renvoie :
+# obs : les observations (processus maintenu au temps d'inspection) 
+# GammaNM : Les processus Gamma Non maintenus (dans la matrice x)
+# GammaM : Le processus Gamma Maintenu
+
 simu1 <- function(alpha=1,beta=1,b=1,rho=0.2,tau=1,L=5,M=10,tps.final=100,pas=0.01){
   id.newcycle <- TRUE # Booléen pour nouveau cycle
   # Création du vecteur temps à chaque pas de simulation
@@ -64,5 +69,5 @@ simu1 <- function(alpha=1,beta=1,b=1,rho=0.2,tau=1,L=5,M=10,tps.final=100,pas=0.
   
   
   
-return(obs)  
+return(list(obs=obs,GammaNM=x,GammaM=y))  
 }

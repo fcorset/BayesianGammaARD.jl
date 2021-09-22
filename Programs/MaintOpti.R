@@ -6,10 +6,10 @@ library(tidyverse)
 # Définition des coûts d'inspections et  de maintenances.
 C_I <- 5
 C_P <- 10
-C_C <- 100
+C_C <- 20
 
 MaintOpti <- function(tau,L=1,col){
-  rho = 0.5 # parametre ARDinf
+  rho = 0.2 # parametre ARDinf
   M=5 # seuil pour MC et renouvellement
   tps.final <-100 # fenêtre d'observation du processus
   id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
@@ -241,16 +241,16 @@ MaintOpti <- function(tau,L=1,col){
   
   # yPi <- runif(1e7,L,M)
   # xPi <- runif(1e7,0,M)
-  xPi <- runif(1e6,0,M)
-  yPi <- runif(1e6,max(L,xPi),M)
+  xPi <- runif(1e5,0,M)
+  yPi <- runif(1e5,max(L,xPi),M)
   
   # int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
   # int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*((M-L)*L + (M-L)^2/2)
   int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)*(M *(M- pmax(xPi,L))))
   
   print(paste("la proba que Y soit entre L et M vaut ",int.1))
-  xPi <- rexp(1e7,1)
-  yPi <- runif(1e7,0,M)
+  xPi <- rexp(1e5,1)
+  yPi <- runif(1e5,0,M)
   int.2 <- 1-mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)/dexp(xPi))*(M)
   print(paste("la proba que Y soit plus grand que M vaut ",int.2))
   
@@ -277,16 +277,16 @@ cout.L <-numeric(length(seq.L))
 
 #set.seed(123)
 for(ii in 1:length(seq.L)){
-  cout.L[ii] <- MaintOpti(tau = 0.5,L=seq.L[ii],col=ii)
+  cout.L[ii] <- MaintOpti(tau = 0.8,L=seq.L[ii],col=ii)
 }
 
-plot(seq.L, cout.L, type = "l")
+plot(seq.L, cout.L, type = "l", lwd = 3)
 
 cout.L.smooth <- loess(cout.L~seq.L,span=0.8)
 
 xfit <- seq(from=min(seq.L),to=max(seq.L),by = 0.01)
 yfit1 <- predict(cout.L.smooth,newdata=xfit)
-plot(x = xfit, y = yfit1, col = "red", type = "l", lwd = 3)
+lines(x = xfit, y = yfit1, col = "red", lwd = 3)
 idx <- which.min(yfit1)
 cat("Coût optimal : ", yfit1[idx], "\n")
 cat("L optimal : ", xfit[idx], "\n")

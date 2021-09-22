@@ -131,7 +131,7 @@ rho.guess <- max(0,max(Eff))
 
 parms <- c(alpha, beta, b, rho)
 parms <- c(alpha, 1, b, rho.guess)
-optim(par = parms, fn = Log.Lik, method = "SANN")
+# optim(par = parms, fn = Log.Lik, method = "SANN")
 # optim(par = parms, fn = Log.Lik, method = "L-BFGS-B", lower = rep(1e-1, 4), upper = c(2,2,2,1))
 
 

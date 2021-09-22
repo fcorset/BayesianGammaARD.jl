@@ -18,7 +18,7 @@
 # GammaM : Le processus Gamma Maintenu
 
 simu1 <- function(alpha=1,beta=1,b=1,rho=0.2,tau=1,L=5,M=10,tps.final=100,pas=0.01){
-  id.newcycle <- TRUE # Booléen pour nouveau cycle
+  id.newcycle <- FALSE # Booléen pour nouveau cycle
   # Création du vecteur temps à chaque pas de simulation
   temps = seq(from = 0,to = tps.final,by = pas)
   n=length(temps) # taille du vecteur temps
@@ -27,7 +27,8 @@ simu1 <- function(alpha=1,beta=1,b=1,rho=0.2,tau=1,L=5,M=10,tps.final=100,pas=0.
   j<-1 # initialisation de l'indicateur de la prochaine inspection
   j.newcycle <- 0 # initialisation de l'identificateur du nouveau cycle
   nb.cycles <- 1 # initialisation du compteur de cycles
-  x=matrix(nrow=nb.insp.max,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles A OPTIMISER !
+  x=matrix(nrow=1,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles 
+  x[1,1] <- 0
   # Simulation du Gamma non maintenu sur la fenêtre d'observation
   for(i in 2:n){
     x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
@@ -40,7 +41,8 @@ simu1 <- function(alpha=1,beta=1,b=1,rho=0.2,tau=1,L=5,M=10,tps.final=100,pas=0.
   while (j<=nb.insp.max) {
     # boucle sur un cycle de renouvellement
     if (id.newcycle){
-      # on resimule un x depuis 0
+      # on resimule un x depuis 0 et on ajoute une ligne à la matrice x
+      x=rbind(x,matrix(ncol=n))
       x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
       for(i in 2:n){
         x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
@@ -69,5 +71,5 @@ simu1 <- function(alpha=1,beta=1,b=1,rho=0.2,tau=1,L=5,M=10,tps.final=100,pas=0.
   
   
   
-return(list(obs=obs,GammaNM=x,GammaM=y))  
+return(list(obs=obs,GammaNM=x,GammaM=y,nb.cycles=nb.cycles))  
 }

@@ -25,7 +25,7 @@ parms <- c(alpha, 1, b, rho)
 
 set.seed(123)
 
-B <- 100
+B <- 1000
 
 vparms <- NULL
 
@@ -35,6 +35,8 @@ for (i in 1:B) {
   opt <- estim1(D, tau, L, M, tps.final, pas, optim.method = "SANN")
   vparms <- rbind(vparms, opt$par)
 }
+
+#vparms <- log(vparms)
 
 par(mfrow = c(2,2))
 hist(x = vparms[,1], probability = TRUE, xlab = "alpha", main = "")

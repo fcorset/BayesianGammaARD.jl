@@ -55,7 +55,7 @@ simu1 <- function(alpha=1,beta=1,b=1,rho=0.2,tau=1,L=5,M=10,tps.final=100,pas=0.
     obs[j]<-y.tilde[j*tau/pas+1] # état dégradation à l'inspection (t_j^-)
     
     if (obs[j] < L) {
-      print("no action")
+      # print("no action")
     } else {
       if (obs[j]<M) {
         y[j*tau/pas+1]<-(1-rho)*y[j*tau/pas+1] # on écrase (ARD infini)

@@ -12,6 +12,10 @@
 *.cb2
 .*.lb
 
+## r
+*.Rhistory
+*.Rdata
+
 ## Intermediate documents:
 *.dvi
 *.xdv

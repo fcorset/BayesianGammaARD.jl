@@ -14,7 +14,7 @@
 
 ## r
 *.Rhistory
-*.Rdata
+*.RData
 
 ## Intermediate documents:
 *.dvi

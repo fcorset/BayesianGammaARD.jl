@@ -12,19 +12,10 @@ source("Estim1.R")
 ### PARAMETRES ###
 ##################
 
-# args <- commandArgs(TRUE)
-# 
-# alpha <- as.numeric(args[1])
-# beta <- as.numeric(args[2])
-# b <- as.numeric(args[3])
-# rho <- as.numeric(args[4])
-
 alpha <- 1
 beta <- 1.25
 b <- 1
 rho <- 0.5
-
-
 tau <- 1
 L <- 5
 M <- 10
@@ -34,16 +25,31 @@ parms <- c(alpha, 1, b, rho)
 
 set.seed(123)
 
-B <- 3
+B <- 1000
 
-vparms <- NULL
+# Code avec parallélisation
 
-for (i in 1:B) {
-  cat("Iteration :", i, "\n")
+library(doParallel)
+library(foreach)
+library(doRNG)
+
+NbCores <- detectCores()
+cl <- makeCluster(NbCores)
+registerDoParallel(cl)
+getDoParWorkers()
+
+estimation <- function() {
   D <- simu1(alpha, beta, b, rho, tau, L, M, tps.final, pas)
   opt <- estim1(D, tau, L, M, tps.final, pas, optim.method = "SANN", guess = TRUE)
-  vparms <- rbind(vparms, opt$par)
+  res <- opt$par
+  return(res)
 }
+
+vparms <- foreach(w = 1: B , .combine = cbind , .options.RNG =123) %dorng%
+  estimation()
+vparms = t(as.table(vparms))
+stopCluster(cl)
+
 
 #vparms <- log(vparms)
 

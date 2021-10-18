@@ -1,0 +1,107 @@
+
+R version 3.6.3 (2020-02-29) -- "Holding the Windsock"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+[Sauvegarde de la session précédente restaurée]
+
+> ##############################
+> ### PREPARATION DU SCRIPTS ###
+> ##############################
+> 
+> rm(list = ls())
+> 
+> source("simu1.R")
+> source("plot1.R")
+> source("Estim1.R")
+> 
+> ##################
+> ### PARAMETRES ###
+> ##################
+> 
+> # args <- commandArgs(TRUE)
+> # 
+> # alpha <- as.numeric(args[1])
+> # beta <- as.numeric(args[2])
+> # b <- as.numeric(args[3])
+> # rho <- as.numeric(args[4])
+> 
+> alpha <- 1
+> beta <- 1.25
+> b <- 1
+> rho <- 0.5
+> 
+> 
+> tau <- 1
+> L <- 5
+> M <- 10
+> tps.final <- 100
+> pas <- 0.01
+> parms <- c(alpha, 1, b, rho)
+> 
+> set.seed(123)
+> 
+> B <- 3
+> 
+> vparms <- NULL
+> 
+> for (i in 1:B) {
++   cat("Iteration :", i, "\n")
++   D <- simu1(alpha, beta, b, rho, tau, L, M, tps.final, pas)
++   opt <- estim1(D, tau, L, M, tps.final, pas, optim.method = "SANN", guess = TRUE)
++   vparms <- rbind(vparms, opt$par)
++ }
+Iteration : 1 
+Iteration : 2 
+Iteration : 3 
+There were 50 or more warnings (use warnings() to see the first 50)
+> 
+> #vparms <- log(vparms)
+> 
+> 
+> par(mfrow = c(2,2))
+> hist(x = vparms[,1], probability = TRUE, xlab = "alpha", main = "")
+> lines(density(vparms[,1]),lwd = 2, col = "red")
+> abline(v = alpha, lty = 2, col = "blue")
+> hist(x = vparms[,2], probability = TRUE, xlab = "beta", main = "")
+> lines(density(vparms[,2]),lwd = 2, col = "red")
+> abline(v = beta, lty = 2, col = "blue")
+> hist(x = vparms[,3], probability = TRUE, xlab = "b", main = "")
+> lines(density(vparms[,3]),lwd = 2, col = "red")
+> abline(v = b, lty = 2, col = "blue")
+> hist(x = vparms[,4], probability = TRUE, xlab = "rho", main = "")
+> lines(density(vparms[,4]),lwd = 2, col = "red")
+> abline(v = rho, lty = 2, col = "blue")
+> 
+> aux <- vparms
+> 
+> vparms <- apply(X = aux, MARGIN = 2, scale)
+> 
+> par(mfrow = c(2,2))
+> hist(x = vparms[,1], probability = TRUE, xlab = "alpha", main = "")
+> lines(density(vparms[,1]),lwd = 2, col = "red")
+> hist(x = vparms[,2], probability = TRUE, xlab = "beta", main = "")
+> lines(density(vparms[,2]),lwd = 2, col = "red")
+> hist(x = vparms[,3], probability = TRUE, xlab = "b", main = "")
+> lines(density(vparms[,3]),lwd = 2, col = "red")
+> hist(x = vparms[,4], probability = TRUE, xlab = "rho", main = "")
+> lines(density(vparms[,4]),lwd = 2, col = "red")
+> 
+> 
+> 
+> 
+> proc.time()
+utilisateur     système      écoulé 
+    104.777       0.054     104.849 

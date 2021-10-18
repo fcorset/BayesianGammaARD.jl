@@ -1,4 +1,4 @@
-estim1 <- function(D, tau, L, M, tps.final, pas, optim.method = "SANN") {
+estim1 <- function(D, tau, L, M, tps.final, pas, optim.method = "SANN", guess = FALSE) {
   tps <- seq(from = 0, by = tau, to = tps.final)
   obs <- D$obs
   
@@ -93,7 +93,18 @@ estim1 <- function(D, tau, L, M, tps.final, pas, optim.method = "SANN") {
     }
   }
   rho.guess <- max(0,max(Eff))
-  res <- optim(par = parms, fn = Log.Lik, method = optim.method)
+  mu <- mean(AccrObs$accr)/tau
+  v <- mean((AccrObs$accr-mu*tau)^2)/tau
+  alpha.guess <- mu^2/v
+  b.guess <- mu/v
+  parms.guess <- c(alpha.guess, 1, b.guess, rho.guess)
+  if (guess) {
+    parms.init <- parms.guess
+  } else {
+    parms.init <- parms
+  }
+
+  res <- optim(par = parms.init, fn = Log.Lik, method = optim.method)
   # optim(par = parms, fn = Log.Lik, method = "L-BFGS-B", lower = rep(1e-1, 4), upper = c(2,2,2,1))
   return(res)
 }

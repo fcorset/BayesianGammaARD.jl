@@ -85,13 +85,18 @@ estim1 <- function(D, tau, L, M, tps.final, pas, optim.method = "SANN", guess = 
       aux <- data.frame(tps1, tps2, accr)
       AccrObs <- rbind(AccrObs, aux)
     }
-    # Computation of the likelihood
+    # Computation of the likelihoo!!d
     nb.acc <- nrow(AccrObs)
     res <- vector(mode = "numeric", length = nb.acc)
     for (i in 1:nb.acc) {
       res[i] <- dgamma(x = AccrObs$accr[i], shape = alpha*AccrObs$tps2[i]^beta - alpha*AccrObs$tps1[i]^beta, scale = b, log = TRUE)
     }
-    return(-sum(res))
+    res <- -sum(res)
+    TestValParms <- (parms[1]<0) |  (parms[2]<0) | (parms[3]<0) | (parms[4]<0) | (parms[4]>1)
+    if (TestValParms) {
+      res <- 1e10
+    }
+    return(res)
   }
   
   

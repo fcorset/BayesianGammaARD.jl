@@ -35,5 +35,12 @@ plot1(D$obs, D$GammaNM, D$GammaM)
 #################################
 
 parms <- c(alpha, 1, b, rho)
-estim1(D, tau, L, M, tps.final, pas, optim.method = "SANN")
+
+
+res.noguess <- estim1(D, tau, L, M, tps.final, pas, optim.method = "SANN")
+print(res.noguess$par)
+
+res.guess <- estim1(D, tau, L, M, tps.final, pas, optim.method = "SANN", guess = TRUE)
+print(res.guess$par)
+
 

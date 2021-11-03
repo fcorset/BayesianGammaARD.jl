@@ -6,35 +6,46 @@ rm(list = ls())
 
 source("simu1.R")
 source("plot1.R")
-source("Estim1.R")
+source("Estim1bis.R")
 
 ##################
 ### PARAMETRES ###
 ##################
 
-alpha <- 1
-beta <- 1.25
-b <- 1
-rho <- 0.5
+Id.Cas <- 4
+
+alpha <- rep(x = 1, times = 9)
+beta <- c(1, 1, 1, 0.75, 0.5, 0.5, 1.2, 1.2, 1.2)
+b <- rep(x = 1, times = 9)
+rho <- c(0.2, 0.5, 0.8, 0.2, 0.5, 0.8, 0.2, 0.5, 0.8)
+TabCas <- cbind(alpha, beta, b, rho)
+
+alpha <- TabCas[Id.Cas,1]
+beta <- TabCas[Id.Cas,2]
+b <- TabCas[Id.Cas,3]
+rho <- TabCas[Id.Cas,4]
+
 tau <- 1
 L <- 5
 M <- 10
 tps.final <- 100
 pas <- 0.01
-parms <- c(alpha, 1, b, rho)
+parms <- c(alpha, beta, b, rho)
 
 set.seed(123)
 
-B <- 1000
+B <- 3
 
 # Code avec parallélisation
 
+# library(slurmR)
 library(doParallel)
 library(foreach)
 library(doRNG)
 
-NbCores <- detectCores()
-cl <- makeCluster(NbCores)
+
+#NbCores <- detectCores()
+cl <- makeCluster(16)
 registerDoParallel(cl)
 getDoParWorkers()
 
@@ -50,37 +61,11 @@ vparms <- foreach(w = 1: B , .combine = cbind , .options.RNG =123) %dorng%
 vparms = t(as.table(vparms))
 stopCluster(cl)
 
+res <- list(parms, vparms)
 
-#vparms <- log(vparms)
+FicOut <- paste("output-cas", Id.Cas, ".Rd", sep = "")
 
-
-par(mfrow = c(2,2))
-hist(x = vparms[,1], probability = TRUE, xlab = "alpha", main = "")
-lines(density(vparms[,1]),lwd = 2, col = "red")
-abline(v = alpha, lty = 2, col = "blue")
-hist(x = vparms[,2], probability = TRUE, xlab = "beta", main = "")
-lines(density(vparms[,2]),lwd = 2, col = "red")
-abline(v = beta, lty = 2, col = "blue")
-hist(x = vparms[,3], probability = TRUE, xlab = "b", main = "")
-lines(density(vparms[,3]),lwd = 2, col = "red")
-abline(v = b, lty = 2, col = "blue")
-hist(x = vparms[,4], probability = TRUE, xlab = "rho", main = "")
-lines(density(vparms[,4]),lwd = 2, col = "red")
-abline(v = rho, lty = 2, col = "blue")
-
-aux <- vparms
-
-vparms <- apply(X = aux, MARGIN = 2, scale)
-
-par(mfrow = c(2,2))
-hist(x = vparms[,1], probability = TRUE, xlab = "alpha", main = "")
-lines(density(vparms[,1]),lwd = 2, col = "red")
-hist(x = vparms[,2], probability = TRUE, xlab = "beta", main = "")
-lines(density(vparms[,2]),lwd = 2, col = "red")
-hist(x = vparms[,3], probability = TRUE, xlab = "b", main = "")
-lines(density(vparms[,3]),lwd = 2, col = "red")
-hist(x = vparms[,4], probability = TRUE, xlab = "rho", main = "")
-lines(density(vparms[,4]),lwd = 2, col = "red")
+save(res, file = FicOut)
 
 
 

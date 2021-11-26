@@ -1,77 +1,95 @@
-# Programme d'optimisation de la maintenance en fonction de tau et de L
-rm(list=ls())
+#############################################################################
+#############################################################################
+### PROGRAMME D'OPTIMISATION DE LA MAINTENANCE EN FONCTION DE TAU ET DE L ###
+#############################################################################
+#############################################################################
+
+#############################
+### PREPARATION DU SCRIPT ###
+#############################
+
+# Nettoyage
+rm(list = ls())
+
+# Chargement des packages
 library(ggplot2)
 library(tidyverse)
 
 # Définition des coûts d'inspections et  de maintenances.
-C_I <- 1
-C_P <- 10
-C_C <- 50
 
-MaintOpti <- function(tau,L=40,col){
-  rho = 0.2 # parametre ARDinf
-  M=50 # seuil pour MC et renouvellement
-  tps.final <-200 # fenêtre d'observation du processus
-  id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
+
+##########################
+### FONCTIONS INTERNES ###
+##########################
+
+MaintOpti <- function(tau, L = 40, M = 50, tps.final = 200,
+                      rho = 0.2, alpha = 1, beta = 1, b = 1, 
+                      C_I = 1, C_P = 10, C_C = 50, col) {
+  # Initialisation du nb de cycle de renouvellement
+  id.newcycle <- FALSE 
   
-  #set.seed(123)
   # Simulation d'un processus gamma jusqu'au temps final
-  pas = 0.01 # pas de temps pour simuler le processus
-  
-  alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
-  beta = 1 # paramètre de forme  de Gamma
-  b=1   # paramètre d'échelle du Gamma
-  temps = seq(from = 0,to = tps.final,by = pas)
-  
-  n=length(temps)
-  
-  nb.inspections<- floor(tps.final/tau) # nombre d'inspections max pendant la fenêtre d'observation.
-  
-  obs<-numeric(nb.inspections) # données observées (pendant les inspections, à t_j^-)
-  
-  j<-1 # indicateur prochaine inspection
-  j.newcycle <- 0 # identifier le j où nouveau cycle
-  nb.cycles <- 1 # compteur de cycles
-  
-  x=matrix(nrow=nb.inspections+1,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles
-  x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
-  for(i in 2:n){
-    x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
+
+  # Pas de temps pour simuler le processus
+  pas <- 0.01 
+  temps <- seq(from = 0,to = tps.final,by = pas)
+  n <- length(temps)
+  # Nombre d'inspections max pendant la fenêtre d'observation
+  nb.inspections <- floor(tps.final/tau) 
+  # Données observées (pendant les inspections, à t_j^-)
+  obs <- numeric(nb.inspections) 
+  # Indicateur prochaine inspection
+  j<-1 
+  # Identifier le j où nouveau cycle
+  j.newcycle <- 0
+  # compteur de cycles
+  nb.cycles <- 1 
+  # Processus Gamma simulé, nb.lignes = nb.cycles
+  x <- matrix(nrow=nb.inspections+1,ncol = n) 
+  # Initialisation du processus Gamma = 0 à t=0
+  x[nb.cycles,1] <- 0     
+  for (i in 2:n){
+    x[nb.cycles, i] <- x[nb.cycles,i-1] + 
+      rgamma(n = 1, scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
   }
-  y=numeric(n) # processus Gamma maintenu
-  y.tilde=numeric(n) # processus Gamma maintenu
-  
-  y[1]<-0
-  y.tilde[1]<-0
-  
-  while (j<=nb.inspections) {
-    # boucle sur un cycle de renouvellement
-    if (id.newcycle){
-      # on resimule un x depuis 0
-      x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
-      for(i in 2:n){
-        x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
+  # Processus Gamma maintenu
+  y <- numeric(n) 
+  # processus Gamma maintenu
+  y.tilde <- numeric(n) 
+  y[1] <- 0
+  y.tilde[1] <- 0
+    while (j <= nb.inspections) {
+    # Boucle sur un cycle de renouvellement
+    if (id.newcycle) {
+      # On resimule un x depuis 0
+      # Initialisation du processus Gamma = 0 à t=0
+      x[nb.cycles,1] <- 0     
+      for (i in 2:n){
+        x[nb.cycles, i] <- x[nb.cycles,i-1] + 
+          rgamma(n = 1, scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
       }
       id.newcycle <- FALSE
     }
     
-    y.tilde[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-j.newcycle-1)*tau/pas+2):((j-j.newcycle)*(tau/pas)+1)]- x[nb.cycles,(j-j.newcycle-1)*tau/pas+1]
-    
-    obs[j]<-y[j*tau/pas+1] # état dégradation à l'inspection (t_j^-)
-    
+    y.tilde[((j-1)*tau/pas+2):(j*(tau/pas)+1)] <- 
+      y[((j-1)*tau/pas+2):(j*(tau/pas)+1)] <- 
+      y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-j.newcycle-1)*tau/pas+2):((j-j.newcycle)*(tau/pas)+1)]- x[nb.cycles,(j-j.newcycle-1)*tau/pas+1]
+    # Etat dégradation à l'inspection (t_j^-)
+    obs[j] <- y[j*tau/pas+1] 
     if (obs[j] < L) {
       #print("no action")
     } else {
-      if (obs[j]<M) {
-        y[j*tau/pas+1]<-(1-rho)*y[j*tau/pas+1] # on écrase (ARD infini)
+      if (obs[j] < M) {
+        # on écrase (ARD infini)
+        y[j*tau/pas+1] <- (1-rho)*y[j*tau/pas+1] 
       } else {
-        y[j*tau/pas+1]<-0
+        y[j*tau/pas+1] <- 0
         id.newcycle <- TRUE
         j.newcycle <- j
         nb.cycles <- nb.cycles+1
       }
     }
-    j<-j+1
+    j < -j+1
   }
   
   
@@ -133,6 +151,7 @@ MaintOpti <- function(tau,L=40,col){
   
   
   
+  #set.seed(123)
   
   # vecteur de l'état x
   level.x <- seq(0.01,2*M,0.01)

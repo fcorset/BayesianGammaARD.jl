@@ -8,7 +8,7 @@ C_I <- 1
 C_P <- 10
 C_C <- 50
 
-MaintOpti <- function(tau,L=80,col){
+MaintOpti <- function(tau,L=40,col){
   rho = 0.2 # parametre ARDinf
   M=50 # seuil pour MC et renouvellement
   tps.final <-200 # fenêtre d'observation du processus
@@ -87,21 +87,21 @@ MaintOpti <- function(tau,L=80,col){
   indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
   
   
-  for (k in 1:nb.cycles){
-    plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
-    par(new=T)
-  }
+  #for (k in 1:nb.cycles){
+  #  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
+  #  par(new=T)
+  #}
   
-  plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
+  #plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
   
   
-  par(new=T)
-  plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
-  abline(h=L,col="blue")
-  abline(h=M,col="red")
-  abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
+  #par(new=T)
+  #plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation")
+  #abline(h=L,col="blue")
+  #abline(h=M,col="red")
+  #abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
   
-  abline(v = tau*(1:nb.inspection))
+  #abline(v = tau*(1:nb.inspection))
   #####################################
   # Calcul de la loi stationnaire
   #####################################
@@ -239,33 +239,51 @@ MaintOpti <- function(tau,L=80,col){
   
   # Ne semble pas fonctionner quand on compare l'histo avec la densité ! 23/06/2021.
   
+  xPi <- runif(1e5,0,L)
+  yPi <- runif(1e5,xPi,L)
+  int.3 <- L*mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)*(L-xPi))
+  print(paste("la proba que Y soit plus petit que L vaut ",int.3))
+  
+  #xPi <- runif(1e5,0,L)
+  #yPi <- runif(1e5,0,L)
+  #int.3.ind <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)*(L^2))
+  #print(paste("la proba que Y soit plus petit que L vaut ",int.3.ind))
+  
   # yPi <- runif(1e7,L,M)
   # xPi <- runif(1e7,0,M)
-  xPi <- runif(1e5,0,M)
-  yPi <- runif(1e5,max(L,xPi),M)
-  yPibis <- runif(1e5,L,M)
+  #xPi <- runif(1e5,0,M)
+  #yPi <- runif(1e5,max(L,xPi),M)
   
   # int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
   # int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*((M-L)*L + (M-L)^2/2)
   #int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)*(M *(M- pmax(xPi,L))))
   #int.1 <- mean(dgamma(yPibis-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M-L)*M
-  int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M^2-L^2)/2
+  #int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi))*(M^2-L^2)/2
+  #int.1 <- mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)*(M *(M- pmax(xPi,L))))
+  
+  xPi.1 <- runif(1e5,0,L)
+  yPi.1 <- runif(1e5,L,M)
+  int.1.1<- mean(dgamma(yPi.1-xPi.1,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi.1)*(L *(M-L)))
+  xPi.2 <- runif(1e5,L,M)
+  yPi.2 <- runif(1e5,xPi.2,M)
+  int.1.2<- mean(dgamma(yPi.2-xPi.2,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi.2)*(M-xPi.2)*(M-L))
+  int.1<-int.1.1+int.1.2
   
   
+  #print(paste("la proba que Y soit entre L et M vaut ",int.1))
   print(paste("la proba que Y soit entre L et M vaut ",int.1))
-  #print(paste("la proba que Y soit entre L et M vaut ",int.1.bis))
   #print(paste("la proba que Y soit entre L et M vaut ",int.1.ter))
   
-  xPi <- rexp(1e5,1)
-  xPi.bis <- runif(1e5,0,M)
-  yPi <- runif(1e5,0,M)
-  yPi.ter <- runif(1e5,xPi.bis,M)
+  xPi <- runif(1e5,0,M)
+  yPi <- runif(1e5,xPi,M)
   
-  int.2 <- 1-mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)/dexp(xPi))*(M)
+  #int.2 <- 1-mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)/dexp(xPi))*(M)
   #int.2.bis <- 1-mean(dgamma(yPi-xPi.bis,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi.bis))*(M^2)
-  #int.2.ter <- 1-mean(dgamma(yPi.ter-xPi.bis,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi.bis)*(M-xPi.bis))*(M)
+  int.2 <- 1-M*mean(dgamma(yPi-xPi,scale=b,shape=alpha*tau^beta)*pi[[K]](xPi)*(M-xPi))
   
   print(paste("la proba que Y soit plus grand que M vaut ",int.2))
+  print(paste("la somme des proba de Y vaut ",int.1+int.2+int.3))
+  
   #print(paste("la proba que Y soit plus grand que M vaut ",int.2.bis))
   #print(paste("la proba que Y soit plus grand que M vaut ",int.2.ter))
   
@@ -302,14 +320,14 @@ MaintOpti <- function(tau,L=80,col){
 
 
 
-seq.L<-seq(from = 1,to = 90,by = .5)
+seq.L<-seq(from = 1,to = 45,by = .5)
 int.1 <-numeric(length(seq.L))
 int.2 <-numeric(length(seq.L))
 cout.L <-numeric(length(seq.L))
 
 #set.seed(123)
 for(ii in 1:length(seq.L)){
-  res <- MaintOpti(tau = 1,L=seq.L[ii],col=ii)
+  res <- MaintOpti(tau = 10,L=seq.L[ii],col=ii)
   int.1[ii]<-res$int.1
   int.2[ii]<-res$int.2
   cout.L[ii]<-res$cout.moy
@@ -318,7 +336,7 @@ for(ii in 1:length(seq.L)){
   cat("itération : ",ii, "\n")
 }
 
-plot(seq.L, cout.L, type = "l", lwd = 3,xlab="L",ylab="Cost",main="Cost for (C_I,C_P,C_C)=(5,10,100)")
+plot(seq.L, cout.L, type = "l", lwd = 3,xlab="L",ylab="Cost",main="Cost for (C_I,C_P,C_C)=(1,5,10) and tau = 10")
 
 cout.L.smooth <- loess(cout.L~seq.L,span=0.8)
 

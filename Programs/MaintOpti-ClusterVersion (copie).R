@@ -45,6 +45,11 @@ ntrap <- function(abs, ord) {
 MaintOpti <- function(tau = 1, L = 40, M = 50, tps.final = 200,
                       rho = 0.2, alpha = 1, beta = 1, b = 1, 
                       C_I = 1, C_P = 10, C_C = 50) {
+
+  tau = 1; L = 40; M = 50; tps.final = 200
+  rho = 0.2; alpha = 1; beta = 1; b = 1
+  C_I = 1; C_P = 10; C_C = 50
+  
   # Paramètres
   pas.x <- 0.01
   pas.x <- 1
@@ -197,11 +202,11 @@ int.2 <-numeric(length(seq.L))
 cout.L <-numeric(length(seq.L))
 
 #set.seed(123)
-for(ii in 1:length(seq.L)){
-  res <- MaintOpti(tau = 5,L=seq.L[ii],col=ii)
-  int.1[ii]<-res$int.1
-  int.2[ii]<-res$int.2
-  cout.L[ii]<-res$cout.moy
+for(i in 1:length(seq.L)){
+  res <- MaintOpti(tau = 5, L = seq.L[i])
+  int.1[i] <- res$int.1
+  int.2[i] <- res$int.2
+  cout.L[i] <- res$cout.moy
   
   cat("itération : ",ii, "sur ", length(seq.L), " \n")
   

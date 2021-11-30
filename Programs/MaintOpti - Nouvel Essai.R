@@ -48,7 +48,6 @@ MaintOpti <- function(tau = 1, alpha = 1, beta = 1, b = 1, rho = 0.2,
                       L = 40,  M = 50, C_I = 1, C_P = 10, C_C = 10, 
                       tps.final = 200, K= 50, nb.sim = 1e5, delta.grid = 0.01){
   # CALCUL DE LA LOI STATIONNAIRE
-  # vecteur de l'état x
   level.x <- seq(from = delta.grid, by = delta.grid, to = 2*M)
   n.level.x <- length(level.x)
   
@@ -74,7 +73,9 @@ MaintOpti <- function(tau = 1, alpha = 1, beta = 1, b = 1, rho = 0.2,
   pi <- list()
   pi[[1]] <- function(x) dgamma(x = ,scale = b, shape = alpha*tau^beta)
 
+  cat("Calcul de la loi stationnaire (", K, " itérations) : ", 1, sep = "")
   for(k in 2:K){
+    cat(" -", k)
     # Contribution à la première intégrale :
     Q1 <- ntrap(level.x[1:ind.L],t(mat.trans[1:ind.L,]) * matrix(rep(w[k-1,1:ind.L],n.level.y),byrow = T,ncol = ind.L)) 
     # Contribution à la deuxième intégrale :
@@ -97,24 +98,8 @@ MaintOpti <- function(tau = 1, alpha = 1, beta = 1, b = 1, rho = 0.2,
     }
     pi[[k]] <- fn_w
   }
+  cat("\n")
   # curve(pi[[K]](x), from = 0, to = max(level.x), add = TRUE,lwd = 2, col = col,ylab = "Stationary Law")
-  
-  PI <- Vectorize(function(u, n = 10000) {
-    if (u > max(level.x)) {
-      res <- 1
-    }
-    else {
-      x <- runif(n = n, min = 0, max = u)
-      res <- mean(pi[[K]](x))*u
-    }  
-    return(res)
-  })
-  # Tirer selon loi stationnaire :
-  # Tirer un u selon U[0,1]
-  samplePi.aux <- function() {
-    uu <- runif(n = 1)
-    uniroot(function(u) PI(u) - uu, c(0,10000))$root
-  }
   
   xPi <- runif(n = nb.sim, min = 0, max = L)
   yPi <- runif(n = nb.sim, min = xPi, max = L)
@@ -128,19 +113,17 @@ MaintOpti <- function(tau = 1, alpha = 1, beta = 1, b = 1, rho = 0.2,
   yPi.2 <- runif(n = nb.sim, min = xPi.2, max = M)
   int.1.2 <- mean(dgamma(x = yPi.2-xPi.2, scale = b, shape = alpha*tau^beta)*pi[[K]](xPi.2)*(M-xPi.2)*(M-L))
   int.1 <- int.1.1+int.1.2
-  
   # print(paste("la proba que Y soit entre L et M vaut ",int.1))
   
   xPi <- runif(n = nb.sim, min = 0, max = M)
   yPi <- runif(n = nb.sim, min = xPi, max = M)
   
   int.2 <- 1-M*mean(dgamma(x = yPi-xPi, scale = b, shape = alpha*tau^beta)*pi[[K]](xPi)*(M-xPi))
-  
   # print(paste("la proba que Y soit plus grand que M vaut ",int.2))
   # print(paste("la somme des proba de Y vaut ",int.1+int.2+int.3))
   
   cout.moy <- (C_I+C_P*int.1+C_C*int.2)/tau
-  res <- list(int.1 = int.1, int.2 = int.2, cout.moy = cout.moy)
+  res <- cout.moy
   return(res)
 }
 
@@ -151,18 +134,16 @@ MaintOpti <- function(tau = 1, alpha = 1, beta = 1, b = 1, rho = 0.2,
 ###################
 
 seq.L <-seq(from = 1,to = 45,by = .5)
-seq.L <-seq(from = 5,to = 45,by = 20)
-int.1 <-vector(mode = "numeric", length = length(seq.L))
-int.2 <-vector(mode = "numeric", length = length(seq.L))
+seq.L <-seq(from = 5,to = 45,by = 1)
 cout.L <-vector(mode = "numeric", length = length(seq.L))
 
 output <- list()
-
 set.seed(123)
 
-K <- 2
 NumCas <- 1
 for (ii in 1:length(seq.L)){
+  cat("Itération sur L : ",ii, "sur ", length(seq.L),"\n")
+  
   # res <- MaintOpti(tau = 10, alpha = 1, beta = 1, b = 1, rho = 0.2,
   #                  L =  seq.L[ii],  M = 50, C_I = 1, C_P = 10, C_C = 10, 
   #                  tps.final = 200, K = K, nb.sim = 1e5, delta.grid = 0.01)
@@ -173,14 +154,13 @@ for (ii in 1:length(seq.L)){
                    M = MatParam$M[NumCas], C_I = MatParam$C_I[NumCas], 
                    C_P = MatParam$C_P[NumCas], C_C = MatParam$C_C[NumCas])
   
-  int.1[ii] <- res$int.1
-  int.2[ii] <- res$int.2
   cout.L[ii] <- res$cout.moy
-#  output <- c(output, res$pi[[K]])
-  cat("itération : ",ii, "sur ", length(seq.L),"\n")
 }
 
-output <- data.frame(seq.L, cout.L)
-colnames(output) <- c("L", "Cout.L")
-save(output, file = "Resultat.Rd")
+Cout.Maintenance <- data.frame(seq.L, cout.L)
+output <- list(Cout.Maintenance, MatParam[NumCas, ])
+fic.name <- paste("Results-cas-", NumCas, ".Rd", sep = "")
+save(output, file = fic.name)
+
+
 

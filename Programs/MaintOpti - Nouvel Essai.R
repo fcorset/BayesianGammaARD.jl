@@ -98,7 +98,7 @@ MaintOpti <- function(tau = 1, alpha = 1, beta = 1, b = 1, rho = 0.2,
     }
     pi[[k]] <- fn_w
   }
-  cat("\n")
+  cat("- ENDED \n")
   # curve(pi[[K]](x), from = 0, to = max(level.x), add = TRUE,lwd = 2, col = col,ylab = "Stationary Law")
   
   xPi <- runif(n = nb.sim, min = 0, max = L)
@@ -134,15 +134,15 @@ MaintOpti <- function(tau = 1, alpha = 1, beta = 1, b = 1, rho = 0.2,
 ###################
 
 seq.L <-seq(from = 1,to = 45,by = .5)
-seq.L <-seq(from = 5,to = 45,by = 1)
+seq.L <-seq(from = 5,to = 45,by = 10)
 cout.L <-vector(mode = "numeric", length = length(seq.L))
 
 output <- list()
 set.seed(123)
 
 NumCas <- 1
-for (ii in 1:length(seq.L)){
-  cat("Itération sur L : ",ii, "sur ", length(seq.L),"\n")
+for (i in 1:length(seq.L)){
+  cat("Itération sur L : ",i, "sur ", length(seq.L),"\n")
   
   # res <- MaintOpti(tau = 10, alpha = 1, beta = 1, b = 1, rho = 0.2,
   #                  L =  seq.L[ii],  M = 50, C_I = 1, C_P = 10, C_C = 10, 
@@ -150,11 +150,11 @@ for (ii in 1:length(seq.L)){
   
   res <- MaintOpti(tau = MatParam$tau[NumCas], alpha = MatParam$alpha[NumCas], 
                    beta = MatParam$beta[NumCas], b = MatParam$b[NumCas], 
-                   rho = MatParam$rho[NumCas], L =  seq.L[ii],  
+                   rho = MatParam$rho[NumCas], L =  seq.L[i],  
                    M = MatParam$M[NumCas], C_I = MatParam$C_I[NumCas], 
                    C_P = MatParam$C_P[NumCas], C_C = MatParam$C_C[NumCas])
   
-  cout.L[ii] <- res$cout.moy
+  cout.L[i] <- res
 }
 
 Cout.Maintenance <- data.frame(seq.L, cout.L)

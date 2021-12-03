@@ -16,6 +16,8 @@
 *.Rhistory
 *.RData
 
+*.DS_Store
+
 ## Intermediate documents:
 *.dvi
 *.xdv

@@ -3,16 +3,17 @@ rm(list=ls())
 library(readxl)
 library(writexl)
 
-NumCas <- 1
+# 1 3 5 8 10 12 51
+NumCas <- 51
 fic.name <- paste("Results-cas-", NumCas, ".Rd", sep = "")
 
 load(file = fic.name)
 
-plot(x = output$seq.L, y = output$cout.L, type = "l", lwd = 3, xlab ="L", ylab = "Cost", main = "")
+plot(x = output[[1]]$seq.L, y = output[[1]]$cout.L, type = "l", lwd = 3, xlab ="L", ylab = "Cost", main = "")
 
-cout.L.smooth <- loess(formula = cout.L ~ seq.L, span = 0.8, data = output)
+cout.L.smooth <- loess(formula = cout.L ~ seq.L, span = 0.8, data = output[[1]])
 
-xfit <- seq(from = min(output$seq.L), to = max(output$seq.L), by = 0.01)
+xfit <- seq(from = min(output[[1]]$seq.L), to = max(output[[1]]$seq.L), by = 0.01)
 yfit1 <- predict(cout.L.smooth, newdata = xfit)
 lines(x = xfit, y = yfit1, col = "red", lwd = 3, xlab = "L")
 idx <- which.min(yfit1)

@@ -1,4 +1,4 @@
-rm(list=ls())
+#rm(list=ls())
 
 library(readxl)
 library(writexl)
@@ -7,7 +7,7 @@ library(writexl)
 
 # 2 4 6 7 9 11 13 14 15
 
-NumCas <- 5
+NumCas <- 12
 fic.name <- paste("Results-cas-", NumCas, ".Rd", sep = "")
 
 load(file = fic.name)

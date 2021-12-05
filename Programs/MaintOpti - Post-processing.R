@@ -8,7 +8,7 @@ library(writexl)
 
 # 17 19 21 22 23 24 25 27 28 29
 
-NumCas <- 29
+NumCas <- 12
 fic.name <- paste("Results-cas-", NumCas, ".Rd", sep = "")
 
 load(file = fic.name)

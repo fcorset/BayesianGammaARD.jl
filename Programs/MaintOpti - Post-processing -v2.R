@@ -17,8 +17,8 @@ for (i in 2:nb.files) {
   Costs <- cbind.data.frame(Costs, output[[1]]$cout.L)
 }
 
-ymin = min(Costs[, -1])*0
-ymax = max(Costs[, -1])*0 + 20
+ymin = min(Costs[, -1])
+ymax = max(Costs[, -1])
 
 plot(x = Costs[, 1], y = Costs[, 2], type = "l", lwd = 2, ylim = c(ymin, ymax))
 for (i in 2:nb.files) {

@@ -9,7 +9,7 @@ C_P <- 10
 C_C <- 50
 
 MaintOpti <- function(tau,L=40,col){
-  rho = 0.2 # parametre ARDinf
+  rho = 0.5 # parametre ARDinf
   M=50 # seuil pour MC et renouvellement
   tps.final <-200 # fenêtre d'observation du processus
   id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
@@ -18,7 +18,7 @@ MaintOpti <- function(tau,L=40,col){
   # Simulation d'un processus gamma jusqu'au temps final
   pas = 0.01 # pas de temps pour simuler le processus
   
-  alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
+  alpha = 0.5 # paramètre de forme de Gamma a = alpha (t)^beta
   beta = 1 # paramètre de forme  de Gamma
   b=1   # paramètre d'échelle du Gamma
   temps = seq(from = 0,to = tps.final,by = pas)
@@ -327,7 +327,7 @@ cout.L <-numeric(length(seq.L))
 
 #set.seed(123)
 for(ii in 1:length(seq.L)){
-  res <- MaintOpti(tau = 10,L=seq.L[ii],col=ii)
+  res <- MaintOpti(tau = 1,L=seq.L[ii],col=ii)
   int.1[ii]<-res$int.1
   int.2[ii]<-res$int.2
   cout.L[ii]<-res$cout.moy

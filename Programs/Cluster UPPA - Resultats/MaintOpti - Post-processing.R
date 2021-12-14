@@ -3,7 +3,7 @@
 library(readxl)
 library(writexl)
 
-NumCas <- 42
+NumCas <- 53
 
 fic.name <- paste("Results-cas-", NumCas, ".Rd", sep = "")
 

@@ -4,7 +4,7 @@ library(readxl)
 library(writexl)
 
 MatParam <- read_xlsx(path = "../../Figures2/res.xlsx")
-Case <- "A"
+Case <- "H"
 idx.case <- which(MatParam$Classe == Case)
 nb.files <- length(idx.case)
 

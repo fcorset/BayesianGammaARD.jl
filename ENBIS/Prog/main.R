@@ -8,9 +8,10 @@
 rm(list=ls())
 library(ggplot2)
 library(tidyverse)
+
 tau <- 1 # intervalle inter-inspection
 rho <- 0.2 # parametre ARDinf pour les maintenances efficaces avec proba p
-rho_w <- 0.2 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+rho_w <- 0.4 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
 p <- 0.9 # proba que la maintenance préventive soit efficace
 
 
@@ -121,6 +122,15 @@ abline(h=L,col="blue")
 abline(h=M,col="red")
 abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 
+vect.b.fact <- factor(vect.b)
+mescouleurs <- rainbow(length(levels(vect.b.fact)))
+plot(1:nb.inspections,obs,type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation",col=mescouleurs[vect.b.fact])
+abline(h=L,col="blue")
+abline(h=M,col="red")
+abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
+
+
+
 #abline(v = tau*(1:nb.inspection))
 
 #####################################
@@ -131,9 +141,9 @@ abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 K<-100
 
 hat.theta<-matrix(nrow=K+1,ncol=6)
-hat.theta[1,] <- c(1,1,1,0.5,0.5,0.75) # (alpha,beta,b,rho,rho^\prime,p)
+hat.theta[1,] <- c(2,1.5,1.5,0.5,0.5,0.5) # (alpha,beta,b,rho,rho^\prime,p)
 
-delta <- hat.theta[1]*(temps.insp^hat.theta[2]-c(0,temps.insp[1:(nb.inspections-1)])^hat.theta[2])
+delta <- hat.theta[1,1]*(temps.insp^hat.theta[1,2]-c(0,temps.insp[1:(nb.inspections-1)])^hat.theta[1,2])
 p.tilde <- (hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))/(hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3])+(1-hat.theta[1,6])*dgamma(obs-(1-c(0,Delta.P[(nb.inspections-1)]))*(1+hat.theta[1,5])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))
 
 for (k in 2:(K+1)){
@@ -144,8 +154,45 @@ for (k in 2:(K+1)){
   
   hat.theta[k,3]<-num.b/det.b # mise à jour de b
   
+  # Pour la mise à jour de rho et rho_w, on utilise optim car uniroot ne marche pas... 
+  # En effet, plusieurs valeurs annulent la dérivée...
+  
+  f.rho <- function(x){
+    y.rho <- obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-x[1])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)])
+    y.rhow <-obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1+x[2])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)])
+    logy.rho<-ifelse(y.rho<=0,-Inf,log(y.rho))
+    logy.rhow<-ifelse(y.rhow<=0,-Inf,log(y.rhow))
+    return(-hat.theta[k,3]*(sum(p.tilde*y.rho+(1-p.tilde)*y.rhow))+sum(p.tilde*(delta-1)*logy.rho+(1-p.tilde)*(delta-1)*ifelse(p.tilde==1,0,logy.rhow)))
+  }
+  hat.theta[k,4:5]<-optim(hat.theta[k-1,4:5],f.rho,control=list(fnscale=-1))$par
+  
+  # Mise à jour de alpha et beta
+  
+  f.ab <- function(x){
+    y.rho  <- obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[k,4])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)])
+    y.rhow <- obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1+hat.theta[k,5])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)])
+    logy.rho<-ifelse(y.rho<=0,-Inf,log(y.rho))
+    logy.rhow<-ifelse(y.rhow<=0,-Inf,log(y.rhow))
+    delta.n <- x[1]*(temps.insp^x[2]-c(0,temps.insp[1:(nb.inspections-1)])^x[2])
+    return(sum(delta.n*log(hat.theta[k,3])-log(gamma(delta.n))+p.tilde*(delta.n-1)*logy.rho+(1-p.tilde)*(delta.n-1)*ifelse(p.tilde==1,0,logy.rhow)))
+  }
+  hat.theta[k,1:2]<-optim(hat.theta[k-1,1:2],f.ab,control=list(fnscale=-1))$par
   
   
+  
+  # Mise à jour des delta.i
+  delta <- hat.theta[k,1]*(temps.insp^hat.theta[k,2]-c(0,temps.insp[1:(nb.inspections-1)])^hat.theta[k,2])
+  
+  # Mise à jour des p.tilde
+  p.tilde <- (hat.theta[k,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[k,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3]))/(hat.theta[k,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[k,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3])+(1-hat.theta[k,6])*dgamma(obs-(1-c(0,Delta.P[(nb.inspections-1)]))*(1+hat.theta[k,5])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3]))
+  
+  print(paste("la valeur de alpha à l'étape ",k," est : ",hat.theta[k,1]))
+  print(paste("la valeur de beta à l'étape ",k," est : ",hat.theta[k,2]))
+  print(paste("la valeur de b à l'étape ",k," est : ",hat.theta[k,3]))
+  print(paste("la valeur de rho à l'étape ",k," est : ",hat.theta[k,4]))
+  print(paste("la valeur de rho_w à l'étape ",k," est : ",hat.theta[k,5]))
+  print(paste("la valeur de p à l'étape ",k," est : ",hat.theta[k,6]))
+  print("==============================================================")
 }
 
 

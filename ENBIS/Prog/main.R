@@ -17,7 +17,7 @@ p <- 0.9 # proba que la maintenance préventive soit efficace
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 100 # fenêtre d'observation du processus
+tps.final <- 500 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -144,7 +144,7 @@ hat.theta<-matrix(nrow=K+1,ncol=6)
 hat.theta[1,] <- c(2,1.5,1.5,0.5,0.5,0.5) # (alpha,beta,b,rho,rho^\prime,p)
 
 delta <- hat.theta[1,1]*(temps.insp^hat.theta[1,2]-c(0,temps.insp[1:(nb.inspections-1)])^hat.theta[1,2])
-p.tilde <- (hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))/(hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3])+(1-hat.theta[1,6])*dgamma(obs-(1-c(0,Delta.P[(nb.inspections-1)]))*(1+hat.theta[1,5])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))
+p.tilde <- (hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))/(hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3])+(1-hat.theta[1,6])*dgamma(obs-(1-c(0,Delta.P[(nb.inspections-1)]))*(1+hat.theta[1,5])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))
 
 for (k in 2:(K+1)){
   hat.theta[k,6]<-mean(p.tilde) # mise à jour de p
@@ -184,7 +184,7 @@ for (k in 2:(K+1)){
   delta <- hat.theta[k,1]*(temps.insp^hat.theta[k,2]-c(0,temps.insp[1:(nb.inspections-1)])^hat.theta[k,2])
   
   # Mise à jour des p.tilde
-  p.tilde <- (hat.theta[k,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[k,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3]))/(hat.theta[k,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[k,4])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3])+(1-hat.theta[k,6])*dgamma(obs-(1-c(0,Delta.P[(nb.inspections-1)]))*(1+hat.theta[k,5])*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3]))
+  p.tilde <- (hat.theta[k,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[k,4])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3]))/(hat.theta[k,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[k,4])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3])+(1-hat.theta[k,6])*dgamma(obs-(1-c(0,Delta.P[(nb.inspections-1)]))*(1+hat.theta[k,5])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[k,3]))
   
   print(paste("la valeur de alpha à l'étape ",k," est : ",hat.theta[k,1]))
   print(paste("la valeur de beta à l'étape ",k," est : ",hat.theta[k,2]))

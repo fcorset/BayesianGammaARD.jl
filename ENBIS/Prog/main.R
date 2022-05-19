@@ -17,7 +17,7 @@ p <- 0.8 # proba que la maintenance préventive soit efficace
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 1000 # fenêtre d'observation du processus
+tps.final <- 200 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -26,7 +26,7 @@ id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 pas = 0.01 # pas de temps pour simuler le processus
 
 alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1.2 # paramètre de forme  de Gamma
+beta = 1 # paramètre de forme  de Gamma
 b=1   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 

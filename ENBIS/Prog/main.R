@@ -140,7 +140,7 @@ abline(v=81)
 #####################################
 
 # initialisation des paramètres
-K<- 100
+K<- 50
 
 hat.theta<-matrix(nrow=K+1,ncol=6)
 hat.theta[1,] <- c(1.2,1.1,1.5,0.2,0.2,0.5) # (alpha,beta,b,rho,rho^\prime,p)
@@ -226,6 +226,10 @@ for (k in 2:(K+1)){
   
   f.rhow <- Vectorize(function(x){
     
+    # UNE COUILLE ICI 
+    # cond <- (p.tilde < 1) & (ind.i.u == 1)
+    # delta.rhow <- hat.theta[k,1]*(temps.insp[cond] - temps.insp.pre[cond])^hat.theta[k,2]
+    # 
     y.rhow <-data1.rhow$obs - (1+x)*data1.rhow$obs.pre
     logy.rhow<-ifelse(y.rhow<=0,-Inf,log(y.rhow))
     return(-hat.theta[k,3]*sum((1-data1.rhow$p.tilde)*y.rhow)+sum((1-data1.rhow$p.tilde)*(delta[ind.i.u==1]-1)*logy.rhow))

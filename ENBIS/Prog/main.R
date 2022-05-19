@@ -10,14 +10,14 @@ library(ggplot2)
 library(tidyverse)
 
 tau <- 1 # intervalle inter-inspection
-rho <- 0.2 # parametre ARDinf pour les maintenances efficaces avec proba p
-rho_w <- 0.3 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
-p <- 0.7 # proba que la maintenance préventive soit efficace
+rho <- 0.3 # parametre ARDinf pour les maintenances efficaces avec proba p
+rho_w <- 0.2 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+p <- 0.8 # proba que la maintenance préventive soit efficace
 
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 1000 # fenêtre d'observation du processus
+tps.final <- 200 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -167,7 +167,7 @@ data <- data.frame(temps.insp,temps.insp.pre,obs,obs.pre,vect.u,vect.b,ind.i.u,D
 
 
 
-data1 <- filter(data,ind.i.u==1)
+data1 <- filter(data,ind.i.u==1) # On ne garde que les y_i tq u_{i-1}=1
 #data0 <- filter(data,ind.i.u==0)
 
 delta <- hat.theta[1,1]*(data$temps.insp^hat.theta[1,2]-data$temps.insp.pre^hat.theta[1,2])
@@ -228,11 +228,11 @@ for (k in 2:(K+1)){
     
     # UNE COUILLE ICI 
     # cond <- (p.tilde < 1) & (ind.i.u == 1)
-    # delta.rhow <- hat.theta[k,1]*(temps.insp[cond] - temps.insp.pre[cond])^hat.theta[k,2]
+    delta.rhow <- hat.theta[k,1]*(data1.rhow$temps.insp^hat.theta[k,2]-data1.rhow$temps.insp.pre^hat.theta[k,2])
     # 
     y.rhow <-data1.rhow$obs - (1+x)*data1.rhow$obs.pre
     logy.rhow<-ifelse(y.rhow<=0,-Inf,log(y.rhow))
-    return(-hat.theta[k,3]*sum((1-data1.rhow$p.tilde)*y.rhow)+sum((1-data1.rhow$p.tilde)*(delta[ind.i.u==1]-1)*logy.rhow))
+    return(-hat.theta[k,3]*sum((1-data1.rhow$p.tilde)*y.rhow)+sum((1-data1.rhow$p.tilde)*(delta.rhow-1)*logy.rhow))
   })
   
   

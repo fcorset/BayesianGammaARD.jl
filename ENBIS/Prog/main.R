@@ -17,7 +17,7 @@ p <- 0.8 # proba que la maintenance préventive soit efficace
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 200 # fenêtre d'observation du processus
+tps.final <- 1000 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -26,7 +26,7 @@ id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 pas = 0.01 # pas de temps pour simuler le processus
 
 alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1 # paramètre de forme  de Gamma
+beta = 1.2 # paramètre de forme  de Gamma
 b=1   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
@@ -218,7 +218,7 @@ for (k in 2:(K+1)){
   f.rho <- Vectorize(function(x){
     y.rho <- data$obs[ind.i.u==1] - (1-x)*data$obs.pre[ind.i.u==1]
      
-    logy.rho<-ifelse(y.rho<=0,-Inf,log(y.rho))
+    logy.rho<-ifelse(y.rho<=0,-1e8,log(y.rho))
     
     return(-hat.theta[k,3]*sum(p.tilde*y.rho)+sum(p.tilde*(delta[ind.i.u==1]-1)*logy.rho))
   })
@@ -228,10 +228,11 @@ for (k in 2:(K+1)){
     
     # UNE COUILLE ICI 
     # cond <- (p.tilde < 1) & (ind.i.u == 1)
-    delta.rhow <- hat.theta[k,1]*(data1.rhow$temps.insp^hat.theta[k,2]-data1.rhow$temps.insp.pre^hat.theta[k,2])
+    delta.rhow <- hat.theta[k-1,1]*(data1.rhow$temps.insp^hat.theta[k-1,2]-data1.rhow$temps.insp.pre^hat.theta[k-1,2])
     # 
     y.rhow <-data1.rhow$obs - (1+x)*data1.rhow$obs.pre
-    logy.rhow<-ifelse(y.rhow<=0,-Inf,log(y.rhow))
+    # logy.rhow<-ifelse(y.rhow<=0,-Inf,log(y.rhow))
+    logy.rhow<-ifelse(y.rhow<=0,-1e8,log(y.rhow))
     return(-hat.theta[k,3]*sum((1-data1.rhow$p.tilde)*y.rhow)+sum((1-data1.rhow$p.tilde)*(delta.rhow-1)*logy.rhow))
   })
   
@@ -243,9 +244,9 @@ for (k in 2:(K+1)){
   y.u.0 <- data$obs[ind.i.u==0]-(1-Delta.P[ind.i.u==0])*data$obs.pre[ind.i.u==0]
   y.rho  <- data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1]
   y.rhow <- data$obs[ind.i.u==1]-(1+hat.theta[k,5])*data$obs.pre[ind.i.u==1]
-  logy.u.O <- ifelse(y.u.0<=0,-Inf,log(y.u.0))
-  logy.rho<-ifelse(y.rho<=0,-Inf,log(y.rho))
-  logy.rhow<-ifelse(y.rhow<=0,-Inf,log(y.rhow))
+  logy.u.O <- ifelse(y.u.0<=0,-1e8,log(y.u.0))
+  logy.rho<-ifelse(y.rho<=0,-1e8,log(y.rho))
+  logy.rhow<-ifelse(y.rhow<=0,-1e8,log(y.rhow))
   
   
   f.ab <- function(x){
@@ -288,17 +289,17 @@ cbind(temps.insp[ind.u],vect.b[ind.u],1-p.tilde)
 
 # PLOT 
 par(mfrow = c(2, 3))
-plot(hat.theta[, 1], type = "l", lwd = 2)
-abline(h = alpha, col = "red", lwd = 2)
-plot(hat.theta[, 2], type = "l", lwd = 2)
+plot(hat.theta[, 1], type = "l", lwd = 2, ylim = c(0,2*alpha))
+abline(h = alpha, col = "red", lwd = 2)^
+plot(hat.theta[, 2], type = "l", lwd = 2, ylim = c(0,2*beta))
 abline(h = beta, col = "red", lwd = 2)
-plot(hat.theta[, 3], type = "l", lwd = 2)
+plot(hat.theta[, 3], type = "l", lwd = 2, ylim = c(0,2*b))
 abline(h = b, col = "red", lwd = 2)
-plot(hat.theta[, 4], type = "l", lwd = 2)
+plot(hat.theta[, 4], type = "l", lwd = 2, ylim = c(0,1))
 abline(h = rho, col = "red", lwd = 2)
-plot(hat.theta[, 5], type = "l", lwd = 2)
+plot(hat.theta[, 5], type = "l", lwd = 2, ylim = c(0,1))
 abline(h = rho_w, col = "red", lwd = 2)
-plot(hat.theta[, 6], type = "l", lwd = 2)
+plot(hat.theta[, 6], type = "l", lwd = 2, ylim = c(0,1))
 abline(h = p, col = "red", lwd = 2)
 
 

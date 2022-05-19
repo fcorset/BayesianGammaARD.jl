@@ -17,7 +17,7 @@ p <- 0.7 # proba que la maintenance préventive soit efficace
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 25 # fenêtre d'observation du processus
+tps.final <- 1000 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -140,7 +140,7 @@ abline(v=81)
 #####################################
 
 # initialisation des paramètres
-K<-50
+K<- 100
 
 hat.theta<-matrix(nrow=K+1,ncol=6)
 hat.theta[1,] <- c(1.2,1.1,1.5,0.2,0.2,0.5) # (alpha,beta,b,rho,rho^\prime,p)
@@ -281,3 +281,22 @@ ind.poor.maintenance <- which(data1$vect.b==0)
 
 # Maintenance où yappartient à [L,M]
 cbind(temps.insp[ind.u],vect.b[ind.u],1-p.tilde)
+
+# PLOT 
+par(mfrow = c(2, 3))
+plot(hat.theta[, 1], type = "l", lwd = 2)
+abline(h = alpha, col = "red", lwd = 2)
+plot(hat.theta[, 2], type = "l", lwd = 2)
+abline(h = beta, col = "red", lwd = 2)
+plot(hat.theta[, 3], type = "l", lwd = 2)
+abline(h = b, col = "red", lwd = 2)
+plot(hat.theta[, 4], type = "l", lwd = 2)
+abline(h = rho, col = "red", lwd = 2)
+plot(hat.theta[, 5], type = "l", lwd = 2)
+abline(h = rho_w, col = "red", lwd = 2)
+plot(hat.theta[, 6], type = "l", lwd = 2)
+abline(h = p, col = "red", lwd = 2)
+
+
+
+

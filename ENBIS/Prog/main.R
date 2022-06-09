@@ -10,8 +10,8 @@ library(ggplot2)
 library(tidyverse)
 
 tau <- 1 # intervalle inter-inspection
-rho <- 0.3 # parametre ARDinf pour les maintenances efficaces avec proba p
-rho_w <- 0.2 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+rho <- 0.4 # parametre ARDinf pour les maintenances efficaces avec proba p
+rho_w <- 0.3 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
 p <- 0.8 # proba que la maintenance préventive soit efficace
 
 
@@ -26,7 +26,7 @@ id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 pas = 0.01 # pas de temps pour simuler le processus
 
 alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1 # paramètre de forme  de Gamma
+beta = 1.6 # paramètre de forme  de Gamma
 b=1   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
@@ -289,17 +289,17 @@ cbind(temps.insp[ind.u],vect.b[ind.u],1-p.tilde)
 
 # PLOT 
 par(mfrow = c(2, 3))
-plot(hat.theta[, 1], type = "l", lwd = 2, ylim = c(0,2*alpha))
+plot(hat.theta[, 1], type = "l", lwd = 2, ylim = c(0,2*alpha),xlab="k",ylab="alpha")
 abline(h = alpha, col = "red", lwd = 2)^
-plot(hat.theta[, 2], type = "l", lwd = 2, ylim = c(0,2*beta))
+plot(hat.theta[, 2], type = "l", lwd = 2, ylim = c(0,2*beta),xlab="k",ylab="beta")
 abline(h = beta, col = "red", lwd = 2)
-plot(hat.theta[, 3], type = "l", lwd = 2, ylim = c(0,2*b))
+plot(hat.theta[, 3], type = "l", lwd = 2, ylim = c(0,2*b),xlab="k",ylab="b")
 abline(h = b, col = "red", lwd = 2)
-plot(hat.theta[, 4], type = "l", lwd = 2, ylim = c(0,1))
+plot(hat.theta[, 4], type = "l", lwd = 2, ylim = c(0,1),xlab="k",ylab="rho")
 abline(h = rho, col = "red", lwd = 2)
-plot(hat.theta[, 5], type = "l", lwd = 2, ylim = c(0,1))
+plot(hat.theta[, 5], type = "l", lwd = 2, ylim = c(0,1),xlab="k",ylab="rho_w")
 abline(h = rho_w, col = "red", lwd = 2)
-plot(hat.theta[, 6], type = "l", lwd = 2, ylim = c(0,1))
+plot(hat.theta[, 6], type = "l", lwd = 2, ylim = c(0,1),xlab="k",ylab="p")
 abline(h = p, col = "red", lwd = 2)
 
 

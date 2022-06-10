@@ -17,7 +17,7 @@ p <- 0.8 # proba que la maintenance préventive soit efficace
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 200 # fenêtre d'observation du processus
+tps.final <- 500 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -25,9 +25,9 @@ id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 # Simulation d'un processus gamma jusqu'au temps final
 pas = 0.01 # pas de temps pour simuler le processus
 
-alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1.6 # paramètre de forme  de Gamma
-b=1   # paramètre d'échelle du Gamma
+alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
+beta = 1.2 # paramètre de forme  de Gamma
+b=1.5   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
 theta <-c(alpha,beta,b,rho,rho_w,p)
@@ -143,7 +143,8 @@ abline(v=81)
 K<- 50
 
 hat.theta<-matrix(nrow=K+1,ncol=6)
-hat.theta[1,] <- c(1.2,1.1,1.5,0.2,0.2,0.5) # (alpha,beta,b,rho,rho^\prime,p)
+#hat.theta[1,] <- c(1.2,1.1,1.5,0.2,0.2,0.5) # (alpha,beta,b,rho,rho^\prime,p)
+hat.theta[1,] <- theta
 
 # On ne définit les p.tildes[i] que lorsque u_{i-1}=1 
 ind.u<-which(vect.u[1:(nb.inspections-1)]==1)
@@ -249,13 +250,13 @@ for (k in 2:(K+1)){
   logy.rhow<-ifelse(y.rhow<=0,-1e8,log(y.rhow))
   
   
-  f.ab <- function(x){
+  f.ab <- Vectorize(function(x){
     delta.u.0 <- x[1]*(data$temps.insp[ind.i.u==0]^x[2]-data$temps.insp.pre[ind.i.u==0]^x[2])
     delta.u.1 <- x[1]*(data$temps.insp[ind.i.u==1]^x[2]-data$temps.insp.pre[ind.i.u==1]^x[2])
     delta.n   <- x[1]*(data$temps.insp^x[2]-data$temps.insp.pre^x[2]) # tous les delta_i
   
     return(sum(delta.n)*log(hat.theta[k,3])-sum(log(gamma(delta.n)))+sum((delta.u.0-1)*logy.u.O)+sum(p.tilde*(delta.u.1-1)*logy.rho+(1-p.tilde)*(delta.u.1-1)*ifelse(p.tilde==1,0,logy.rhow)))
-  }
+  })
   hat.theta[k,1:2]<-optim(hat.theta[k-1,1:2],f.ab,control=list(fnscale=-1))$par
   
   

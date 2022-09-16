@@ -17,7 +17,7 @@ p <- 0.8 # proba que la maintenance préventive soit efficace
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 500 # fenêtre d'observation du processus
+tps.final <- 20 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -29,6 +29,7 @@ alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
 beta = 1.2 # paramètre de forme  de Gamma
 b=1.5   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
+temps2 <- temps
 
 theta <-c(alpha,beta,b,rho,rho_w,p)
 
@@ -50,7 +51,7 @@ nb.cycles <- 1 # compteur de cycles
 x=matrix(nrow=nb.inspections,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles
 x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
 for(i in 2:n){
-  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
+  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps2[i]^beta-temps2[i-1]^beta))
 }
 y=numeric(n) # processus Gamma maintenu
 y.tilde=numeric(n) # processus Gamma maintenu
@@ -61,14 +62,16 @@ while (j<=nb.inspections) {
   # boucle sur un cycle de renouvellement
   if (id.newcycle){
     # on resimule un x depuis 0
-    x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
-    for(i in 2:n){
-      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i]^beta-temps[i-1]^beta))
+    x[nb.cycles,1:((j-1)*tau/pas+1)] = 0     # initialisation du processus Gamma = 0 à t=0
+    for(i in ((j-1)*tau/pas+2):n){
+      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i-(j-1)*tau/pas+1]^beta-temps[i-(j-1)*tau/pas]^beta))
     }
     id.newcycle <- FALSE
   }
-  
-  y.tilde[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-j.newcycle-1)*tau/pas+2):((j-j.newcycle)*(tau/pas)+1)]- x[nb.cycles,(j-j.newcycle-1)*tau/pas+1]
+ # Changement 21/07 : remise du temps à 0 
+#  y.tilde[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-j.newcycle-1)*tau/pas+2):((j-j.newcycle)*(tau/pas)+1)]- x[nb.cycles,(j-j.newcycle-1)*tau/pas+1]
+ 
+   y.tilde[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[((j-1)*tau/pas+2):(j*(tau/pas)+1)]<-y[(j-1)*tau/pas+1]+ x[nb.cycles,((j-1)*tau/pas+2):((j)*(tau/pas)+1)]- x[nb.cycles,(j-1)*tau/pas+1]
   
   obs[j]<-y[j*tau/pas+1] # état dégradation à l'inspection (t_j^-)
   
@@ -86,6 +89,7 @@ while (j<=nb.inspections) {
       j.newcycle <- j
       nb.cycles <- nb.cycles+1
       Delta.P[j]<-1
+ #     temps2[(j*tau/pas+1):n] <- temps[(j*tau/pas+1):n]-temps[j*tau/pas+1]
     }
   }
   j<-j+1
@@ -107,7 +111,7 @@ indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
 
 
 for (k in 1:nb.cycles){
-  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
+  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,indice.temps.cycle[k]:indice.temps.cycle[k+1]],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
   par(new=T)
 }
 
@@ -157,7 +161,7 @@ ind.i.u[ind.u+1] <- 1
 ind.Delta<-which(Delta.P==1)
 
 ind.i.Delta<-rep(0,nb.inspections)
-ind.i.Delta[ind.Delta+1] <- 1
+ind.i.Delta[ind.Delta+1] <- 1   # Pb si la dernière inspection est > M (15/09/22)
 
 #Définition des y_{t_{i-1}}
 obs.pre<-c(0,obs[1:(nb.inspections-1)])*(1-ind.i.Delta)
@@ -250,13 +254,13 @@ for (k in 2:(K+1)){
   logy.rhow<-ifelse(y.rhow<=0,-1e8,log(y.rhow))
   
   
-  f.ab <- Vectorize(function(x){
+  f.ab <- function(x){
     delta.u.0 <- x[1]*(data$temps.insp[ind.i.u==0]^x[2]-data$temps.insp.pre[ind.i.u==0]^x[2])
     delta.u.1 <- x[1]*(data$temps.insp[ind.i.u==1]^x[2]-data$temps.insp.pre[ind.i.u==1]^x[2])
     delta.n   <- x[1]*(data$temps.insp^x[2]-data$temps.insp.pre^x[2]) # tous les delta_i
   
     return(sum(delta.n)*log(hat.theta[k,3])-sum(log(gamma(delta.n)))+sum((delta.u.0-1)*logy.u.O)+sum(p.tilde*(delta.u.1-1)*logy.rho+(1-p.tilde)*(delta.u.1-1)*ifelse(p.tilde==1,0,logy.rhow)))
-  })
+  }
   hat.theta[k,1:2]<-optim(hat.theta[k-1,1:2],f.ab,control=list(fnscale=-1))$par
   
   

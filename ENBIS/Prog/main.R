@@ -88,7 +88,8 @@ while (j<=nb.inspections) {
       id.newcycle <- TRUE
       j.newcycle <- j
       nb.cycles <- nb.cycles+1
-      Delta.P[j]<-1
+      if(j<nb.inspections){Delta.P[j]<-1} # 19/09/22 : Peu importe si la dernière inspection est une CM
+      
  #     temps2[(j*tau/pas+1):n] <- temps[(j*tau/pas+1):n]-temps[j*tau/pas+1]
     }
   }
@@ -157,11 +158,14 @@ ind.u<-which(vect.u[1:(nb.inspections-1)]==1)
 ind.i.u<-rep(0,nb.inspections)
 ind.i.u[ind.u+1] <- 1
 
-# indice i lorsque Delta_{i-1}=1
+# indice i lorsque Delta_{i-1}=1 et i différent de nb.inspections
 ind.Delta<-which(Delta.P==1)
 
 ind.i.Delta<-rep(0,nb.inspections)
 ind.i.Delta[ind.Delta+1] <- 1   # Pb si la dernière inspection est > M (15/09/22)
+
+
+
 
 #Définition des y_{t_{i-1}}
 obs.pre<-c(0,obs[1:(nb.inspections-1)])*(1-ind.i.Delta)

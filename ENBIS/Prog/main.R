@@ -11,13 +11,13 @@ library(tidyverse)
 
 tau <- 1 # intervalle inter-inspection
 rho <- 0.4 # parametre ARDinf pour les maintenances efficaces avec proba p
-rho_w <- 0.3 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+rho_w <- 0.6 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
 p <- 0.8 # proba que la maintenance préventive soit efficace
 
 
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
-tps.final <- 20 # fenêtre d'observation du processus
+tps.final <- 500 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -25,9 +25,9 @@ id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 # Simulation d'un processus gamma jusqu'au temps final
 pas = 0.01 # pas de temps pour simuler le processus
 
-alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1.2 # paramètre de forme  de Gamma
-b=1.5   # paramètre d'échelle du Gamma
+alpha = 1.5 # paramètre de forme de Gamma a = alpha (t)^beta
+beta = 1.3 # paramètre de forme  de Gamma
+b=1.2   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 temps2 <- temps
 
@@ -38,7 +38,8 @@ n=length(temps)
 
 nb.inspections<- floor(tps.final/tau) # nombre d'inspections max pendant la fenêtre d'observation.
 
-temps.insp<-temps[tau/pas*(1:nb.inspections)+1] # temps des inspections (t_i dans le papier)
+temps.insp<-temps[tau/pas*(1:nb.inspections)+1] # temps des inspections (t_i dans le papier) sans tenir compte des renouvellements
+
 
 obs<-numeric(nb.inspections) # données observées (pendant les inspections, à t_j^-)
 vect.b<-rep(1,nb.inspections) # données non observées =1 si PM efficace, 0 si worse
@@ -87,8 +88,10 @@ while (j<=nb.inspections) {
       y[j*tau/pas+1]<-0
       id.newcycle <- TRUE
       j.newcycle <- j
-      nb.cycles <- nb.cycles+1
-      if(j<nb.inspections){Delta.P[j]<-1} # 19/09/22 : Peu importe si la dernière inspection est une CM
+      if(j<nb.inspections){
+          Delta.P[j]<-1
+          nb.cycles <- nb.cycles+1
+        } # 19/09/22 : Peu importe si la dernière inspection est une CM
       
  #     temps2[(j*tau/pas+1):n] <- temps[(j*tau/pas+1):n]-temps[j*tau/pas+1]
     }
@@ -109,6 +112,19 @@ vect.u <- (obs<M)*(obs>L) # indicatrice u_i
 
 temps.cycle<-c(0,tau*which(obs>M),tps.final)
 indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
+
+
+# Calcul du vecteur s (cf. papier)
+s<-temps[1:indice.temps.cycle[2]]
+for(k in 2:nb.cycles){
+  s.aux <- temps[(indice.temps.cycle[k]+1):indice.temps.cycle[k+1]]-temps[indice.temps.cycle[k]]
+  s<-c(s,s.aux)
+}
+
+temps.insp.2<-c(0,s[tau/pas*(1:nb.inspections)+1]) # Ajout du 20/09/2022 : A mettre dans la LogL
+
+dif.tps <- diff(temps.insp.2^beta)
+dif.tps[dif.tps<0]<-1  # vecteur de longueur n prenant en compte les renouvellements (23/09/2022)
 
 
 for (k in 1:nb.cycles){
@@ -159,9 +175,9 @@ ind.i.u<-rep(0,nb.inspections)
 ind.i.u[ind.u+1] <- 1
 
 # indice i lorsque Delta_{i-1}=1 et i différent de nb.inspections
-ind.Delta<-which(Delta.P==1)
+ind.Delta<-which(Delta.P[1:(nb.inspections-1)]==1)
 
-ind.i.Delta<-rep(0,nb.inspections)
+ind.i.Delta<-c(1,rep(0,nb.inspections-1))
 ind.i.Delta[ind.Delta+1] <- 1   # Pb si la dernière inspection est > M (15/09/22)
 
 
@@ -172,23 +188,41 @@ obs.pre<-c(0,obs[1:(nb.inspections-1)])*(1-ind.i.Delta)
 
 temps.insp.pre <- c(0,temps.insp[1:(nb.inspections-1)])
 
-data <- data.frame(temps.insp,temps.insp.pre,obs,obs.pre,vect.u,vect.b,ind.i.u,Delta.P,ind.i.Delta)
+
+# Nouveaux temps d'inspection prennant en compte les renouvellements
+
+
+tps.insp.wR<-c(tau,rep(0,nb.inspections-1))
+tps.insp.pre.wR<-rep(0,nb.inspections)
+                            
+for(i in 2:nb.inspections){
+  if(ind.i.Delta[i]==1){
+    tps.insp.wR[i]<-tau
+    tps.insp.pre.wR[i]<-0
+  } else {
+    tps.insp.wR[i]<-tps.insp.wR[i-1]+tau
+    tps.insp.pre.wR[i]<-tps.insp.pre.wR[i-1]+tau
+  }
+}
+
+data <- data.frame(temps.insp,temps.insp.pre,obs,obs.pre,vect.u,vect.b,ind.i.u,Delta.P,ind.i.Delta,tps.insp.wR,tps.insp.pre.wR)
 
 
 
 data1 <- filter(data,ind.i.u==1) # On ne garde que les y_i tq u_{i-1}=1
-#data0 <- filter(data,ind.i.u==0)
-
-delta <- hat.theta[1,1]*(data$temps.insp^hat.theta[1,2]-data$temps.insp.pre^hat.theta[1,2])
+data0 <- filter(data,ind.i.u==0)
 
 
+
+delta <- hat.theta[1,1]*(tps.insp.wR^hat.theta[1,2]-tps.insp.pre.wR^hat.theta[1,2])
 
   
 #p.tilde <- (hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))/(hat.theta[1,6]*dgamma(obs-(1-c(0,Delta.P[1:(nb.inspections-1)]))*(1-hat.theta[1,4])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3])+(1-hat.theta[1,6])*dgamma(obs-(1-c(0,Delta.P[(nb.inspections-1)]))*(1+hat.theta[1,5])^(c(0,vect.u[1:(nb.inspections-1)]))*c(0,obs[1:(nb.inspections-1)]),delta,rate=hat.theta[1,3]))
 
 # p.tilde uniquement défini lorsque u_{i-1}=1
 
-p.tilde <- ifelse(data1$obs/data1$obs.pre<=1,1,(hat.theta[1,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[1,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3]))/(hat.theta[1,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[1,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3])+(1-hat.theta[1,6])*dgamma(data$obs[ind.i.u==1]-(1+hat.theta[1,5])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3])))
+#p.tilde <- ifelse(data1$obs/data1$obs.pre<=1,1,(hat.theta[1,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[1,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3]))/(hat.theta[1,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[1,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3])+(1-hat.theta[1,6])*dgamma(data$obs[ind.i.u==1]-(1+hat.theta[1,5])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3])))
+p.tilde <- ifelse(data1$obs/data1$obs.pre<=1,1,(hat.theta[1,6]*dgamma(data1$obs-(1-hat.theta[1,4])*data1$obs.pre,delta[ind.i.u==1],rate=hat.theta[1,3]))/(hat.theta[1,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[1,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3])+(1-hat.theta[1,6])*dgamma(data$obs[ind.i.u==1]-(1+hat.theta[1,5])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[1,3])))
 
 
 
@@ -213,13 +247,31 @@ upper.rhow <- min(data1.rhow$obs/data1.rhow$obs.pre-1)
 for (k in 2:(K+1)){
   hat.theta[k,6]<-mean(p.tilde) # mise à jour de p
   # Calcul des delta_i
-  num.b<-sum(hat.theta[k-1,1]*(temps.insp^hat.theta[k-1,2]-(c(0,temps.insp[1:(nb.inspections-1)]))^hat.theta[k-1,2]))
-  
-  det.b.1 <- sum(data$obs[ind.i.u==0]-data$obs.pre[ind.i.u==0])
-  det.b.2 <- sum(p.tilde*(data$obs[ind.i.u==1]-(1-hat.theta[k-1,4])*data$obs.pre[ind.i.u==1])+(1-p.tilde)*(data$obs[ind.i.u==1]-(1+hat.theta[k-1,5])*data$obs.pre[ind.i.u==1]))
+#  num.b<-sum(hat.theta[k-1,1]*(temps.insp^hat.theta[k-1,2]-(c(0,temps.insp[1:(nb.inspections-1)]))^hat.theta[k-1,2]))
  
-  det.b<-det.b.1+det.b.2  
-  hat.theta[k,3]<-num.b/det.b # mise à jour de b
+  # Mise à jour du 23/09/2022
+  # theta <-c(alpha,beta,b,rho,rho_w,p)
+  
+  esp.logL <- function(x){
+    # x[1] : alpha
+    # x[2] : beta
+    # x[3] : b
+    # x[4] : rho
+    # x[5] : rho_w
+    part.0 <- sum(log(dgamma(data0$obs-data0$obs.pre,shape =x[1]*(data0$tps.insp.wR^x[2]-data0$tps.insp.pre.wR^x[2]),rate = x[3])))
+    part.1 <- sum(p.tilde*log(dgamma(x = data1$obs-(1-x[4])*data1$obs.pre,shape=x[1]*(data1$tps.insp.wR^x[2]-data1$tps.insp.pre.wR^x[2]),rate=x[3])))
+    part.1.w <- sum((1-p.tilde)*log(dgamma(x = data1.rhow$obs-(1+x[5])*data1.rhow$obs.pre,shape=x[1]*(data1.rhow$tps.insp.wR^x[2]-data1.rhow$tps.insp.pre.wR^x[2]),rate=x[3])))
+    return(part.0+part.1+part.1.w)
+  }
+    par <- c(hat.theta[k-1,1:5])
+    hat.theta[k,1:5] <- optim(par,esp.logL,control = list(fnscale=-1))$par
+#   num.b<-sum(hat.theta[k-1,1]*dif.tps)
+  
+#  det.b.1 <- sum(data$obs[ind.i.u==0]-data$obs.pre[ind.i.u==0])
+#  det.b.2 <- sum(p.tilde*(data$obs[ind.i.u==1]-(1-hat.theta[k-1,4])*data$obs.pre[ind.i.u==1])+(1-p.tilde)*(data$obs[ind.i.u==1]-(1+hat.theta[k-1,5])*data$obs.pre[ind.i.u==1]))
+ 
+#  det.b<-det.b.1+det.b.2  
+#  hat.theta[k,3]<-num.b/det.b # mise à jour de b
   
   # Pour la mise à jour de rho et rho_w, on utilise optim car uniroot ne marche pas... 
   # En effet, plusieurs valeurs annulent la dérivée...
@@ -231,7 +283,7 @@ for (k in 2:(K+1)){
     
     return(-hat.theta[k,3]*sum(p.tilde*y.rho)+sum(p.tilde*(delta[ind.i.u==1]-1)*logy.rho))
   })
-  hat.theta[k,4]<-optimize(f.rho,c(lower.rho,1),maximum = T)$maximum
+#  hat.theta[k,4]<-optimize(f.rho,c(lower.rho,1),maximum = T)$maximum
   
   f.rhow <- Vectorize(function(x){
     
@@ -246,34 +298,42 @@ for (k in 2:(K+1)){
   })
   
   
-  hat.theta[k,5]<-optimize(f.rhow,c(0,upper.rhow),maximum = T)$maximum
+#  hat.theta[k,5]<-optimize(f.rhow,c(0,upper.rhow),maximum = T)$maximum
   
   # Mise à jour de alpha et beta
   
-  y.u.0 <- data$obs[ind.i.u==0]-(1-Delta.P[ind.i.u==0])*data$obs.pre[ind.i.u==0]
-  y.rho  <- data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1]
-  y.rhow <- data$obs[ind.i.u==1]-(1+hat.theta[k,5])*data$obs.pre[ind.i.u==1]
-  logy.u.O <- ifelse(y.u.0<=0,-1e8,log(y.u.0))
-  logy.rho<-ifelse(y.rho<=0,-1e8,log(y.rho))
-  logy.rhow<-ifelse(y.rhow<=0,-1e8,log(y.rhow))
+#  y.u.0 <- data$obs[ind.i.u==0]-(1-Delta.P[ind.i.u==0])*data$obs.pre[ind.i.u==0]
+#  y.rho  <- data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1]
+#  y.rhow <- data$obs[ind.i.u==1]-(1+hat.theta[k,5])*data$obs.pre[ind.i.u==1]
+#  logy.u.O <- ifelse(y.u.0<=0,-1e8,log(y.u.0))
+#  logy.rho<-ifelse(y.rho<=0,-1e8,log(y.rho))
+#  logy.rhow<-ifelse(y.rhow<=0,-1e8,log(y.rhow))
   
   
-  f.ab <- function(x){
-    delta.u.0 <- x[1]*(data$temps.insp[ind.i.u==0]^x[2]-data$temps.insp.pre[ind.i.u==0]^x[2])
-    delta.u.1 <- x[1]*(data$temps.insp[ind.i.u==1]^x[2]-data$temps.insp.pre[ind.i.u==1]^x[2])
-    delta.n   <- x[1]*(data$temps.insp^x[2]-data$temps.insp.pre^x[2]) # tous les delta_i
-  
-    return(sum(delta.n)*log(hat.theta[k,3])-sum(log(gamma(delta.n)))+sum((delta.u.0-1)*logy.u.O)+sum(p.tilde*(delta.u.1-1)*logy.rho+(1-p.tilde)*(delta.u.1-1)*ifelse(p.tilde==1,0,logy.rhow)))
-  }
-  hat.theta[k,1:2]<-optim(hat.theta[k-1,1:2],f.ab,control=list(fnscale=-1))$par
+ # f.ab <- function(x){
+#    delta.u.0 <- x[1]*(data$temps.insp[ind.i.u==0]^x[2]-data$temps.insp.pre[ind.i.u==0]^x[2])
+#    delta.u.1 <- x[1]*(data$temps.insp[ind.i.u==1]^x[2]-data$temps.insp.pre[ind.i.u==1]^x[2])
+#    delta.n   <- x[1]*(data$temps.insp^x[2]-data$temps.insp.pre^x[2]) # tous les delta_i
+#  
+#    return(sum(delta.n)*log(hat.theta[k,3])-sum(log(gamma(delta.n)))+sum((delta.u.0-1)*logy.u.O)+sum(p.tilde*(delta.u.1-1)*logy.rho+(1-p.tilde)*(delta.u.1-1)*ifelse(p.tilde==1,0,logy.rhow)))
+#  }
+#  hat.theta[k,1:2]<-optim(hat.theta[k-1,1:2],f.ab,control=list(fnscale=-1))$par
   
   
   
   # Mise à jour des delta.i
-  delta <- hat.theta[k,1]*(data$temps.insp^hat.theta[k,2]-data$temps.insp.pre^hat.theta[k,2])
+  #delta <- hat.theta[k,1]*(data$temps.insp^hat.theta[k,2]-data$temps.insp.pre^hat.theta[k,2])
+  delta <- hat.theta[k,1]*(tps.insp.wR^hat.theta[k,2]-tps.insp.pre.wR^hat.theta[k,2])
+
+  #dif.tps <- diff(temps.insp.2^hat.theta[k,2])
+  #dif.tps[dif.tps<0]<-0
+  
+  #delta <- hat.theta[k,1]*dif.tps
+  
   
   # Mise à jour des p.tilde
-  p.tilde <- ifelse(data1$obs/data1$obs.pre<=1,1,(hat.theta[k,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3]))/(hat.theta[k,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3])+(1-hat.theta[k,6])*dgamma(data$obs[ind.i.u==1]-(1+hat.theta[k,5])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3])))
+  #p.tilde <- ifelse(data1$obs/data1$obs.pre<=1,1,(hat.theta[k,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3]))/(hat.theta[k,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3])+(1-hat.theta[k,6])*dgamma(data$obs[ind.i.u==1]-(1+hat.theta[k,5])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3])))
+  p.tilde <- ifelse(data1$obs/data1$obs.pre<=1,1,(hat.theta[k,6]*dgamma(data1$obs-(1-hat.theta[k,4])*data1$obs.pre,delta[ind.i.u==1],rate=hat.theta[k,3]))/(hat.theta[k,6]*dgamma(data$obs[ind.i.u==1]-(1-hat.theta[k,4])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3])+(1-hat.theta[k,6])*dgamma(data$obs[ind.i.u==1]-(1+hat.theta[k,5])*data$obs.pre[ind.i.u==1],delta[ind.i.u==1],rate=hat.theta[k,3])))
   
   
   data.temp <- data.frame(data1,p.tilde)

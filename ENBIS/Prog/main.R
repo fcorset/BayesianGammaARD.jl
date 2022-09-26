@@ -10,8 +10,8 @@ library(ggplot2)
 library(tidyverse)
 
 tau <- 1 # intervalle inter-inspection
-rho <- 0.4 # parametre ARDinf pour les maintenances efficaces avec proba p
-rho_w <- 0.6 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+rho <- 0.6 # parametre ARDinf pour les maintenances efficaces avec proba p
+rho_w <- 0.8 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
 p <- 0.8 # proba que la maintenance préventive soit efficace
 
 
@@ -52,7 +52,7 @@ nb.cycles <- 1 # compteur de cycles
 x=matrix(nrow=nb.inspections,ncol = n) # processus Gamma simulé, nb.lignes = nb.cycles
 x[nb.cycles,1] = 0     # initialisation du processus Gamma = 0 à t=0
 for(i in 2:n){
-  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps2[i]^beta-temps2[i-1]^beta))
+  x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,rate = b, shape = alpha*(temps2[i]^beta-temps2[i-1]^beta))
 }
 y=numeric(n) # processus Gamma maintenu
 y.tilde=numeric(n) # processus Gamma maintenu
@@ -65,7 +65,7 @@ while (j<=nb.inspections) {
     # on resimule un x depuis 0
     x[nb.cycles,1:((j-1)*tau/pas+1)] = 0     # initialisation du processus Gamma = 0 à t=0
     for(i in ((j-1)*tau/pas+2):n){
-      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,scale = b, shape = alpha*(temps[i-(j-1)*tau/pas+1]^beta-temps[i-(j-1)*tau/pas]^beta))
+      x[nb.cycles,i] = x[nb.cycles,i-1] + rgamma(1,rate = b, shape = alpha*(temps[i-(j-1)*tau/pas+1]^beta-temps[i-(j-1)*tau/pas]^beta))
     }
     id.newcycle <- FALSE
   }
@@ -81,7 +81,9 @@ while (j<=nb.inspections) {
   } else {
     if (obs[j]<M) {
       u<-runif(1)
-      if (u>p) vect.b[j]<-0
+      if (u>p){
+        vect.b[j]<-0
+      }
       ifelse(u<=p,y[j*tau/pas+1]<-(1-rho)*y[j*tau/pas+1],y[j*tau/pas+1]<-(1+rho_w)*y[j*tau/pas+1])
        # on écrase (ARD infini)
     } else {

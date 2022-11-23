@@ -14,12 +14,12 @@ alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
 beta = 1.2 # paramètre de forme  de Gamma
 b=2   # paramètre d'échelle du Gamma
 rho <- 0.8 # parametre ARDinf pour les maintenances efficaces avec proba p
-rho_w <- 0.5 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
-p <- 0.9# proba que la maintenance préventive soit efficace
+rho_w <- 0.1 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+p <- 0.7 # proba que la maintenance préventive soit efficace
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
 tau <- 1 # intervalle inter-inspection
-HT <- 100 # fenêtre d'observation du processus
+HT <- 500 # fenêtre d'observation du processus
 pas <- 0.01 # pas de temps pour simuler le processus
 
 # Vraie valeur du paramètre
@@ -35,6 +35,8 @@ for(kk in 1:N){
   
   # Simulation des données
   data <- simuGP(alpha = alpha,beta = beta,b = b,rho = rho,rho_w = rho_w,p = p)
+  
+  # 
   
   # Estimation de alpha, beta et b
   hat.theta[kk,1:3] <- optim(c(1.5,1.5,1.5),EspLogLik.abc,mydata=data,control = list(fnscale=-1))$par

@@ -14,7 +14,7 @@
 
 ## r
 *.Rhistory
-*.RData
+
 
 *.DS_Store
 

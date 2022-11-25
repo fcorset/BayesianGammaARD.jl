@@ -9,13 +9,12 @@ source("./fonctions.R")
 #==================================
 #      Paramètres du modèle :
 #==================================
-
 alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
 beta = 1.2 # paramètre de forme  de Gamma
 b=2   # paramètre d'échelle du Gamma
-rho <- 0.8 # parametre ARDinf pour les maintenances efficaces avec proba p
+rho <- 0.5 # parametre ARDinf pour les maintenances efficaces avec proba p
 rho_w <- 0.1 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
-p <- 0.7 # proba que la maintenance préventive soit efficace
+p <- 0.9 # proba que la maintenance préventive soit efficace
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
 tau <- 1 # intervalle inter-inspection

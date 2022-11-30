@@ -41,7 +41,9 @@ for (i in 1:nb.fic) {
                         sep = ""))
     png(Fig.File.Name)
     hist(x = hat.theta[, j], freq = FALSE, nclass = 20, xlab = "", main = titre)
-    lines(density(hat.theta[, j]), col = "red", lwd = 2)
+    # lines(density(hat.theta[, j]), col = "red", lwd = 2)
+    abline(v = as.numeric(tmp[i, j+1]), col = "green")
+    abline(v = mean(hat.theta[, j]), col = "red")
     dev.off()
   }
 }

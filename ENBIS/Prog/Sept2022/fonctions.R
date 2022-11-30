@@ -12,6 +12,12 @@ simuGP <- function(alpha=1,beta=1,b=1,rho=.2,rho_w = 0.2,p=.9,tau=1,HT=100,L=5,M
   # beta  : paramètre de forme  de Gamma
   # b     : paramètre de taux du Gamma
   
+  # Renvoie une liste 
+  # donnees est la data frame des données
+  # ProcGamma renvoie la date frame :
+  #   * x pour le processus non maintenu
+  #   * y pour le processus maintenu
+  
   id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
   
   #set.seed(123)
@@ -145,7 +151,7 @@ simuGP <- function(alpha=1,beta=1,b=1,rho=.2,rho_w = 0.2,p=.9,tau=1,HT=100,L=5,M
   data <- data.frame(temps.insp,temps.insp.pre,obs,obs.pre,vect.u,vect.b,ind.i.u,Delta.P,ind.i.Delta,tps.insp.wR,tps.insp.pre.wR)
   
   
-  return(data)
+  return(list(donnees=data,ProcGammaNM=x,ProcGammaM=y))
   
   
 }
@@ -252,9 +258,52 @@ AlgoEM <- function(mydata,par.init,K=50,est.alpha,est.beta,est.b,est.rho){
     data1.rhow <- filter(data1.temp,p.tilde<1)
     
   }
-  return(est.rhow.p[K+1,1:2])
+  return(list(estim = est.rhow.p[K+1,1:2],p = p.tilde))
 }
 
+plot1traj <- function(mydata,alpha=1,beta=1,b=1,rho=.2,rho_w = 0.2,p=.9,tau=1,HT=100,L=5,M=10,pas=0.01){
+  temps = seq(from = 0,to = HT,by = pas)
+  temps.cycle<-c(0,tau*which(mydata$obs>M),HT)
+  indice.temps.cycle <- c(1,tau/pas*(which(data$obs>M))+1,length(temps))
+  nb.cycles <- sum(data$obs>=M)+1
+  nb.inspections<- floor(HT/tau) # nombre d'inspections max pendant la fenêtre d'observation.
+  
+  # Calcul du vecteur s (cf. papier)
+  s<-temps[1:indice.temps.cycle[2]]
+  for(k in 2:nb.cycles){
+    s.aux <- temps[(indice.temps.cycle[k]+1):indice.temps.cycle[k+1]]-temps[indice.temps.cycle[k]]
+    s<-c(s,s.aux)
+  }
+  
+  temps.insp.2<-c(0,s[tau/pas*(1:nb.inspections)+1]) # Ajout du 20/09/2022 : A mettre dans la LogL
+  
+  dif.tps <- diff(temps.insp.2^beta)
+  dif.tps[dif.tps<0]<-1  # vecteur de longueur n prenant en compte les renouvellements (23/09/2022)
+  
+  
+  for (k in 1:nb.cycles){
+    plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,indice.temps.cycle[k]:indice.temps.cycle[k+1]],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,HT),xlab="",ylab="")
+    par(new=T)
+  }
+  
+  plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
+  
+  
+  par(new=T)
+  vect.b.fact <- factor(data$vect.b)
+  mescouleurs <- rainbow(length(levels(vect.b.fact)))
+  plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "time",ylab="Degradation",col=mescouleurs[vect.b.fact])
+  abline(h=L,col="blue")
+  abline(h=M,col="red")
+  abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
+  
+  vect.b.fact <- factor(vect.b)
+  mescouleurs <- rainbow(length(levels(vect.b.fact)))
+  plot(1:nb.inspections,obs,type="p",xlim = c(0,HT),xlab = "time",ylab="Degradation",col=mescouleurs[vect.b.fact])
+  abline(h=L,col="blue")
+  abline(h=M,col="red")
+  abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
+}
 
 
 

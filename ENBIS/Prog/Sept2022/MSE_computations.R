@@ -122,7 +122,7 @@ library(WriteXLS)
 do.rounding <- TRUE
 nb.dec <- 5
 if (do.rounding) {
-  Tab.MSE[, 8:13] <- round(x = Tab.MSE[, 8:13], digits = nb.dec)
+  Tab.MSE[, 8:19] <- round(x = Tab.MSE[, 8:19], digits = nb.dec)
 }
 WriteXLS(x = Tab.MSE, ExcelFileName = "MSE.xls")
 

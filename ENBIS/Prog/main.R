@@ -11,7 +11,7 @@ library(tidyverse)
 
 tau <- 1 # intervalle inter-inspection
 rho <- 0.6 # parametre ARDinf pour les maintenances efficaces avec proba p
-rho_w <- 0.8 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+rho_w <- 0.2 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
 p <- 0.8 # proba que la maintenance préventive soit efficace
 
 

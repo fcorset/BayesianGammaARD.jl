@@ -9,9 +9,9 @@ source("./fonctions.R")
 #==================================
 #      Paramètres du modèle :
 #==================================
-alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1.2 # paramètre de forme  de Gamma
-b=2   # paramètre d'échelle du Gamma
+alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
+beta = 1 # paramètre de forme  de Gamma
+b=1   # paramètre d'échelle du Gamma
 rho <- 0.8 # parametre ARDinf pour les maintenances efficaces avec proba p
 rho_w <- 0.5 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
 p <- 0.9 # proba que la maintenance préventive soit efficace
@@ -58,10 +58,13 @@ for(kk in 1:N){
   hat.theta[kk,5:6] <- resEM$estim
   est.p.tilde <- resEM$p
   id.worseM <- data1$temps.insp[which(est.p.tilde<1)]-1
+  data1<-data.frame(data1,est.p.tilde)
+  plot1traj(tmp,alpha=alpha,beta=beta,b=b,rho=rho,rho_w = rho_w,p=p,tau=1,HT=HT,L=5,M=10,pas=0.01)
 }
 
 txt <- str_remove_all(paste("./Results/1trajectoire/Convexe/estim_",alpha,"_",beta,"_",b,"_",rho,"_",rho_w,"_",p,"_",HT)," ")
 
 save(hat.theta,file=str_remove_all(paste(txt,".Rdata")," "))
 save(tmp,file="./Results/1trajectoire/Convexe/donnees.Rdata")
+save(data1,file="./Results/1trajectoire/Convexe/data1.Rdata")
 save(id.worseM,file="./Results/1trajectoire/Convexe/idWM.Rdata")

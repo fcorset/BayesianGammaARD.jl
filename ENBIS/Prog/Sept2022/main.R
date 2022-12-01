@@ -27,7 +27,7 @@ theta <-c(alpha,beta,b,rho,rho_w,p)
 # Estimation des paramètres
 #N<-200 # Nb de simulations
 
-N<-200
+N<-1
 
 hat.theta <- matrix(ncol=6,nrow=N)
 
@@ -36,8 +36,11 @@ for(kk in 1:N){
   print(paste("Numéro simulation : ",kk))
   
   # Simulation des données
-  data <- simuGP(alpha = alpha,beta = beta,b = b,rho = rho,rho_w = rho_w,p = p,HT=HT)$donnees  
-  
+  tmp <- simuGP(alpha = alpha,beta = beta,b = b,rho = rho,rho_w = rho_w,p = p,HT=HT)
+  data<-tmp$donnees
+  TrajecNM <- tmp$ProcGammaNM
+  TrajecM<- tmp$ProcGammaM
+  Nbcycles<- tmp$Nbcycles
   # 
   
   # Estimation de alpha, beta et b
@@ -51,12 +54,14 @@ for(kk in 1:N){
   hat.theta[kk,4] <- optim(0.5,EspLogLik.rho,mydata=data,est.alpha=hat.theta[kk,1],est.beta=hat.theta[kk,2],est.b=hat.theta[kk,3],method="Brent",lower=lower.rho,upper=1,control = list(fnscale=-1))$par
   
   # Algo EM
-  
-  hat.theta[kk,5:6] <- AlgoEM(mydata=data,par.init=c(.5,.5),K=50,est.alpha=hat.theta[kk,1],est.beta=hat.theta[kk,2],est.b=hat.theta[kk,3],est.rho=hat.theta[kk,4])$estim
-
-  
+  resEM <- AlgoEM(mydata=data,par.init=c(.5,.5),K=50,est.alpha=hat.theta[kk,1],est.beta=hat.theta[kk,2],est.b=hat.theta[kk,3],est.rho=hat.theta[kk,4])
+  hat.theta[kk,5:6] <- resEM$estim
+  est.p.tilde <- resEM$p
+  id.worseM <- data1$temps.insp[which(est.p.tilde<1)]-1
 }
 
 txt <- str_remove_all(paste("./Results/1trajectoire/Convexe/estim_",alpha,"_",beta,"_",b,"_",rho,"_",rho_w,"_",p,"_",HT)," ")
 
 save(hat.theta,file=str_remove_all(paste(txt,".Rdata")," "))
+save(tmp,file="./Results/1trajectoire/Convexe/donnees.Rdata")
+save(id.worseM,file="./Results/1trajectoire/Convexe/idWM.Rdata")

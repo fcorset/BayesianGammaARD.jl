@@ -9,7 +9,7 @@ alpha <- 2
 beta <- 1.2
 b <- 2
 rho <- 0.8
-rho_w <- 0.5
+rho_w <- 0.1
 p <- 0.9
 HT <- 50
 theta<-c(alpha,beta,b,rho,rho_w,p)
@@ -24,36 +24,36 @@ label.theta <-c("alpha","beta","b","rho","rho_w","p")
 #theta <- c(alpha,beta,b,rho,rho_w,p)
 
 # Histogramme pour alpha
-hist(hat.theta[,1],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",alpha," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.5, ",p,"=0.9, ",n,"=500)")))
+hist(hat.theta[,1],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",alpha," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.1, ",p,"=0.9, ",n,"=50)")))
 abline(v=theta[1],col="green")
 abline(v=mean(hat.theta[,1]),col="red")
 
 # Histogramme pour beta
-hist(hat.theta[,2],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",beta," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.5, ",p,"=0.9, ",n,"=500)")))
+hist(hat.theta[,2],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",beta," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.1, ",p,"=0.9, ",n,"=50)")))
 abline(v=theta[2],col="green")
 abline(v=mean(hat.theta[,2]),col="red")
 
 
 # Histogramme pour b
-hist(hat.theta[,3],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",b," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.5, ",p,"=0.9, ",n,"=500)")))
+hist(hat.theta[,3],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",b," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.1, ",p,"=0.9, ",n,"=50)")))
 abline(v=theta[3],col="green")
 abline(v=mean(hat.theta[,3]),col="red")
 
 
 # Histogramme pour rho
-hist(hat.theta[,4],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",rho," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.5, ",p,"=0.9, ",n,"=500)")))
+hist(hat.theta[,4],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",rho," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.1, ",p,"=0.9, ",n,"=50)")))
 abline(v=theta[4],col="green")
 abline(v=mean(hat.theta[,4]),col="red")
 
 
 # histogramme pour rho_w
-hist(hat.theta[,5],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",rho[w]," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.5, ",p,"=0.9, ",n,"=500)")))
+hist(hat.theta[,5],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",rho[w]," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.1, ",p,"=0.9, ",n,"=50)")))
 abline(v=theta[5],col="green")
 abline(v=mean(hat.theta[,5]),col="red")
 
 
 # Histogramme pour p
-hist(hat.theta[,6],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",p," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.5, ",p,"=0.9, ",n,"=500)")))
+hist(hat.theta[,6],freq=F,nclass=20,xlab="",main=expression(paste("Histogram of ",p," (for ",alpha, "=2, ",beta,"=1.2, ",b,"=2, ",rho,"=0.8, ",rho[w],"=0.1, ",p,"=0.9, ",n,"=50)")))
 abline(v=theta[6],col="green")
 abline(v=mean(hat.theta[,6]),col="red")
 

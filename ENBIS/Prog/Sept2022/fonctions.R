@@ -277,10 +277,13 @@ plot1traj <- function(mydata,alpha=1,beta=1,b=1,rho=.2,rho_w = 0.2,p=.9,tau=1,HT
   
   # Calcul du vecteur s (cf. papier)
   s<-temps[1:indice.temps.cycle[2]]
-  for(k in 2:nb.cycles){
-    s.aux <- temps[(indice.temps.cycle[k]+1):indice.temps.cycle[k+1]]-temps[indice.temps.cycle[k]]
-    s<-c(s,s.aux)
+  if (nb.cycles>1){
+    for(k in 2:nb.cycles){
+      s.aux <- temps[(indice.temps.cycle[k]+1):indice.temps.cycle[k+1]]-temps[indice.temps.cycle[k]]
+      s<-c(s,s.aux)
+    }
   }
+  
   
   temps.insp.2<-c(0,s[tau/pas*(1:nb.inspections)+1]) # Ajout du 20/09/2022 : A mettre dans la LogL
   

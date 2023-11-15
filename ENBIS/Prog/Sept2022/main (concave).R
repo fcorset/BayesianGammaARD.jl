@@ -5,20 +5,20 @@ library(stringr)
 library(dplyr)
 #setwd(dir = "/Users/fcorset/Documents/bureau/Papiers/encours/AnalyseSensibilite/degradation/ENBIS/Prog/Sept2022")
 source("./fonctions.R")
-
+set.seed(10)
 #==================================
 #      Paramètres du modèle :
 #==================================
-# alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
-# beta = 1.2 # paramètre de forme  de Gamma
-# b=2   # paramètre d'échelle du Gamma
-# rho <- 0.8 # parametre ARDinf pour les maintenances efficaces avec proba p
-# rho_w <- 0.5 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
-# p <- 0.9 # proba que la maintenance préventive soit efficace
+ alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
+ beta = 1.2 # paramètre de forme  de Gamma
+ b=2   # paramètre d'échelle du Gamma
+ rho <- 0.8 # parametre ARDinf pour les maintenances efficaces avec proba p
+ rho_w <- 0.5 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+ p <- 0.9 # proba que la maintenance préventive soit efficace
 L <- 5 # seuil pour MP
 M <- 10 # seuil pout MC
 tau <- 1 # intervalle inter-inspection
-# HT <- 50 # fenêtre d'observation du processus
+ HT <- 50 # fenêtre d'observation du processus
 pas <- 0.01 # pas de temps pour simuler le processus
 
 # Vraie valeur du paramètre
@@ -44,7 +44,7 @@ for(kk in 1:N){
   hat.theta[kk,1:3] <- optim(c(1.5,1.5,1.5),EspLogLik.abc,mydata=data,control = list(fnscale=-1))$par
 
   # Estimation de rho
-  # Définition de la borne inf pour rho
+  # Définition de la borne infNo pour rho
   data1 <- filter(data,ind.i.u==1) # On ne garde que les y_i tq u_{i-1}=0
   lower.rho <- max(1-data1$obs/data1$obs.pre)
 

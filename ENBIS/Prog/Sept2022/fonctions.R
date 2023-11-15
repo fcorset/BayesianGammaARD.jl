@@ -167,9 +167,25 @@ EspLogLik.abc <- function(x,mydata){
   
   # Calcul des delta_i
   delta <- x[1]*(data0$tps.insp.wR^x[2]-data0$tps.insp.pre.wR^x[2])
-
+  
   # 
   return(log(x[3])*sum(delta) - sum(log(gamma(delta))) + sum((delta-1)*log(data0$obs-data0$obs.pre)) - x[3]*sum(data0$obs-data0$obs.pre))
+}
+
+EspLogLik.abcbis <- function(x,mydata){
+  # Cette fonction calcule l'espérance de la logVraisemblance en fonction de alpha
+  # beta et b uniquement pour les données où y_i < L, i.e u_{i-1}=0
+  # x[1] : alpha
+  # x[2] : beta
+  # x[3] : b
+  
+  data0 <- filter(mydata,ind.i.u==0) # On ne garde que les y_i tq u_{i-1}=0
+  
+  # Calcul des delta_i
+  delta <- x[1]*(data0$tps.insp.wR^x[2]-data0$tps.insp.pre.wR^x[2])
+  deltabis <- x[1]*(data$tps.insp.wR^x[2]-data$tps.insp.pre.wR^x[2])
+  # 
+  return(log(x[3])*sum(deltabis) - sum(log(gamma(deltabis))) + sum((delta-1)*log(data0$obs-data0$obs.pre)) - x[3]*sum(data0$obs-data0$obs.pre))
 }
 
 EspLogLik.rho <- function(x,mydata,est.alpha,est.beta,est.b){
@@ -180,7 +196,7 @@ EspLogLik.rho <- function(x,mydata,est.alpha,est.beta,est.b){
   # est.b : estimation de b
   # x : rho
   
-  data1 <- filter(mydata,ind.i.u==1) # On ne garde que les y_i tq u_{i-1}=0
+  data1 <- filter(mydata,ind.i.u==1) # On ne garde que les y_i tq u_{i-1}=1
   
   data1.rho <- filter(data1,obs<obs.pre)
   # Calcul des delta_i

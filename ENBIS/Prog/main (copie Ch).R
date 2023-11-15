@@ -38,7 +38,7 @@ M <- 10
 # Paramètre de forme de Gamma a = alpha (t)^beta
 alpha <- 2
 # Paramètre de forme  de Gamma
-beta <- 1 
+beta <- 1.4 
 # Paramètre d'échelle du Gamma
 b <- 1.5   
 
@@ -52,7 +52,7 @@ theta <-c(alpha, beta, b, rho, rho_w, p)
 ###################################################################
 
 # Fenêtre d'observation du processus
-tps.final <- 500 
+tps.final <- 100 
 # Pas de temps pour la simulation
 pas <- 0.01 
 # Vecteur des instants de simulation

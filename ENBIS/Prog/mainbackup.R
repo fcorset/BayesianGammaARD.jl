@@ -5,9 +5,19 @@
 
 
 
-# rm(list=ls())
+rm(list=ls())
 library(ggplot2)
 library(tidyverse)
+
+tau <- 1 # intervalle inter-inspection
+rho <- 0.4 # parametre ARDinf pour les maintenances efficaces avec proba p
+rho_w <- 0.3 # parametre ARDinf pour les maintenances néfastes avec proba 1-p
+p <- 0.8 # proba que la maintenance préventive soit efficace
+
+
+L <- 5 # seuil pour MP
+M <- 10 # seuil pout MC
+tps.final <- 20 # fenêtre d'observation du processus
 
 id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 
@@ -15,9 +25,9 @@ id.newcycle <- FALSE # Initialisation du nb de cycle de renouvellement
 # Simulation d'un processus gamma jusqu'au temps final
 pas = 0.01 # pas de temps pour simuler le processus
 
-alpha = 1 # paramètre de forme de Gamma a = alpha (t)^beta
-beta = 1.6 # paramètre de forme  de Gamma
-b=1   # paramètre d'échelle du Gamma
+alpha = 2 # paramètre de forme de Gamma a = alpha (t)^beta
+beta = 1.2 # paramètre de forme  de Gamma
+b=1.5   # paramètre d'échelle du Gamma
 temps = seq(from = 0,to = tps.final,by = pas)
 
 theta <-c(alpha,beta,b,rho,rho_w,p)
@@ -63,7 +73,7 @@ while (j<=nb.inspections) {
   obs[j]<-y[j*tau/pas+1] # état dégradation à l'inspection (t_j^-)
   
   if (obs[j] < L) {
-    # print("no action")
+    print("no action")
   } else {
     if (obs[j]<M) {
       u<-runif(1)
@@ -96,29 +106,29 @@ temps.cycle<-c(0,tau*which(obs>M),tps.final)
 indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
 
 
-# for (k in 1:nb.cycles){
-#   plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
-#   par(new=T)
-# }
+for (k in 1:nb.cycles){
+  plot(temps[indice.temps.cycle[k]:indice.temps.cycle[k+1]],x[k,1:(indice.temps.cycle[k+1]-indice.temps.cycle[k]+1)],col="red",type="l",ylim = c(0,max(y.tilde)),xlim = c(0,tps.final),xlab="",ylab="")
+  par(new=T)
+}
 
-# plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
+plot(temps,y.tilde,type="l",ylim=c(0,max(y.tilde)),xlim = c(0,tps.final),ylab="",xlab="")
 
 
-# par(new=T)
-# vect.b.fact <- factor(vect.b)
-# mescouleurs <- rainbow(length(levels(vect.b.fact)))
-# plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation",col=mescouleurs[vect.b.fact])
-# abline(h=L,col="blue")
-# abline(h=M,col="red")
-# abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
+par(new=T)
+vect.b.fact <- factor(vect.b)
+mescouleurs <- rainbow(length(levels(vect.b.fact)))
+plot(tau*(1:nb.inspections),numeric(length = nb.inspections),ylim=c(0,max(y.tilde)),type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation",col=mescouleurs[vect.b.fact])
+abline(h=L,col="blue")
+abline(h=M,col="red")
+abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
 
-# vect.b.fact <- factor(vect.b)
-# mescouleurs <- rainbow(length(levels(vect.b.fact)))
-# plot(1:nb.inspections,obs,type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation",col=mescouleurs[vect.b.fact])
-# abline(h=L,col="blue")
-# abline(h=M,col="red")
-# abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
-# abline(v=81)
+vect.b.fact <- factor(vect.b)
+mescouleurs <- rainbow(length(levels(vect.b.fact)))
+plot(1:nb.inspections,obs,type="p",xlim = c(0,tps.final),xlab = "temps",ylab="Dégradation",col=mescouleurs[vect.b.fact])
+abline(h=L,col="blue")
+abline(h=M,col="red")
+abline(v=tau*(1:nb.inspections), lty =3, col = grey(0.1), lwd = 0.45)
+abline(v=81)
 
 
 
@@ -130,9 +140,11 @@ indice.temps.cycle <- c(1,tau/pas*(which(obs>M))+1,length(temps))
 #####################################
 
 # initialisation des paramètres
+K<- 50
 
 hat.theta<-matrix(nrow=K+1,ncol=6)
-hat.theta[1,] <- c(1.2,1.1,1.5,0.2,0.2,0.5) # (alpha,beta,b,rho,rho^\prime,p)
+#hat.theta[1,] <- c(1.2,1.1,1.5,0.2,0.2,0.5) # (alpha,beta,b,rho,rho^\prime,p)
+hat.theta[1,] <- theta
 
 # On ne définit les p.tildes[i] que lorsque u_{i-1}=1 
 ind.u<-which(vect.u[1:(nb.inspections-1)]==1)
@@ -261,13 +273,13 @@ for (k in 2:(K+1)){
   upper.rhow <- min(data1.rhow$obs/data1.rhow$obs.pre-1)
   
   
-  # print(paste("la valeur de alpha à l'étape ",k," est : ",hat.theta[k,1]))
-  # print(paste("la valeur de beta à l'étape ",k," est : ",hat.theta[k,2]))
-  # print(paste("la valeur de b à l'étape ",k," est : ",hat.theta[k,3]))
-  # print(paste("la valeur de rho à l'étape ",k," est : ",hat.theta[k,4]))
-  # print(paste("la valeur de rho_w à l'étape ",k," est : ",hat.theta[k,5]))
-  # print(paste("la valeur de p à l'étape ",k," est : ",hat.theta[k,6]))
-  # print("==============================================================")
+  print(paste("la valeur de alpha à l'étape ",k," est : ",hat.theta[k,1]))
+  print(paste("la valeur de beta à l'étape ",k," est : ",hat.theta[k,2]))
+  print(paste("la valeur de b à l'étape ",k," est : ",hat.theta[k,3]))
+  print(paste("la valeur de rho à l'étape ",k," est : ",hat.theta[k,4]))
+  print(paste("la valeur de rho_w à l'étape ",k," est : ",hat.theta[k,5]))
+  print(paste("la valeur de p à l'étape ",k," est : ",hat.theta[k,6]))
+  print("==============================================================")
 }
 
 # Identifier les p.tildes <1
@@ -276,21 +288,21 @@ ind.poor.maintenance <- which(data1$vect.b==0)
 # Maintenance où yappartient à [L,M]
 cbind(temps.insp[ind.u],vect.b[ind.u],1-p.tilde)
 
-# # PLOT 
-# par(mfrow = c(2, 3))
-# plot(hat.theta[, 1], type = "l", lwd = 2, ylim = c(0,2*alpha))
-# abline(h = alpha, col = "red", lwd = 2)^
-# plot(hat.theta[, 2], type = "l", lwd = 2, ylim = c(0,2*beta))
-# abline(h = beta, col = "red", lwd = 2)
-# plot(hat.theta[, 3], type = "l", lwd = 2, ylim = c(0,2*b))
-# abline(h = b, col = "red", lwd = 2)
-# plot(hat.theta[, 4], type = "l", lwd = 2, ylim = c(0,1))
-# abline(h = rho, col = "red", lwd = 2)
-# plot(hat.theta[, 5], type = "l", lwd = 2, ylim = c(0,1))
-# abline(h = rho_w, col = "red", lwd = 2)
-# plot(hat.theta[, 6], type = "l", lwd = 2, ylim = c(0,1))
-# abline(h = p, col = "red", lwd = 2)
-# 
-# 
-# 
-# 
+# PLOT 
+par(mfrow = c(2, 3))
+plot(hat.theta[, 1], type = "l", lwd = 2, ylim = c(0,2*alpha),xlab="k",ylab="alpha")
+abline(h = alpha, col = "red", lwd = 2)^
+plot(hat.theta[, 2], type = "l", lwd = 2, ylim = c(0,2*beta),xlab="k",ylab="beta")
+abline(h = beta, col = "red", lwd = 2)
+plot(hat.theta[, 3], type = "l", lwd = 2, ylim = c(0,2*b),xlab="k",ylab="b")
+abline(h = b, col = "red", lwd = 2)
+plot(hat.theta[, 4], type = "l", lwd = 2, ylim = c(0,1),xlab="k",ylab="rho")
+abline(h = rho, col = "red", lwd = 2)
+plot(hat.theta[, 5], type = "l", lwd = 2, ylim = c(0,1),xlab="k",ylab="rho_w")
+abline(h = rho_w, col = "red", lwd = 2)
+plot(hat.theta[, 6], type = "l", lwd = 2, ylim = c(0,1),xlab="k",ylab="p")
+abline(h = p, col = "red", lwd = 2)
+
+
+
+

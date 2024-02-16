@@ -22,3 +22,13 @@ Processus gamma+ effect aléatoire, échelle gamma
 Processus inverse gaussien + effet aléatoire, 1/mu normal tronqué 
 MCMC
 Données laser
+
+@@@@@@@@@@@@@@@@@@@@@@@
+Bayesian estimation and prediction for the transformed gamma degradation process (Giorgio et al. 2018) :
+A priori sur la corrélation entre dynamique de dégradation et son niveau et sur la courbe moyenne de dégradation.
+
+Inférence bayésienne via MCMC + Prédiction
+
+@@@@@@@@@@@@@@@@@@@@@@
+
+

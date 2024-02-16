@@ -31,4 +31,10 @@ Inférence bayésienne via MCMC + Prédiction
 
 @@@@@@@@@@@@@@@@@@@@@@
 
+How heterogeneity influences condition-based maintenance for gamma degradation process
+Markov decision process pour GP +CBM
+A priori Gamma sur 1/beta (effet aléatoire comme lawless) due à la hétérogénéité
+Construction de v.a qui suit une loi de Fisher 
+Analyse de ‘impact de l’effet aléatoire sur le CBM (seuil, cout, interval d’inspection..) CBM optimal 
+
 

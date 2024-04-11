@@ -107,3 +107,33 @@ dai2022reliability
 Reliability modelling of wheel wear deterioration using conditional bivariate gamma processes and Bayesian hierarchical models
 %%%%%%%%%%
 LawlessCrowder04
+%%%%%%%%%%%%%%%%
+mehta2015condition
+
+Double-sampling Bayesian scheme with state-dependent inspection intervals.
+Markovian deterioration with self-announced failures.
+Double samplings are allowed.
+Analytic derivation of cost function without the need for discretization.
+Improved economic outcome compared to previous Bayesian policies.
+
+%%%%%%%%%%%%%%%
+
+flage2012safety
+
+(1) with a given subjective probability (degree of belief), the limiting relative frequency of one or more failures during a fixed time interval is bounded; or (2) the subjective probability of one or more failures during a fixed time interval is bounded. In the model, the parameter(s) of a condition-based inspection scheduling function and a preventive replacement threshold are jointly optimized upon each replacement and inspection such as to minimize the expected long run cost per unit of time, but also considering one of the specified safety constraints. 
+
+%%%%%%%%%%%%%%%%
+pang2021bayesian
+Nonlinear model is used to characterize the degradation process.
+Accelerated degradation data and condition monitoring data are fused.
+Random-effect parameters are modeled as non-conjugate prior distributions.
+The approximate life distribution is obtained and validated by practical data.
+%%%%%%%%%%%%%%%%%
+walter2017condition
+Uses the reliability block diagram and the status (working/defective) of components.
+Closed-form Bayesian update of system reliability using all available information.
+Separate Weibull model for each component type using expert knowledge and test data.
+Maintenance decision via minimization of the expected one-cycle cost rate.
+%%%%%%%%%%%%%%%
+quatrini2020condition
+(i) towards more specific implementation strategies (ii) and then specifically focusing on operational aspects related to (iii) inspection and replacement and (iv) prognosis. The data-driven bibliometric results have been combined with an interpretative research to extract both core and detailed concepts related to CBM. This combined analysis allows a critical reflection on the field and the extraction of potential future research directions.

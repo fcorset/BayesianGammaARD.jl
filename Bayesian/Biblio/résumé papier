@@ -137,3 +137,9 @@ Maintenance decision via minimization of the expected one-cycle cost rate.
 %%%%%%%%%%%%%%%
 quatrini2020condition
 (i) towards more specific implementation strategies (ii) and then specifically focusing on operational aspects related to (iii) inspection and replacement and (iv) prognosis. The data-driven bibliometric results have been combined with an interpretative research to extract both core and detailed concepts related to CBM. This combined analysis allows a critical reflection on the field and the extraction of potential future research directions.
+%%%%%%%%%%%%%%%%
+kallen2005optimal
+This paper proposes an adaptive Bayesian decision model to determine these optimal inspection plans under uncertain deterioration. It uses the gamma stochastic process to model the corrosion damage mechanism and Bayes’ theorem to update prior knowledge over the corrosion rate with imperfect wall thickness measurements.
+%%%%%%%%%%%%%%%%%
+curcuru2010predictive
+This paper deals with this topic and proposes a procedure for the computation of the maintenance time that minimizes the global maintenance cost. By adopting a stochastic model for the degradation process and by hypothesizing the use of an imperfect monitoring system, the procedure updates by a Bayesian approach, the a-priori information, using the data coming from the monitoring system.

@@ -143,3 +143,20 @@ This paper proposes an adaptive Bayesian decision model to determine these optim
 %%%%%%%%%%%%%%%%%
 curcuru2010predictive
 This paper deals with this topic and proposes a procedure for the computation of the maintenance time that minimizes the global maintenance cost. By adopting a stochastic model for the degradation process and by hypothesizing the use of an imperfect monitoring system, the procedure updates by a Bayesian approach, the a-priori information, using the data coming from the monitoring system.
+%%%%%%%%%%%%%%%%%%%
+ye2015bayesian
+To account for the heterogeneous degradation rate and the non-negligible measurement errors, we model the degradation observations using a random-effects Wiener process with measurement errors. Under the model, direct estimation of current degradation and prediction of future degradation are difficult. We thus develop a filtering algorithm that recursively estimates the joint distribution of the degradation rate and the current degradation levels. Based on the estimates, the distribution of the remaining useful life can be timely predicted. 
+%%%%%%%%%%%%%%%%%%%
+omshi2021replacement,
+A deteriorating system subject to imperfect repair is considered.
+A random improvement factor describes the effect of imperfect repair.
+A condition-based predictive maintenance with aperiodic planning is proposed.
+A new decision variable adjusts the balance between repairs and replacements.
+The closed form of long run maintenance cost is obtained, and optimized numerically.
+%%%%%%%%
+franckbayesian
+This paper proposes a Bayesian analysis of ARA imperfect maintenance models, when both Corrective Main-
+tenance (CM) and planned Preventive Maintenance (PM) are performed. The Arithmetic Reduction of Age
+(ARA) models consider that maintenance effect is to rejuvenate the system by an arithmetic reduction of its
+virtual age. 
+%%%%%%%%%%%%%

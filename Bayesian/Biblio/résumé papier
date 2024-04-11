@@ -1,40 +1,109 @@
-Guida:
+%%%%%%%%%%%%%%
+Guida -A Bayesian approach for non-homogeneous gamma degradation processes
+guida2019bayesian
 Gamma non homogène, fonction de forme at^b, Changement de variables pour donner expressions les de RUL, E(RUL) etc sont données.  
-Bayésien: échelle inverse gaussien, loi gamma pour la moyenne, pour b trois lois: impropre, beta et gamma a trois paramètres, a écrit en fonction des autres. 
-Objectif, loi conditionnelle et RUL, 
+Bayésien: \theta=E/var  de loi inverse gaussien, loi gamma pour la moyenne, pour b 4 lois: impropre, beta et gamma à un paramètre, gamma à trois paramètres, a écrit en fonction des autres. 
+Posteriori. loi conditionnelle et RUL, 
 Méthode MCMC
+Generation de données
 Données Meeker 1998, Ebrahem 2006
-
-ABC HAZRA
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+ABC HAZRA hazra2020approximate
 Y(t)=A+X(t)+Z où X processus gamma , Z bruit gaussiez, A degradation initiale aléatoire 
+ABC (approximate Bayes computation) avec un choix de distance pour accepter les bons paramètres. 
 ABC+MCMC priori uniforme
-
-Bousquet et al
+Application: piping network of the primary heat transport system of Canada
+%%%%%%%%%%%%%%%%%%%%%%%%
+Bousquet et al. bousquet2015bayesian
 Censure, jeffery et inverse gamma ou inverse gamma  et gamma
-
-BayesGaussGamma2018
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+BayesGaussGamma2018 Di et. Al.  liu2018bayesian
 Processus gamma ou processus inverse gaussien avec effet aléatoire gamma
-Priori non informative pour les hyper parameters (uniforme et TN)
-MCMC
-
-Degradation modeling based on gamma process models with random effects
-Processus gamma+ effect aléatoire, échelle gamma 
-Processus inverse gaussien + effet aléatoire, 1/mu normal tronqué 
-MCMC
+Priori non informative pour les hyper parameters 
+Mélange deux des modèles et estimation bayesienne 
+Loi a prior (uniforme et TN) pour les proba de suivre un modèle
+Resultats exactes d’estimation des paramètres sous chaque modèle
+MCMC estimation de tous les paramètres ensemble
 Données laser
+Fiabilité
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+BayesianAnalysis2017 Tang   tang2017bayesian
+NHPP+ Weibull
+Intensity suit un processus Gamma
+Trois paramètres à estimer (Parameters de forme de processus gamma, car échelle est 1, et les paramètres de Weibull
+t_i instance d défaillance on donne la densité de t_|t_i-1 ainsi que la vraisemblance
+Matrice d’information de fisher 
+Jeffery’s prior
+Six Référence prior pour le vecteur des paramètres dans l’ordre différentes
+Gibbs sampling pour aposteriori
+Prediction 
+Application Donnée National Bureau Economic research, US business cycle contractions
+%%%%%%%%%%%%%%%%%%%
+ComponentABCGibbs2020. CLARTE
 
-@@@@@@@@@@@@@@@@@@@@@@@
-Bayesian estimation and prediction for the transformed gamma degradation process (Giorgio et al. 2018) :
-A priori sur la corrélation entre dynamique de dégradation et son niveau et sur la courbe moyenne de dégradation.
+Gibbs+ABC: existence de solution et convergence 
 
-Inférence bayésienne via MCMC + Prédiction
+
+%%%%%%%%%%%%%
+RODRIGUEZ_PICON 2017. rodriguez2018degradation
+Degradation modeling based on gamma process models with random effects
+Processus gamma+ effect aléatoire, paramètre d’échelle suit une loi gamma
+Hyper paramètres aussi Gamma 
+Processus inverse gaussien + effet aléatoire, 1/mu normal tronqué 
+MCMC OPENBUG
+Données laser
+Crack
+
+%%%%%%%%%%%%%%%%%
+Fast_Bayesian_Inference_of_Reparameterized_Gamma_Process_With_Random_Effects 2023
+Zhou. zhou2023fast
+Variational bayesian
+Gamma process
+Paramètre de forme lognormale
+Gauss hermite quadrature pour calcul d’integral (version déterministe de MC)
+BS distribution failure
+Variatiobnla bayesian when the posterior density is approximated
+By Maximising the evidence lower bound up to the negative KL divergence
+tradeoff between traditional EM and Bayesian methods regarding computational time
+and computational efficiency
 
 @@@@@@@@@@@@@@@@@@@@@@
-
+Zhang 2016. zhang2016heterogeneity
 How heterogeneity influences condition-based maintenance for gamma degradation process
 Markov decision process pour GP +CBM
 A priori Gamma sur 1/beta (effet aléatoire comme lawless) due à la hétérogénéité
 Construction de v.a qui suit une loi de Fisher 
 Analyse de ‘impact de l’effet aléatoire sur le CBM (seuil, cout, interval d’inspection..) CBM optimal 
+Ordre stochastic, impact de heterogenneité sur le cout et l’inreval d ‘inspection 
 
+%%%%%%%%%%%%%%%%%%%
+Ling RESS2019. ling2019bayesian
+Gamma process with random change points for the shape function.
+SEM and bayesian+MCMC
+RUL
+Application LEDS gamma prior
+@@@@@@@@@@@@@@@@@@@@@@@
+Pandey 2021 yuan2021estimation
+Gamma process, specific parametrisation
+Temporal uncertainty 
+Value of information 
+Mean->Prior inverse gamma-> Fisher v.a
+Hyper parameters updating
+Single component maintenance+ posterior 
+Update posterior after inspections 
+%%%%%%%%%%%%%%%%%%
+Bayesian estimation and prediction for the transformed gamma degradation process (Giorgio et al. 2018) :
+giorgio2018bayesian
+A priori sur la corrélation entre dynamique de dégradation et son niveau et sur la courbe moyenne de dégradation.
+Transformed gamma-> different priors in function of the correlation of W(t) and following increment 
+Inférence bayésienne via MCMC +Prédiction
+Application sweatshirt of liners of engines in ships of Grimaldi line 
 
+%%%%%%%%%%%%%%%%%%
+Review ABC 2017 Prangle
+
+%%%%%%%%%%%%%
+dai2022reliability
+Reliability modelling of wheel wear deterioration using conditional bivariate gamma processes and Bayesian hierarchical models
+%%%%%%%%%%
+LawlessCrowder04

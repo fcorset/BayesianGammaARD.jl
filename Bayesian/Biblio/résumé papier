@@ -1,21 +1,55 @@
-Guida:
+###############################
+Guida, Postiglione, Pulcini 2019 :
 Gamma non homogène, fonction de forme at^b, Changement de variables pour donner expressions les de RUL, E(RUL) etc sont données.  
+Observation de m systèmes à des temps quelconques !
+A priori sur le ratio variance/moyenne qui est constant pour le processus Gamma : Loi Inverse Gamma
+A priori sur le paramètre de forme beta : Loi impropre 1/beta ou loi Gamma ou loi Beta ou Loi Gamma à 3 paramètres
+A priori sur le niveau de dégradation à un temps \omega : Loi Gamma
+
 Bayésien: échelle inverse gaussien, loi gamma pour la moyenne, pour b trois lois: impropre, beta et gamma a trois paramètres, a écrit en fonction des autres. 
 Objectif, loi conditionnelle et RUL, 
 Méthode MCMC
 Données Meeker 1998, Ebrahem 2006
 
-ABC HAZRA
-Y(t)=A+X(t)+Z où X processus gamma , Z bruit gaussiez, A degradation initiale aléatoire 
+################################
+
+
+ABC HAZRA et al. 2020 :
+Y(t)=A+X(t)+Z où X processus gamma , Z bruit gaussien, A dégradation initiale aléatoire (gaussienne)
+Plusieurs systèmes tous inspectés à des temps identiques 
 ABC+MCMC priori uniforme
 
-Bousquet et al
-Censure, jeffery et inverse gamma ou inverse gamma  et gamma
 
-BayesGaussGamma2018
+################################
+
+Bousquet et al. 2014 :
+Processus Gamma sur M systèmes inspectés à des temps différents.
+
+Censure, Jeffreys et inverse gamma ou inverse gamma  et gamma
+MCMC : Gibbs + MH
+
+
+#################################
+
+Di et al. 2018 :BayesGaussGamma2018
 Processus gamma ou processus inverse gaussien avec effet aléatoire gamma
 Priori non informative pour les hyper parameters (uniforme et TN)
 MCMC
+
+##################################
+
+Tang et al. 2017 : 
+
+PLP + Bayesien / Prior de référence
+
+
+###################################
+
+Clarté et al. 2020
+
+ABC + Hierarchique
+
+###################################
 
 Degradation modeling based on gamma process models with random effects
 Processus gamma+ effect aléatoire, échelle gamma 

@@ -1,35 +1,57 @@
 
+
 %%%%%%%%%%%%%%
-Guida -A Bayesian approach for non-homogeneous gamma degradation processes
-guida2019bayesian
+Guida, Postiglione, Pulcini 2019 :A Bayesian approach for non-homogeneous gamma degradation processes
+
 Gamma non homogène, fonction de forme at^b, Changement de variables pour donner expressions les de RUL, E(RUL) etc sont données.  
-Bayésien: \theta=E/var  de loi inverse gaussien, loi gamma pour la moyenne, pour b 4 lois: impropre, beta et gamma à un paramètre, gamma à trois paramètres, a écrit en fonction des autres. 
-Posteriori. loi conditionnelle et RUL, 
+
+Observation de m systèmes à des temps quelconques !
+A priori sur le ratio variance/moyenne qui est constant pour le processus Gamma : Loi Inverse Gamma
+A priori sur le paramètre de forme beta : Loi impropre 1/beta ou loi Gamma ou loi Beta ou Loi Gamma à 3 paramètres
+A priori sur le niveau de dégradation à un temps \omega : Loi Gamma
+
+Bayésien: échelle inverse gaussien, loi gamma pour la moyenne, pour b trois lois: impropre, beta et gamma a trois paramètres, a écrit en fonction des autres. 
+Objectif, loi conditionnelle et RUL, 
 Méthode MCMC
-Generation de données
 Données Meeker 1998, Ebrahem 2006
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-ABC HAZRA hazra2020approximate
-Y(t)=A+X(t)+Z où X processus gamma , Z bruit gaussiez, A degradation initiale aléatoire 
+
+
+
+ABC HAZRA et al. 2020 : hazra2020approximate
+Y(t)=A+X(t)+Z où X processus gamma , Z bruit gaussien, A dégradation initiale aléatoire (gaussienne)
 ABC (approximate Bayes computation) avec un choix de distance pour accepter les bons paramètres. 
+Plusieurs systèmes tous inspectés à des temps identiques 
 ABC+MCMC priori uniforme
 Application: piping network of the primary heat transport system of Canada
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%
-Bousquet et al. bousquet2015bayesian
+Bousquet et al. 2014 : bousquet2015bayesian
 Censure, jeffery et inverse gamma ou inverse gamma  et gamma
+Processus Gamma sur M systèmes inspectés à des temps différents.
+MCMC : Gibbs + MH
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 BayesGaussGamma2018 Di et. Al.  liu2018bayesian
 Processus gamma ou processus inverse gaussien avec effet aléatoire gamma
-Priori non informative pour les hyper parameters 
+Priori non informative pour les hyper parameters (uniforme et TN)
 Mélange deux des modèles et estimation bayesienne 
 Loi a prior (uniforme et TN) pour les proba de suivre un modèle
 Resultats exactes d’estimation des paramètres sous chaque modèle
 MCMC estimation de tous les paramètres ensemble
 Données laser
 Fiabilité
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 BayesianAnalysis2017 Tang   tang2017bayesian
 NHPP+ Weibull
+
+PLP + Bayesien / Prior de référence
+
 Intensity suit un processus Gamma
 Trois paramètres à estimer (Parameters de forme de processus gamma, car échelle est 1, et les paramètres de Weibull
 t_i instance d défaillance on donne la densité de t_|t_i-1 ainsi que la vraisemblance
@@ -39,8 +61,10 @@ Six Référence prior pour le vecteur des paramètres dans l’ordre différente
 Gibbs sampling pour aposteriori
 Prediction 
 Application Donnée National Bureau Economic research, US business cycle contractions
+
 %%%%%%%%%%%%%%%%%%%
 ComponentABCGibbs2020. CLARTE
+ABC + Hierarchique
 
 Gibbs+ABC: existence de solution et convergence 
 

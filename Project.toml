@@ -1,0 +1,13 @@
+name = "BayesianGammaARD"
+uuid = "4c062bfe-a3d5-4f0d-9e02-50b34c97797b"
+authors = ["franck.corset@gmail.com"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

@@ -6,16 +6,20 @@ using Statistics
 using SpecialFunctions
 using CSV
 
-mutable struct GammaM
-    α::Float64 # paramètre de forme de Gamma a = α t^β
-    β::Float64 # paramètre de forme de Gamma a = α (t)^β
-    b::Float64 # paramètre de taux de Gamma (échelle dans Julia)
-    ρ::Float64 # paramètre d'efficacité des MP
-    ρw::Float64 # paramètre d'efficacité des MP nuisibles
-    p::Float64 # probabilité d'avoir une MP efficace
-    L::Float64 # Seuil des MP
-    M::Float64 # Seuil des MC
+mutable struct GammaProcess
+    α::Float64 # paramètre de forme du processus Gamma eta = α t^β
+    β::Float64 # paramètre de forme du processus Gamma eta = α t^β
+    θ::Float64 # paramètre d'échelle du processus Gamma (échelle dans Julia)
 end
+
+
+mutable struct MaintenanceModels
+    L::Float64 # seuil L à partir duquel on déclenche une Maintenance Préventive (ARD)
+    M::Float64 # seuil M à partir duquel on déclenche une Maintenance Corrective (AGAN)
+    τ::Float64 # temps inter-inspection
+
+end
+
 
 import Base.rand
 

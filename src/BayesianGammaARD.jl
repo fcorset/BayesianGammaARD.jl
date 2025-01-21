@@ -7,8 +7,9 @@ using Statistics
 using CSV
 
 
-export GammaProcess, MaintenanceModel, MLE, loglikelihood
+export GammaProcess, MaintenanceModel, MLE, loglikelihood, NonInformative, pdf
 # Write your package code here.
 include("maintenancemodels.jl")
 include("gammaprocesses.jl")
+include("bayesian.jl")
 end

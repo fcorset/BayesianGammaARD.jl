@@ -68,14 +68,38 @@ function predf(gp::GammaProcess, df::DataFrame)
     # Rend la df exploitable pour MLE et bayésien en calculant les u et les deg précédentes
     mydf = deepcopy(df) 
     u = Int.((mydf.deg .> gp.mm.L) .* (mydf.deg .< gp.mm.U)) # u_i dans le papier
+    Δ = Int.(mydf.deg .> gp.mm.U)
+
+    Δm1 = Δ[1:end-1]
+    Δm1 = pushfirst!(Δm1,0) # Δ_{i-1} dans le papier en ajoutant zéro en 1er élément
+    
     um1 = u[1:end-1]
     um1 = pushfirst!(um1,0) # u_{i-1} dans le papier en ajoutant zéro en 1er élément
+    mydf[!,:Δm1] = Δm1
     mydf[!,:um1] = um1
+    
     degprec = mydf.deg[1:(length(mydf.deg) - 1)]
     pushfirst!(degprec,0)
     mydf[!,:degprec] = degprec
+
+    tr = zeros(nrow(df))
+    for i in 1:nrow(df)-1
+        if mydf.deg[i] > gp.mm.U  
+            tr[i+1:nrow(df)] .= mydf.tinsp[i]
+        end
+    end
+    s = mydf.tinsp .-tr
+    spre = [0;mydf.tinsp[1:nrow(df)-1]] .- tr
+    mydf[!,:s] = s
+    mydf[!,:spre] = spre
+    mydf[!,:tr] = tr        
     return mydf
 end
+
+function deltaeta(mydf::DataFrame,α,β)
+    return α .* (mydf.s.^β - mydf.spre.^β)
+end
+
 
 
 

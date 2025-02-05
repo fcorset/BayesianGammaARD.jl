@@ -1,12 +1,12 @@
 using BayesianGammaARD
-#using DataFrames
+using DataFrames
 using Statistics
 using Plots
 # gp = GammaProcess(β=1.5)
 # GammaProcess(α=.9)
 
 mm = MaintenanceModel(ρ=0.3)
-gp = GammaProcess(α=0.8,β=2.0,θ=2.0,mm=MaintenanceModel(ρ=0.3))
+gp = GammaProcess(α=0.8,β=2.0,θ=2.0,mm=mm)
 y, df = rand(gp,HT=100)
 
 mydf = BayesianGammaARD.predf(gp,df)

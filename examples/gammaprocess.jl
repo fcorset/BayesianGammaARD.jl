@@ -5,12 +5,30 @@ using Plots
 # gp = GammaProcess(β=1.5)
 # GammaProcess(α=.9)
 
-mm = MaintenanceModel(ρ=0.3)
-gp = GammaProcess(α=0.8,β=2.0,θ=2.0,mm=mm)
-y, df = rand(gp,HT=100)
+mm = MaintenanceModel(ρ=0.6)
+L=3
+M=6
+gp = GammaProcess(α=0.8,β=1.0,θ=2.0,mm=mm)
+HT=20
+y, df = rand(gp,tinsp=1:HT,HT=HT)
+
+plot(y,label="Degradation",xlabel="Time",ylabel="Degradation")
+hline!([L],label="L")
+hline!([M],label="M")
+savefig("gammaprocess_initial.png")
+
 
 mydf = BayesianGammaARD.predf(gp,df)
 
+
+plot(mydf.tinsp,mydf.deg,label="Degradation",seriestype=:scatter,
+    xlabel="Time",ylabel="Degradation",
+    title="Degradation process",
+    legend=:topright,
+    xlims=(0,HT),ylims=(0,10))
+hline!([L],label="L")
+hline!([M],label="M")
+savefig("gammaprocess_point.png")
 
 ρlow=BayesianGammaARD.lowerboundrho(mydf)
 

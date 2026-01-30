@@ -27,6 +27,37 @@ x0 = [1.0, 1.5, 1.0, (1+ρlow)/2]
 
 est = MLE(gp,mydf,x0,[1e-2,0.1,0.01,ρlow+0.01],[Inf, Inf, Inf, 1])
 
+# PARTIE BAYESIENNE
+# CAS Informatif
+# Loi a priori pour θ (loi inverse gamma)
+
+# Paramètre theta
+priormeanθ = 2.0 # Moyenne donnée par un expert
+priorvarθ = 0.5 # Variance a priori
+# Calcul des paramètres de la loi inverse gamma
+a = 2+ priormeanθ^2 / priorvarθ
+b = (a-1) * priormeanθ
+# Definition de la loi a priori pour θ
+dθ = Informative(:θ,a,b,1)
+
+# Paramètre beta 
+# cas convexe (beta>1)
+priormeanβ = 1.5
+priorvarβ = 0.5
+c = (priormeanβ-1)^2 / priorvarβ
+d = priorvarβ / (priormeanβ-1)
+dβ = Informative(:β,c,d,3)
+
+# Paramètre alpha
+
+
+
+
+
+# Cas Non Informatif
+
+
+
 
 #ni = NonInformative(:θ)
 
@@ -45,11 +76,6 @@ est = MLE(gp,mydf,x0,[1e-2,0.1,0.01,ρlow+0.01],[Inf, Inf, Inf, 1])
 #pdf(dd,2)
 
 #ni isa Distribution
-priormeanθ = 2.0
-    priorvarθ = 0.5
-    a = 2+ priormeanθ^2 / priorvarθ
-    b = (a-1) * priormeanθ
-    dθ = Informative(:θ,a,b,1)
 
     pβ = 2.0
     dβ = Informative(:β,2,1,2)

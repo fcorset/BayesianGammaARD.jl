@@ -4,27 +4,34 @@ using DataFrames
 using Statistics
 using Plots
 
+# Vraies valeurs des paramètres
 αtrue = 0.8
-βtrue = 1.0
-θtrue = 2.0
+βtrue = 1.5
+θtrue = 1.0
 ρtrue = 0.6
+
+# Définition du modèle
 mm = MaintenanceModel(ρ=ρtrue)
 gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 
+HT = 20 # Fenêtre d'observation [0,T]
 
-HT = 20
+# Simulation du processus de dégradation
 y, df = rand(gp,tinsp=1:HT,HT=HT)
 
-
+# df exploitable 
 mydf = BayesianGammaARD.predf(gp,df)
+
 
 plot(mydf.tinsp,mydf.deg)
 
+# Définition de la borne inf por le paramètre rho
 ρlow=BayesianGammaARD.lowerboundrho(mydf)
 
-
+# Initialisation du vecteur de paramètre pour l'optimisation de la fonction log-vraisemblance
 x0 = [1.0, 1.5, 1.0, (1+ρlow)/2]
 
+# Calcul du MLE
 est = MLE(gp,mydf,x0,[1e-2,0.1,0.01,ρlow+0.01],[Inf, Inf, Inf, 1])
 
 # PARTIE BAYESIENNE
@@ -42,14 +49,46 @@ dθ = Informative(:θ,a,b,1)
 
 # Paramètre beta 
 # cas convexe (beta>1)
-priormeanβ = 1.5
-priorvarβ = 0.5
-c = (priormeanβ-1)^2 / priorvarβ
-d = priorvarβ / (priormeanβ-1)
-dβ = Informative(:β,c,d,3)
 
-# Paramètre alpha
+if βtrue>1
+    priormeanβ = 1.5
+    priorvarβ = 0.1
 
+    d = priorvarβ/(priormeanβ-1)
+    c = (priormeanβ-1)/d
+
+    dβ = Informative(:β,c,d,3)
+elseif βtrue==1
+    pβ = 2.0
+    dβ = Informative(:β,2,1,2)
+else
+    priormeanβ = 0.5
+    priorvarβ = 0.1
+    c = priormeanβ*(priormeanβ*(1-priormeanβ)/priorvarβ-1)
+    d = (1-priormeanβ)*(priormeanβ*(1-priormeanβ)/priorvarβ-1)
+    dβ = Informative(:β,c,d,1)
+end
+
+# Paramètre alpha (loi Gamma)
+w = 1 # time given by expert à mettre à jour dans la fonction postalpha....
+priormeanEw = θtrue*αtrue*w^βtrue # Degradation level at time w given by expert, ici la vraie valeur !
+priorvarEw = 0.5
+f = priorvarEw/priormeanEw
+e = priormeanEw/f
+dα = Informative(:α,e,f,2) # Le deuxième paramètre sera mis à jour dans le calcul de la post de alpha
+
+
+
+# Paramètre rho
+priormeanρ = 0.7
+varpriorρ = 0.02
+g = (ρlow-priormeanρ)*(ρlow-ρlow*priormeanρ-priormeanρ+priormeanρ^2+varpriorρ)/(varpriorρ*(1-ρlow))
+h=-(1-priormeanρ)*(ρlow-ρlow*priormeanρ-priormeanρ+priormeanρ^2+varpriorρ)/(varpriorρ*(1-ρlow))
+
+dρ = (1-ρlow)*Informative(:ρ,g,h,1)+ρlow
+
+#mean(dρ)
+#var(dρ)
 
 
 
@@ -76,12 +115,12 @@ dβ = Informative(:β,c,d,3)
 #pdf(dd,2)
 
 #ni isa Distribution
+#priors = [NonInformative(:α), dβ, dθ, (1 - ρlow) * Uniform() + ρlow]
+#priors = [NonInformative(:α), dβ, dθ, Uniform()]
+#priors = [NonInformative(:α), NonInformative(:β), NonInformative(:θ), (1-ρlow)*Uniform()+ρlow]
+#priors = [NonInformative(:α), dβ, dθ, (1 - ρlow) * Uniform() + ρlow]
 
-    pβ = 2.0
-    dβ = Informative(:β,2,1,2)
-
-    #priors = [NonInformative(:α), dβ, dθ, (1 - ρlow) * Uniform() + ρlow]
-priors = [NonInformative(:α), dβ, dθ, Uniform()]
+priors = [dα, dβ, dθ, dρ]
 #priors = [NonInformative(:α), NonInformative(:β), NonInformative(:θ), (1-ρlow)*Uniform()+ρlow]
 res = algoMCMC(gp,df,priors,10000,1.0,0.5,0.2)
 res = res[1001:end,:] # On enlève les 1000 premières itérations pour éviter l'effet de démarrage
@@ -102,7 +141,7 @@ histogram(res[:,2],normalize=:pdf,
     label="posterior distribution of beta",
     xlabel="beta",
     ylabel="density",
-    xlims=(0,2),
+    xlims=(0,5),
     ylims=(0,3))
 vline!([gp.β], label="true value of beta")
 vline!([est[2]],label="MLE of beta")
@@ -144,12 +183,6 @@ d = 1/c # equal to variance
 dβ = Informative(:β,c,d,2)
 
 # Pour α 
-w = 1 # time given by expert
-priormeanEw = θtrue*αEtrue # Degradation level at time w given by expert, ici la vraie valeur !
-priorvarEw = 1
-f = priorvarEw/priormeanw
-e = priormeanEw/f
-dα = Informative(:α,e,f,2) # A changer... le deuxième paramètre dépend de θ et β !!!!
 
 
 

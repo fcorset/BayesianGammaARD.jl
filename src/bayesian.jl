@@ -84,6 +84,9 @@ function logcondpostdistalpha(α,priors::Vector{ContinuousUnivariateDistribution
         if dd==NonInformativeAlpha
             s+=log(pdf(dd,α))
         else
+            w=1 # A changer...
+            s+=log(pdf(dd,α*θ*w^β))+log(θ*w^β)
+
 #            s+=log(pdf(dd,α * θ * w^β))
             # Il faut donner w en argument !!!
             s+=log(pdf(dd,α * θ))

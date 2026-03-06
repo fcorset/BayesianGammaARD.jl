@@ -16,6 +16,14 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 
 HT = 20 # Fenêtre d'observation [0,T]
 
+
+
+##############################################
+##### On étudie 1 trajectoire pour n = 20
+###############################################
+
+
+
 # Simulation du processus de dégradation
 y, df = rand(gp,tinsp=1:HT,HT=HT)
 
@@ -24,6 +32,11 @@ mydf = BayesianGammaARD.predf(gp,df)
 
 
 plot(mydf.tinsp,mydf.deg)
+hline!([3],label="L")
+hline!([6],label="M")
+
+
+
 
 # Définition de la borne inf por le paramètre rho
 ρlow=BayesianGammaARD.lowerboundrho(mydf)
@@ -39,7 +52,7 @@ est = MLE(gp,mydf,x0,[1e-2,0.1,0.01,ρlow+0.01],[Inf, Inf, Inf, 1])
 # Loi a priori pour θ (loi inverse gamma)
 
 # Paramètre theta
-priormeanθ = 2.0 # Moyenne donnée par un expert
+priormeanθ = 1.0 # Moyenne donnée par un expert
 priorvarθ = 0.5 # Variance a priori
 # Calcul des paramètres de la loi inverse gamma
 a = 2+ priormeanθ^2 / priorvarθ
@@ -52,7 +65,7 @@ dθ = Informative(:θ,a,b,1)
 
 if βtrue>1
     priormeanβ = 1.5
-    priorvarβ = 0.1
+    priorvarβ = 0.05
 
     d = priorvarβ/(priormeanβ-1)
     c = (priormeanβ-1)/d
@@ -72,7 +85,7 @@ end
 # Paramètre alpha (loi Gamma)
 w = 1 # time given by expert à mettre à jour dans la fonction postalpha....
 priormeanEw = θtrue*αtrue*w^βtrue # Degradation level at time w given by expert, ici la vraie valeur !
-priorvarEw = 0.5
+priorvarEw = 0.2
 f = priorvarEw/priormeanEw
 e = priormeanEw/f
 dα = Informative(:α,e,f,2) # Le deuxième paramètre sera mis à jour dans le calcul de la post de alpha
@@ -80,7 +93,7 @@ dα = Informative(:α,e,f,2) # Le deuxième paramètre sera mis à jour dans le 
 
 
 # Paramètre rho
-priormeanρ = 0.7
+priormeanρ = 0.6
 varpriorρ = 0.02
 g = (ρlow-priormeanρ)*(ρlow-ρlow*priormeanρ-priormeanρ+priormeanρ^2+varpriorρ)/(varpriorρ*(1-ρlow))
 h=-(1-priormeanρ)*(ρlow-ρlow*priormeanρ-priormeanρ+priormeanρ^2+varpriorρ)/(varpriorρ*(1-ρlow))
@@ -94,9 +107,6 @@ dρ = (1-ρlow)*Informative(:ρ,g,h,1)+ρlow
 
 
 # Cas Non Informatif
-
-
-
 
 #ni = NonInformative(:θ)
 
@@ -129,7 +139,7 @@ histogram(res[:,1],normalize=:pdf,
     label="posterior distribution of alpha",
     xlabel="alpha",
     ylabel="density",
-    title="Posterior distributions of parameters",
+    title="Posterior distribution of parameter α",
     legend=:topright,
     xlims=(0,2),
     ylims=(0,3))
@@ -168,6 +178,19 @@ vline!([mean(res[:,4])],label="Bayesian Estimator of rho")
 # histogram! permet de superposer les histogrammes
 
 #priors isa Vector{ContinuousUnivariateDistribution}
+
+###########################################################
+#.  CAS NON INFORMATIF
+###########################################################
+
+priors = [NonInformative(:α), NonInformative(:β), NonInformative(:θ), (1 - ρlow) * Uniform() + ρlow]
+
+res.noninfo = algoMCMC(gp,df,priors,10000,1.0,0.5,0.2)
+res.noninfo = res.noninfo[1001:end,:] # On enlève les 1000 premières itérations pour éviter l'effet de démarrage
+
+
+
+
 
 # Cas Informatif homogène
 ## Pour θ

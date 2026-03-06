@@ -106,6 +106,11 @@ end
 import Distributions.loglikelihood
 
 function loglikelihood(gp::GammaProcess,x::Vector{Float64},mydf::DataFrame)
+    # x[1] = α
+    # x[2] = β
+    # x[3] = θ
+    # x[4] = ρ
+
     part1 = (x[1] * mydf.tinsp[1]^x[2] - 1) * log(mydf.deg[1]) - log(x[3]) * x[1] * mydf.tinsp[1]^x[2] - log(gamma(x[1] * mydf.tinsp[1]^x[2])) +  - mydf.deg[1]/x[3] # part de la vraisemenblance où u_{i-1}=0.
         tr = 0 # dernier temps de renouvellement
         for i in 2:nrow(mydf)

@@ -108,7 +108,7 @@ end
 # Faire une fonction qui prend une DataFrame (données) et les loi a priori
 # Renvoie un échantillon des paramètres après un algo MCMC (Gibbs + MH)
 
-function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUnivariateDistribution}=[NonInformative(:α), NonInformative(:β), NonInformative(:θ), Uniform()], K::Int=10000,tau2α::Float64=1.0,tau2β::Float64=0.5,tau2ρ::Float64=0.2)
+function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUnivariateDistribution}=[NonInformative(:α), NonInformative(:β), NonInformative(:θ), Uniform()], K::Int=10000,tau2α::Float64=1.0,tau2β::Float64=0.2,tau2ρ::Float64=0.2)
     # Choisir des valeurs initiales pour les paramètres (on prend le MLE)
     dα = priors[1]
     dβ = priors[2]
@@ -121,14 +121,15 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
     estpar = DataFrame((α=zeros(K+1),β=zeros(K+1),θ=zeros(K+1),ρ=zeros(K+1)))
     estpar[1,:]=parinit
     for k in 2:K+1
-#        println("La valeur de k est ",k)
+        println("La valeur de k est ",k)
         for j ∈ [3,2,1,4]
             if j==3 
-                if priors[j] == NonInformativeBetaTheta
+                if priors[j] isa Noninformative
                     estpar[k,j] = rand(InverseGamma(sum(deltaeta(mydf,estpar[k-1,1],estpar[k-1,2])), sum(mydf.deg .- exp.(mydf.um1 .* log(1-estpar[k-1,4])) .* (1 .- mydf.Δm1) .* mydf.degprec)))
                 else
                     estpar[k,j] = rand(InverseGamma(params(dθ)[1]+sum(deltaeta(mydf,estpar[k-1,1],estpar[k-1,2])),params(dθ)[2]+sum(mydf.deg .- exp.(mydf.um1 .* log(1-estpar[k-1,4])) .* (1 .- mydf.Δm1) .* mydf.degprec)))
                 end
+                println("l'estimation de θ est ",estpar[k,j])
             end
             if j==2
                 if priors[j] == InformativeBetaInf1
@@ -140,7 +141,7 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
                 else
                     # Cas Non Informatif
                     βstar = rand(Normal(estpar[k-1,2],sqrt(tau2β)))
-#                    println(βstar)
+                    println("βstar =  ",βstar)
                     logratio  = logcondpostdistbeta(βstar,priors,mydf,estpar[k,3],estpar[k-1,1],estpar[k-1,4],lbrho)-logcondpostdistbeta(estpar[k-1,2],priors,mydf,estpar[k,3],estpar[k-1,1],estpar[k-1,4],lbrho)
                     if logratio > log(rand(Uniform()))
                         estpar[k,2] = βstar
@@ -170,20 +171,16 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
                 end
             end
             if j==4
-                if priors[j] == Uniform()
-                    ρstar = rand(Normal(estpar[k-1,4],sqrt(tau2ρ)))
-                    logratio  = logcondpostdistrho(ρstar,priors,mydf,estpar[k,1],estpar[k,2],estpar[k,3],lbrho)-logcondpostdistrho(estpar[k-1,4],priors,mydf,estpar[k,1],estpar[k,2],estpar[k,3],lbrho)
-                    if logratio > log(rand(Uniform()))
-                        estpar[k,4] = ρstar
-                    else
-                        estpar[k,4] = estpar[k-1,4]
-                    end
+                ρstar = rand(Normal(estpar[k-1,4],sqrt(tau2ρ)))
+                logratio  = logcondpostdistrho(ρstar,priors,mydf,estpar[k,1],estpar[k,2],estpar[k,3],lbrho)-logcondpostdistrho(estpar[k-1,4],priors,mydf,estpar[k,1],estpar[k,2],estpar[k,3],lbrho)
+                if logratio > log(rand(Uniform()))
+                    estpar[k,4] = ρstar
                 else
-                    estpar[k,j] = rand(priors[j])
+                    estpar[k,4] = estpar[k-1,4]
                 end
             end
         end
-#        println(estpar[k,:])
+        println(estpar[k,:])
     end
     return estpar
 end

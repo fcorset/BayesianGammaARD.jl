@@ -18,6 +18,9 @@ const NonInformativeAlpha = NonInformative(x -> sqrt(x*trigamma(x)-1))
 const NonInformativeBetaTheta = NonInformative(x -> if x>0 return 1/x else return 0 end)
 const NonInformativeRho = NonInformative(x -> if x>=0 && x <= 1 return 1 else return 0 end)
 
+# Alias non casse-sensitive pour compatibilité (potentiellement `Noninformative` utilisé par erreur)
+const Noninformative = NonInformative   
+
 const InformativeBetaInf1 = Beta
 const InformativeBetaEq1 = Gamma # with d=1/c
 const InformativeBetaSup1 = Gamma
@@ -89,7 +92,7 @@ function logcondpostdistalpha(α,priors::Vector{ContinuousUnivariateDistribution
 
 #            s+=log(pdf(dd,α * θ * w^β))
             # Il faut donner w en argument !!!
-            s+=log(pdf(dd,α * θ))
+            #s+=log(pdf(dd,α * θ))
         end
         return s
     end
@@ -121,15 +124,13 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
     estpar = DataFrame((α=zeros(K+1),β=zeros(K+1),θ=zeros(K+1),ρ=zeros(K+1)))
     estpar[1,:]=parinit
     for k in 2:K+1
-        println("La valeur de k est ",k)
         for j ∈ [3,2,1,4]
             if j==3 
-                if priors[j] isa Noninformative
+                if priors[j] isa NonInformative
                     estpar[k,j] = rand(InverseGamma(sum(deltaeta(mydf,estpar[k-1,1],estpar[k-1,2])), sum(mydf.deg .- exp.(mydf.um1 .* log(1-estpar[k-1,4])) .* (1 .- mydf.Δm1) .* mydf.degprec)))
                 else
                     estpar[k,j] = rand(InverseGamma(params(dθ)[1]+sum(deltaeta(mydf,estpar[k-1,1],estpar[k-1,2])),params(dθ)[2]+sum(mydf.deg .- exp.(mydf.um1 .* log(1-estpar[k-1,4])) .* (1 .- mydf.Δm1) .* mydf.degprec)))
                 end
-                println("l'estimation de θ est ",estpar[k,j])
             end
             if j==2
                 if priors[j] == InformativeBetaInf1
@@ -180,7 +181,6 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
                 end
             end
         end
-        println(estpar[k,:])
     end
     return estpar
 end

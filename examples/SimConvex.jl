@@ -21,6 +21,9 @@ HT = 100 # Fenêtre d'observation [0,T]
 # Simulation du processus de dégradation
 y, df = rand(gp,tinsp=1:HT,HT=HT)
 
+# Chargement du dataframe depuis un fichier CSV
+# df = CSV.read("sim_data_full.csv", DataFrame)
+
 # On génère plusieurs jeux de données (n croissant):
 
 df10 = df[1:10,:]
@@ -135,23 +138,23 @@ vline!([mean(res10_NonInfo[:,4])],label="Bayesian Estimator of rho")
 # histogram! permet de superposer les histogrammes
 
 # --- Sauvegarde des dataframes dans des fichiers CSV ---
-CSV.write("sim_data_full.csv", df)
+CSV.write("Results/Convex/sim_data_full.csv", df)
 for i in 1:10
     subset_df = eval(Meta.parse("df" * string(i*10)))
-    CSV.write("sim_data_$(i*10).csv", subset_df)
+    CSV.write("Results/Convex/sim_data_$(i*10).csv", subset_df)
 end
 
 # Sauvegarde des résultats bayésiens (postérieurs) pour chaque jeu de données
 for i in 1:length(res_all)
-    CSV.write("bayes_posterior_n$(i*10).csv", res_all[i])
+    CSV.write("Results/Convex/bayes_posterior_n$(i*10).csv", res_all[i])
 end
 
 # Sauvegarde des MLE pour chaque jeu de données
 mle_df = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[])
 for i in 1:length(EstMLE)
     push!(mle_df, (i*10, EstMLE[i]...))
-    CSV.write("mle_n$(i*10).csv", DataFrame(α = EstMLE[i][1], β = EstMLE[i][2], θ = EstMLE[i][3], ρ = EstMLE[i][4]))
+    CSV.write("Results/Convex/mle_n$(i*10).csv", DataFrame(α = EstMLE[i][1], β = EstMLE[i][2], θ = EstMLE[i][3], ρ = EstMLE[i][4]))
 end
-CSV.write("mle_results.csv", mle_df)
+CSV.write("Results/Convex/mle_results.csv", mle_df)
 
 

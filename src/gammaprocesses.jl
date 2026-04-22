@@ -125,10 +125,11 @@ function loglikelihood(gp::GammaProcess,x::Vector{Float64},mydf::DataFrame)
                     #end
                     (Δηi - 1) * log(mydf.deg[i]) - Δηi*log(x[3])  - log(gamma(Δηi))  - mydf.deg[i]/x[3]
                 else
+                    # Pb ici si mydf.deg[i] est égal à mydf.deg[i-1] (cas où il n'y a pas de dégradation entre les deux temps d'inspection)
                     (Δηi - 1) * log(mydf.deg[i] - mydf.deg[i-1])  - log(x[3]) * Δηi - log(gamma(Δηi)) - (mydf.deg[i] - mydf.deg[i-1])/x[3]
                 end
             else
-                (Δηi - 1) * log(mydf.deg[i] - (1-x[4])*mydf.deg[i-1])  - log(x[3]) * Δηi - log(gamma(Δηi)) - (mydf.deg[i] - (1-x[4])*mydf.deg[i-1])/x[3]
+                part1 += (Δηi - 1) * log(mydf.deg[i] - (1-x[4])*mydf.deg[i-1])  - log(x[3]) * Δηi - log(gamma(Δηi)) - (mydf.deg[i] - (1-x[4])*mydf.deg[i-1])/x[3]
             end
             if mydf.deg[i] > gp.mm.U
                 tr = mydf.tinsp[i] # On met à jour le dernier instant de renouvellement

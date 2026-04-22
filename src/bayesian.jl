@@ -142,7 +142,7 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
                 else
                     # Cas Non Informatif
                     βstar = rand(Normal(estpar[k-1,2],sqrt(tau2β)))
-                    println("βstar =  ",βstar)
+                    #println("βstar =  ",βstar)
                     logratio  = logcondpostdistbeta(βstar,priors,mydf,estpar[k,3],estpar[k-1,1],estpar[k-1,4],lbrho)-logcondpostdistbeta(estpar[k-1,2],priors,mydf,estpar[k,3],estpar[k-1,1],estpar[k-1,4],lbrho)
                     if logratio > log(rand(Uniform()))
                         estpar[k,2] = βstar

@@ -4,6 +4,7 @@ using DataFrames
 using CSV
 using Statistics
 using Plots
+using DrWatson
 
 # Vraies valeurs des paramètres
 αtrue = 0.8

@@ -35,7 +35,16 @@ df150_rho0_7 = df[1:150,:]
 df175_rho0_7 = df[1:175,:]
 df200_rho0_7 = df[1:200,:]
 
-
+# On récupère les données depuis des fichiers CSV
+df10_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:10,:]
+df25_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:25,:]
+df50_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:50,:]
+df75_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:75,:]
+df100_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:100,:]
+df125_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:125,:]
+df150_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:150,:]
+df175_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:175,:]
+df200_rho0_7 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:200,:]    
 
 # Plot de la dégradation simulée
 plot(df.tinsp, df.deg, label="Simulated degradation", xlabel="Time", ylabel="Degradation level", title="Simulated degradation process (ρ=0.7)")
@@ -132,7 +141,6 @@ for i in 1:length(res_NI_all_rho0_7)
     CSV.write("examples/Results/Concave/bayes_posterior_good_priors_n$(n_values[i])_$rho_label.csv", res_GP_all_rho0_7[i])
 end
 
-mle_df_rho_0_7 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[])
 for i in 1:length(EstMLE_rho0_7)
     push!(mle_df_rho_0_7, (n_values[i], EstMLE_rho0_7[i]...))
 end
@@ -175,7 +183,8 @@ for i in 1:length(ρlow)
     # Graphique β
     p_β = histogram(res_NI_all[i][:,2],normalize=:pdf,
         label="posterior distribution of beta",
-        xlabel="beta",
+    mle_df_rho_0_7 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[])
+    xlabel="beta",
         ylabel="density",
         title="Posterior distribution of parameter β (n=$(i*10), Convex, Non-informative prior)",
         xlims=(1,2.5),

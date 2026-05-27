@@ -35,6 +35,18 @@ df150_rho0_2 = df[1:150,:]
 df175_rho0_2 = df[1:175,:]
 df200_rho0_2 = df[1:200,:]
 
+# Cas où l'on veut charger les données depuis des fichiers CSV
+df10_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:10,:]
+df25_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:25,:]
+df50_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:50,:]
+df75_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:75,:]
+df100_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:100,:]
+df125_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:125,:]
+df150_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:150,:]
+df175_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:175,:]
+df200_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:200,:]
+
+
 ρlow = Vector{Float64}(undef,9)
 EstMLE_rho0_2 = Vector{Vector{Float64}}(undef,9)
 
@@ -152,4 +164,5 @@ mle_df_rho_0_2 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float
 for i in 1:length(EstMLE_rho0_2)
     push!(mle_df_rho_0_2, (n_values[i], EstMLE_rho0_2[i]...))
 end
+
 CSV.write("examples/Results/Concave/mle_results_$rho_label.csv", mle_df_rho_0_2)

@@ -14,8 +14,6 @@ using DrWatson
 # ρtrue = 0.7 et ρtrue = 0.2
 
 
-
-
 # Définition du modèle
 mm = MaintenanceModel(ρ=ρtrue)
 gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)

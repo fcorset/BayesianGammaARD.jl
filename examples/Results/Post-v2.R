@@ -13,8 +13,8 @@ nb.dec <- 2
 # ρtrue = 0.7 et ρtrue = 0.2
 
 # Case <- "Concave"
-Case <- "Convex"
-# Case <- "Homogeneous"
+# Case <- "Convex"
+Case <- "Homogeneous"
 File.Path <- paste("./", Case, "/", sep = "")
 
 setwd(File.Path)
@@ -100,8 +100,18 @@ for (i in 1:nbf) {
   Prior.dist[[2]] <- data.frame(x.beta, y.beta)
   
   # theta
+  priormean.theta <- theta.true
+  priorvar.theta <- 0.2
+  a <- 2 + priormean.theta^2 / priorvar.theta
+  b <- (a-1) * priormean.theta
+  x.theta.min <- 0
+  x.theta.max <- round(max(Df$θ)*1.2, digits = nb.dec)
+  x.theta <- seq(from = x.theta.min, by = 10^(-nb.dec), to = x.theta.max)
+  y.theta <- b^a/gamma(a)/x.theta^(a+1)*exp(-b/x.theta)
+  Prior.dist[[3]] <- data.frame(x.theta, y.theta)
   
   # rho
+  
   
   gr1 <- ggplot(data = Df, aes(x = α)) + 
     geom_density() +
@@ -149,8 +159,8 @@ for (i in 1:nbf) {
     theme_classic()
   if ((!is.noninformative.prior) & (!is.bad.prior)) {
     gr3 <- gr3
-    # gr3 <- gr3 +
-    #   geom_line(data = Prior.dist[[3]], mapping = aes(x = x.theta, y = y.theta), col = grey(0.8))
+    gr3 <- gr3 +
+      geom_line(data = Prior.dist[[3]], mapping = aes(x = x.theta, y = y.theta), col = grey(0.8))
   }
   
   gr4 <- ggplot(data = Df, aes(x = ρ)) + 

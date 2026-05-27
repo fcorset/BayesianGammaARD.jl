@@ -10,9 +10,9 @@ library(cowplot)
 # θtrue = 2.0
 # ρtrue = 0.7 et ρtrue = 0.2
 
-Case <- "Concave"
+# Case <- "Concave"
 # Case <- "Convex"
-# Case <- "Homogeneous"
+Case <- "Homogeneous"
 File.Path <- paste("./", Case, "/", sep = "")
 
 setwd(File.Path)
@@ -92,9 +92,9 @@ for (i in 1:nbf) {
     geom_vline(aes(xintercept = Df.MLE$β[idx]), 
                color = "blue", linetype="dashed") +
     geom_vline(aes(xintercept = Bayes.Mean[2]), 
-               color = "black", linetype="dashed") +
-    geom_line(data = Prior.dist, 
-              mapping = aes(x = x.beta, y = y.beta), col = grey(0.8)) +
+               color = "black", linetype="dashed") 
+    # geom_line(data = Prior.dist, 
+    #           mapping = aes(x = x.beta, y = y.beta), col = grey(0.8)) +
     theme_classic()
   gr3 <- ggplot(data = Df, aes(x = θ)) + 
     geom_density() +

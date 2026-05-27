@@ -144,6 +144,7 @@ end
 for i in 1:length(EstMLE_rho0_7)
     push!(mle_df_rho_0_7, (n_values[i], EstMLE_rho0_7[i]...))
 end
+mle_df_rho_0_7[!, :ρlow] = ρlow
 CSV.write("examples/Results/Concave/mle_results_$rho_label.csv", mle_df_rho_0_7)
 
 

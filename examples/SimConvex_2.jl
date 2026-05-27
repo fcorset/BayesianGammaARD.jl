@@ -160,4 +160,5 @@ mle_df_rho_0_2 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float
 for i in 1:length(EstMLE_rho0_2)
     push!(mle_df_rho_0_2, (n_values[i], EstMLE_rho0_2[i]...))
 end
+mle_df_rho_0_2[!, :ρlow] = ρlow
 CSV.write("examples/Results/Convex/mle_results_$rho_label.csv", mle_df_rho_0_2)

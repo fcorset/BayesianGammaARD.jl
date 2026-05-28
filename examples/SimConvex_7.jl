@@ -48,6 +48,11 @@ df175_rho0_7 = CSV.read("examples/Results/Convex/sim_data_full_$rho_label.csv", 
 df200_rho0_7 = CSV.read("examples/Results/Convex/sim_data_full_$rho_label.csv", DataFrame)[1:200,:]
 
 
+# Plot de la dégradation simulée
+plot(df200_rho0_7.tinsp, df200_rho0_7.deg, label="Simulated degradation", xlabel="Time", ylabel="Degradation level", title="Simulated degradation process (ρ=0.7)")
+hline!([3], label="l_PM")
+hline!([6], label="l_CM")
+
 
 
 ρlow = Vector{Float64}(undef,9)

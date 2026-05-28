@@ -57,10 +57,9 @@ res_GP_all_rho0_7 = Vector{DataFrame}(undef,9)
 
 
 # Plot de la dégradation simulée
-plot(df.tinsp, df.deg, label="Simulated degradation", xlabel="Time", ylabel="Degradation level", title="Simulated degradation process (ρ=0.7)")
-hline!([3], label="L")
-hline!([6], label="M")
-
+plot(df200_rho0_7.tinsp, df200_rho0_7.deg, label="Simulated degradation", xlabel="Time", ylabel="Degradation level", title="Simulated degradation process (ρ=0.7)")
+hline!([3], label="l_PM")
+hline!([6], label="l_CM")
 
 
 

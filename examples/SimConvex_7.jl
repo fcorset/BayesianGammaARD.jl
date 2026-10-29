@@ -122,6 +122,32 @@ for i in 1:length(ρlow)
 
     dρ = (1-ρlow[i]) * Informative(:ρ, g, h, 1) + ρlow[i]
 
+    # Exemple LaTeX Beamer + TikZ pour dÃ©filer 4 graphiques (copier dans un .tex)
+    # \begin{frame}{Défilement de 4 plots}
+    # \centering
+    # \begin{tikzpicture}
+    #   % on suppose que chaque plot est une image externe (plot1.pdf ... plot4.pdf)
+    #   \foreach \i in {1,...,4} {
+    #     \only<\i>{
+    #       \node at (0,0) {\includegraphics[width=0.8\textwidth]{plot\i.pdf}};
+    #     }
+    #   }
+    # \end{tikzpicture}
+    # \end{frame}
+
+    # Variante avec overlay and captions:
+    # \begin{frame}{Défilement de 4 plots - variante}
+    # \centering
+    # \begin{tikzpicture}
+    #   \node (A) at (0,0) {};
+    #   \only<1>{\node at (A) {\includegraphics[width=0.8\textwidth]{plot1.pdf}};}
+    #   \only<2>{\node at (A) {\includegraphics[width=0.8\textwidth]{plot2.pdf}};}
+    #   \only<3>{\node at (A) {\includegraphics[width=0.8\textwidth]{plot3.pdf}};}
+    #   \only<4>{\node at (A) {\includegraphics[width=0.8\textwidth]{plot4.pdf}};}
+    # \end{tikzpicture}
+    # \end{frame}
+
+
     priors_GP = [dα, dβ, dθ, dρ]
     res_GP = algoMCMC(gp, mydf, priors_GP, 10000, 1.0, 0.5, 0.2)
     res_GP_all_rho0_7[i] = res_GP[1001:end,:]

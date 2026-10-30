@@ -24,7 +24,7 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 
 HT = 200 # Fenêtre d'observation [0,T]
 
-N = 200 # Nb simulation
+N = 20 # Nb simulation
 
 df200_rho0_2_Nsim = DataFrame[]
 
@@ -34,7 +34,8 @@ res_VBP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # strongly 
 
 mle_df_rho_0_2 = DataFrame(k = Int[], n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[])
 
-for k in 1:N
+for nsim in 1:N
+    println("Début de la $nsim ème simulation")
     # Simulation du processus de dégradation
     y, df = rand(gp,tinsp=1:HT,HT=HT)
 
@@ -83,7 +84,7 @@ for k in 1:N
         x0 = [1.0, 1.5, 1.0, (1+ρlow[i])/2]
 
         EstMLE_rho0_2[i] = MLE(gp, mydf, x0, [1e-2,0.1,0.01,ρlow[i]+0.01], [Inf, Inf, Inf, 1])
-        push!(mle_df_rho_0_2, (k, n_values[i], EstMLE_rho0_2[i]..., ρlow[i]))
+        push!(mle_df_rho_0_2, (nsim, n_values[i], EstMLE_rho0_2[i]..., ρlow[i]))
 
         
         
@@ -130,7 +131,7 @@ for k in 1:N
         κ_g = priormeanβ * (1-priormeanβ) / priorvarβ - 1
         c_g = priormeanβ * κ_g
         d_g = (1-priormeanβ) * κ_g
-        println("Parameters for β: c = $c_g, d = $d_g")
+        #println("Parameters for β: c = $c_g, d = $d_g")
 
         dβ_g = Informative(:β, c_g, d_g, 1) # le troisième paramètre est égal à 1 pour loi beta
 
@@ -238,24 +239,28 @@ for k in 1:N
             [1.5 * mle_start[1], clamp(mle_start[2] - 0.1, 1e-6, 1 - 1e-6),
              1.2 * mle_start[3], clamp(mle_start[4] + 0.1, ρlow[i] + 1e-6, 1 - 1e-6)]
         ]
-
+        
         for chain in 1:4
             #println("Chaîne numéro $chain")
             res_GP = algoMCMC(gp, mydf, priors_GP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
-            res_GP_all_rho0_2[i][chain] = res_GP[1001:end,:]
+            res_GP_all_rho0_2[i][chain] =  res_GP[1001:end,:]
+            insertcols!(res_GP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_GP_all_rho0_2[i][chain])))
             append!(res_GP_all_rho_2_Nsim[i][chain],res_GP_all_rho0_2[i][chain])
 
             res_BP = algoMCMC(gp, mydf, priors_BP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_BP_all_rho0_2[i][chain] = res_BP[1001:end,:]
+            insertcols!(res_BP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_BP_all_rho0_2[i][chain])))
             append!(res_BP_all_rho_2_Nsim[i][chain],res_BP_all_rho0_2[i][chain])
 
             res_VBP = algoMCMC(gp, mydf, priors_VBP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_VBP_all_rho0_2[i][chain] = res_VBP[1001:end,:]
+            insertcols!(res_VBP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_VBP_all_rho0_2[i][chain])))
             append!(res_VBP_all_rho_2_Nsim[i][chain],res_VBP_all_rho0_2[i][chain])
 
         end
     end
     # Sauver toutes les simus
+    insertcols!(df200_rho0_2, 1, :NumSim => fill(nsim,nrow(df200_rho0_2)))
     append!(df200_rho0_2_Nsim,df200_rho0_2)
 end
 
@@ -264,7 +269,7 @@ end
 CSV.write("examples/Results/Nsim/Concave/sim_data_full_$rho_label.csv", df200_rho0_2_Nsim)
 
 n_values = [10,20,30,50,75,100,125,150,175,200]
-for i in 1:length(res_GP_all_rho0_2)
+for i in 1:length(n_values)
     for chain in 1:4
         CSV.write("examples/Results/Nsim/Concave/bayes_posterior_verybad_priors_n$(n_values[i])_chain$(chain)_$rho_label.csv", res_VBP_all_rho0_2_Nsim[i][chain])
         CSV.write("examples/Results/Nsim/Concave/bayes_posterior_good_priors_n$(n_values[i])_chain$(chain)_$rho_label.csv", res_GP_all_rho0_2_Nsim[i][chain])

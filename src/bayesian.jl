@@ -227,54 +227,54 @@ function logcondpostdistrho(ρ,priors::Vector{ContinuousUnivariateDistribution},
 end
 
 
-function mcmc_diagnostics(samples::DataFrame; acceptance_rates=nothing, max_lag::Union{Nothing,Integer}=nothing)
-    n = nrow(samples)
-    n >= 2 || throw(ArgumentError("Il faut au moins deux itérations pour calculer les diagnostics MCMC."))
-    max_lag === nothing || max_lag >= 0 ||
-        throw(ArgumentError("max_lag doit être positif ou nul."))
-    lag_limit = min(max_lag === nothing ? 1000 : Int(max_lag), n - 1)
+#function mcmc_diagnostics(samples::DataFrame; acceptance_rates=nothing, max_lag::Union{Nothing,Integer}=nothing)
+#    n = nrow(samples)
+#    n >= 2 || throw(ArgumentError("Il faut au moins deux itérations pour calculer les diagnostics MCMC."))
+#    max_lag === nothing || max_lag >= 0 ||
+#        throw(ArgumentError("max_lag doit être positif ou nul."))
+#    lag_limit = min(max_lag === nothing ? 1000 : Int(max_lag), n - 1)
 
-    parameter_names = (:α, :β, :θ, :ρ)
-    all(name -> name in propertynames(samples), parameter_names) ||
-        throw(ArgumentError("La chaîne doit contenir les colonnes α, β, θ et ρ."))
+#    parameter_names = (:α, :β, :θ, :ρ)
+#    all(name -> name in propertynames(samples), parameter_names) ||
+#        throw(ArgumentError("La chaîne doit contenir les colonnes α, β, θ et ρ."))
 
-    rates = acceptance_rates === nothing ?
-        (α=mean(diff(samples.α) .!= 0), β=mean(diff(samples.β) .!= 0),
-         θ=missing, ρ=mean(diff(samples.ρ) .!= 0)) : acceptance_rates
-    ess = Dict{Symbol,Union{Missing,Float64}}()
-    autocorrelation = DataFrame(lag=collect(0:lag_limit))
+#    rates = acceptance_rates === nothing ?
+#        (α=mean(diff(samples.α) .!= 0), β=mean(diff(samples.β) .!= 0),
+#         θ=missing, ρ=mean(diff(samples.ρ) .!= 0)) : acceptance_rates
+#    ess = Dict{Symbol,Union{Missing,Float64}}()
+#    autocorrelation = DataFrame(lag=collect(0:lag_limit))
 
-    for name in parameter_names
-        x = Float64.(samples[!, name])
-        all(isfinite, x) ||
-            throw(ArgumentError("La chaîne du paramètre $name contient des valeurs non finies."))
-        centered = x .- mean(x)
-        variance_sum = sum(abs2, centered)
+#    for name in parameter_names
+#        x = Float64.(samples[!, name])
+#        all(isfinite, x) ||
+#            throw(ArgumentError("La chaîne du paramètre $name contient des valeurs non finies."))
+#        centered = x .- mean(x)
+#        variance_sum = sum(abs2, centered)
 
-        if variance_sum == 0
-            autocorrelation[!, name] = Union{Missing,Float64}[missing for _ in 0:lag_limit]
-            ess[name] = missing
-            continue
-        end
+#        if variance_sum == 0
+#            autocorrelation[!, name] = Union{Missing,Float64}[missing for _ in 0:lag_limit]
+#            ess[name] = missing
+#            continue
+#        end
 
-        acf = Vector{Float64}(undef, lag_limit + 1)
-        acf[1] = 1.0
-        for lag in 1:lag_limit
-            acf[lag + 1] = sum(centered[1:(n-lag)] .* centered[(lag+1):n]) / variance_sum
-        end
-        autocorrelation[!, name] = acf
+#        acf = Vector{Float64}(undef, lag_limit + 1)
+#        acf[1] = 1.0
+#        for lag in 1:lag_limit
+#            acf[lag + 1] = sum(centered[1:(n-lag)] .* centered[(lag+1):n]) / variance_sum
+#        end
+#        autocorrelation[!, name] = acf
 
-        positive_pairs_sum = 0.0
-        for lag in 1:2:(lag_limit - 1)
-            pair_sum = acf[lag + 1] + acf[lag + 2]
-            pair_sum > 0 || break
-            positive_pairs_sum += pair_sum
-        end
-        ess[name] = n / (1 + 2 * positive_pairs_sum)
-    end
+#        positive_pairs_sum = 0.0
+#        for lag in 1:2:(lag_limit - 1)
+#            pair_sum = acf[lag + 1] + acf[lag + 2]
+#            pair_sum > 0 || break
+#            positive_pairs_sum += pair_sum
+#        end
+#        ess[name] = n / (1 + 2 * positive_pairs_sum)
+#    end
 
-    return (acceptance_rates=rates, ess=ess, autocorrelation=autocorrelation)
-end
+#    return (acceptance_rates=rates, ess=ess, autocorrelation=autocorrelation)
+#end
 
 function mcmc_diagnostics(chains::AbstractVector{<:DataFrame}; acceptance_rates=nothing, max_lag::Union{Nothing,Integer}=nothing)
     n_chains = length(chains)

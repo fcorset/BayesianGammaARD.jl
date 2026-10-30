@@ -24,15 +24,18 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 
 HT = 200 # Fenêtre d'observation [0,T]
 
-N = 20 # Nb simulation
+N = 2 # Nb simulation
 
 df200_rho0_2_Nsim = DataFrame[]
 
-res_GP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # Good Priors
-res_BP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # moderately misspecified priors
-res_VBP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # strongly misspecified priors
+#res_GP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # Good Priors
+#res_BP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # moderately misspecified priors
+#res_VBP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # strongly misspecified priors
 
-mle_df_rho_0_2 = DataFrame(k = Int[], n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[])
+
+
+
+mle_df_rho_0_2 = DataFrame(k = Int[], n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[], ρlow = Float64[])
 
 for nsim in 1:N
     println("Début de la $nsim ème simulation")
@@ -245,17 +248,20 @@ for nsim in 1:N
             res_GP = algoMCMC(gp, mydf, priors_GP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_GP_all_rho0_2[i][chain] =  res_GP[1001:end,:]
             insertcols!(res_GP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_GP_all_rho0_2[i][chain])))
-            append!(res_GP_all_rho_2_Nsim[i][chain],res_GP_all_rho0_2[i][chain])
+            res_GP_all_rho0_2_Nsim[i][chain] = DataFrame()
+            append!(res_GP_all_rho0_2_Nsim[i][chain],res_GP_all_rho0_2[i][chain])
 
             res_BP = algoMCMC(gp, mydf, priors_BP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_BP_all_rho0_2[i][chain] = res_BP[1001:end,:]
             insertcols!(res_BP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_BP_all_rho0_2[i][chain])))
-            append!(res_BP_all_rho_2_Nsim[i][chain],res_BP_all_rho0_2[i][chain])
+            res_BP_all_rho0_2_Nsim[i][chain] = DataFrame()
+            append!(res_BP_all_rho0_2_Nsim[i][chain],res_BP_all_rho0_2[i][chain])
 
             res_VBP = algoMCMC(gp, mydf, priors_VBP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_VBP_all_rho0_2[i][chain] = res_VBP[1001:end,:]
             insertcols!(res_VBP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_VBP_all_rho0_2[i][chain])))
-            append!(res_VBP_all_rho_2_Nsim[i][chain],res_VBP_all_rho0_2[i][chain])
+            res_VBP_all_rho0_2_Nsim[i][chain] = DataFrame()
+            append!(res_VBP_all_rho0_2_Nsim[i][chain],res_VBP_all_rho0_2[i][chain])
 
         end
     end

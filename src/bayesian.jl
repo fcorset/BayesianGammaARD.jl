@@ -359,7 +359,7 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
     lbrho = lowerboundrho(mydf)
     #parinit = MLE(gp,mydf,x0 = [1.0, 1.5, 1.0, (1+lbrho)/2],lower = [1e-2,0.1,0.01,lbrho+0.01],upper=[Inf, Inf, Inf, 1])
     parinit = x0
-    estpar = DataFrame((α=zeros(K+1),β=zeros(K+1),θ=zeros(K+1),ρ=zeros(K+1)))
+    estpar = DataFrame((α=zeros(K),β=zeros(K),θ=zeros(K),ρ=zeros(K)))
     estpar[1,:]=parinit
     accepted = zeros(Int, 3)
     for k in 2:K

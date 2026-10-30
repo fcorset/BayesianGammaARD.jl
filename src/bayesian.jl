@@ -362,7 +362,7 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
     estpar = DataFrame((α=zeros(K+1),β=zeros(K+1),θ=zeros(K+1),ρ=zeros(K+1)))
     estpar[1,:]=parinit
     accepted = zeros(Int, 3)
-    for k in 2:K+1
+    for k in 2:K
         #println("k = $k")
         for j ∈ [3,2,1,4]
             if j==3

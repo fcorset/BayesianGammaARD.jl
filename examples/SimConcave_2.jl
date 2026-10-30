@@ -24,6 +24,7 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 
 HT = 200 # Fenêtre d'observation [0,T]
 
+
 # Simulation du processus de dégradation
 y, df = rand(gp,tinsp=1:HT,HT=HT)
 
@@ -248,9 +249,9 @@ for i in 1:length(res_GP_all_rho0_2)
     end
 end
 
-mle_df_rho_0_2 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[])
+mle_df_rho_0_2 = DataFrame(k = Int[], n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[])
 for i in 1:length(EstMLE_rho0_2)
-    push!(mle_df_rho_0_2, (n_values[i], EstMLE_rho0_2[i]...))
+    push!(mle_df_rho_0_2, (k, n_values[i], EstMLE_rho0_2[i]...))
 end
 mle_df_rho_0_2[!, :ρlow] = ρlow
 CSV.write("examples/Results/Concave/mle_results_$rho_label.csv", mle_df_rho_0_2)

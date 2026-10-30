@@ -58,6 +58,7 @@ hline!([6], label="M")
 
 # Cas concave et ρ=0.2 (cf. SimConcave_2.jl)
 #
+αtrue = 2.0
 
 # MLE
 df_MLE  = CSV.read(
@@ -127,9 +128,9 @@ histogram(df_4chains[1][:, 1],normalize=:pdf,
     ylabel="density",
     xlims=(0,6),
     ylims=(0,3))
-vline!([], label="true value of alpha")
-vline!([df_mle[1,1]]label="MLE of rho")
-vline!([mean(df_4chains[1][:,1])],label="Bayesian Estimator of rho")
+vline!([αtrue], label="true value of α")
+vline!([df_MLE[1,2]],label="MLE of α")
+vline!([mean(df_4chains[1][:,1])],label="Bayesian Estimator of α")
 
 
 

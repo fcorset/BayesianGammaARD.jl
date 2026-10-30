@@ -23,8 +23,9 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 # ... (simulation) ...
 
 HT = 200 # Fenêtre d'observation [0,T]
+n_values = [10,20,30,50,75,100,125,150,175,200]
 
-N = 2 # Nb simulation
+N = 2 # Nb simulations
 
 df200_rho0_2_Nsim = DataFrame[]
 
@@ -274,9 +275,7 @@ end
 # Sauvegarde (fichiers + noms de dataframes) avec indication rho 0.2
 CSV.write("examples/Results/Nsim/Concave/sim_data_full_$rho_label.csv", df200_rho0_2_Nsim)
 
-n_size = [10,20,30,50,75,100,125,150,175,200]
-
-for i in 1:length(n_size)
+for i in 1:length(n_values)
     for chain in 1:4
         CSV.write("examples/Results/Nsim/Concave/bayes_posterior_verybad_priors_n$(n_values[i])_chain$(chain)_$rho_label.csv", res_VBP_all_rho0_2_Nsim[i][chain])
         CSV.write("examples/Results/Nsim/Concave/bayes_posterior_good_priors_n$(n_values[i])_chain$(chain)_$rho_label.csv", res_GP_all_rho0_2_Nsim[i][chain])

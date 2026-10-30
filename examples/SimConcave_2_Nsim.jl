@@ -25,21 +25,15 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 HT = 200 # Fenêtre d'observation [0,T]
 n_values = [10,20,30,50,75,100,125,150,175,200]
 
-N = 2 # Nb simulations
+N = 500 # Nb simulations
 
-df200_rho0_2_Nsim = DataFrame[]
-
-#res_GP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # Good Priors
-#res_BP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # moderately misspecified priors
-#res_VBP_all_rho0_2_Nsim = [Vector{DataFrame}(undef,4) for _ in 1:10] # strongly misspecified priors
+sorties_sim = Vector{DataFrame}(undef, N)
+sorties_Bay = Vector{Vector{DataFrame}}(undef,N)
+sorties_MLE = Vector{DataFrame}(undef,N)
 
 
-
-
-mle_df_rho_0_2 = DataFrame(k = Int[], n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[], ρlow = Float64[])
-
-for nsim in 1:N
-    println("Début de la $nsim ème simulation")
+Threads.@threads for nsim in 1:N
+    #println("Début de la $nsim ème simulation")
     # Simulation du processus de dégradation
     y, df = rand(gp,tinsp=1:HT,HT=HT)
 
@@ -77,7 +71,8 @@ for nsim in 1:N
     res_BP_all_rho0_2 = [Vector{DataFrame}(undef,4) for _ in 1:10] # moderately misspecified priors
     res_VBP_all_rho0_2 = [Vector{DataFrame}(undef,4) for _ in 1:10] # strongly misspecified priors
 
-    
+    mle_df_rho_0_2 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[], ρlow = Float64[])
+
 
     for i in 1:length(ρlow)
         dfs = [df10_rho0_2, df20_rho0_2, df30_rho0_2, df50_rho0_2, df75_rho0_2,
@@ -88,7 +83,8 @@ for nsim in 1:N
         x0 = [1.0, 1.5, 1.0, (1+ρlow[i])/2]
 
         EstMLE_rho0_2[i] = MLE(gp, mydf, x0, [1e-2,0.1,0.01,ρlow[i]+0.01], [Inf, Inf, Inf, 1])
-        push!(mle_df_rho_0_2, (nsim, n_values[i], EstMLE_rho0_2[i]..., ρlow[i]))
+        
+        push!(mle_df_rho_0_2, (n_values[i], EstMLE_rho0_2[i]..., ρlow[i]))
 
         
         
@@ -248,32 +244,36 @@ for nsim in 1:N
             #println("Chaîne numéro $chain")
             res_GP = algoMCMC(gp, mydf, priors_GP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_GP_all_rho0_2[i][chain] =  res_GP[1001:end,:]
-            insertcols!(res_GP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_GP_all_rho0_2[i][chain])))
-            res_GP_all_rho0_2_Nsim[i][chain] = DataFrame()
-            append!(res_GP_all_rho0_2_Nsim[i][chain],res_GP_all_rho0_2[i][chain])
 
             res_BP = algoMCMC(gp, mydf, priors_BP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_BP_all_rho0_2[i][chain] = res_BP[1001:end,:]
-            insertcols!(res_BP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_BP_all_rho0_2[i][chain])))
-            res_BP_all_rho0_2_Nsim[i][chain] = DataFrame()
-            append!(res_BP_all_rho0_2_Nsim[i][chain],res_BP_all_rho0_2[i][chain])
-
+            
             res_VBP = algoMCMC(gp, mydf, priors_VBP, K, 1.0, 0.5, 0.2; w=w, x0=initial_points[chain])
             res_VBP_all_rho0_2[i][chain] = res_VBP[1001:end,:]
-            insertcols!(res_VBP_all_rho0_2[i][chain], 1, :NumSim => fill(nsim, nrow(res_VBP_all_rho0_2[i][chain])))
-            res_VBP_all_rho0_2_Nsim[i][chain] = DataFrame()
-            append!(res_VBP_all_rho0_2_Nsim[i][chain],res_VBP_all_rho0_2[i][chain])
-
         end
     end
+    sorties_Bay[nsim] = [res_GP_all_rho0_2, res_BP_all_rho0_2, res_VBP_all_rho0_2]
+    sorties_MLE[nsim] = mle_df_rho_0_2
+    sorties_sim[nsim] = df200_rho0_2
     # Sauver toutes les simus
-    insertcols!(df200_rho0_2, 1, :NumSim => fill(nsim,nrow(df200_rho0_2)))
-    append!(df200_rho0_2_Nsim,df200_rho0_2)
 end
 
+res_GP_all_rho0_2_Nsim = sorties_Bay[1][1]
+res_BP_all_rho0_2_Nsim = sorties_Bay[1][2]
+res_VBP_all_rho0_2_Nsim = sorties_Bay[1][3]
+res_MLE_rho0_2_Nsim = sorties_MLE[1]
+sim_rho0_2_Nsim = sorties_sim[1]
+
+for i = 2:N
+    append!(res_GP_all_rho0_2_Nsim,sorties_Bay[i][1])
+    append!(res_BP_all_rho0_2_Nsim,sorties_Bay[i][2])
+    append!(res_VBP_all_rho0_2_Nsim,sorties_Bay[i][3])
+    append!(res_MLE_rho0_2_Nsim,sorties_MLE[i])
+    append!(sim_rho0_2_Nsim,sorties_sim[i])
+end
 
 # Sauvegarde (fichiers + noms de dataframes) avec indication rho 0.2
-CSV.write("examples/Results/Nsim/Concave/sim_data_full_$rho_label.csv", df200_rho0_2_Nsim)
+CSV.write("examples/Results/Nsim/Concave/sim_data_full_$rho_label.csv", sim_rho0_2_Nsim)
 
 for i in 1:length(n_values)
     for chain in 1:4
@@ -284,4 +284,4 @@ for i in 1:length(n_values)
 end
 
 
-CSV.write("examples/Results/Nsim/Concave/mle_results_Nsim_$rho_label.csv", mle_df_rho_0_2)
+CSV.write("examples/Results/Nsim/Concave/mle_results_Nsim_$rho_label.csv", res_MLE_rho0_2_Nsim)

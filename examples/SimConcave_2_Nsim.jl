@@ -25,7 +25,7 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 HT = 200 # Fenêtre d'observation [0,T]
 n_values = [10,20,30,50,75,100,125,150,175,200]
 
-N = 500 # Nb simulations
+N = 200 # Nb simulations
 
 sorties_sim = Vector{DataFrame}(undef, N)
 sorties_Bay = Vector{Vector{DataFrame}}(undef,N)
@@ -273,7 +273,9 @@ for i = 2:N
 end
 
 # Sauvegarde (fichiers + noms de dataframes) avec indication rho 0.2
-CSV.write("examples/Results/Nsim/Concave/sim_data_full_$rho_label.csv", sim_rho0_2_Nsim)
+chemin = "examples/Results/Nsim/Concave/sim_data_full_$rho_label.csv"
+mkpath(dirname(chemin))
+CSV.write(chemin, sim_rho0_2_Nsim)
 
 for i in 1:length(n_values)
     for chain in 1:4

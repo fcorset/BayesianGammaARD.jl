@@ -31,11 +31,11 @@ mm = MaintenanceModel(ρ=ρtrue)
 gp = GammaProcess(α=αtrue, β=βtrue, θ=θtrue, mm=mm)
 
 HT = 200 # Fenêtre d'observation [0,T]
-# n_values = [10, 20, 30, 50, 75, 100, 125, 150, 175, 200]
+ n_values = [10, 20, 30, 50, 75, 100, 125, 150, 175, 200]
 # test en mode rapide pour débogage
-n_values = [10, 20]
+#n_values = [10, 20]
 
-N = 1 # Nombre de simulations globales
+N = 200 # Nombre de simulations globales
 
 # Conteneurs globaux pré-alloués (Un élément par simulation)
 # Sécurisé pour le multi-threading car l'index d'écriture 'nsim' est unique par thread.
@@ -236,7 +236,7 @@ q025_col = Symbol(param_name, "_q025")
 q975_col = Symbol(param_name, "_q975")
 df_bayes[!, :error] = df_bayes[!, mean_col] .- true_val
 df_bayes[!, :sq_error] = df_bayes[!, :error].^2
-df_bayes[!, :covered] = (df_bayes[!, q025_col] .<= true_val) .& (true_val .<= df_bayes[!, :q975_col])
+df_bayes[!, :covered] = (df_bayes[!, q025_col] .<= true_val) .& (true_val .<= df_bayes[!, q975_col])
 df_bayes[!, :ic_length] = df_bayes[!, q975_col] .- df_bayes[!, q025_col]
 synthese = combine(groupby(df_bayes, [:n, :prior_type]),
 :error => mean => Symbol("Bias_", param_name),

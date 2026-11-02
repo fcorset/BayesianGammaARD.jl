@@ -64,9 +64,9 @@ function rand(gp::GammaProcess; tinsp=1:100, δ::Float64=0.01, HT::Int=100)
     return y, df
 end
 
-function predf(gp::GammaProcess, df::DataFrame)
+function predf(gp::GammaProcess, df::AbstractDataFrame)
     # Rend la df exploitable pour MLE et bayésien en calculant les u et les deg précédentes
-    mydf = deepcopy(df) 
+    mydf = DataFrame(df)
     u = Int.((mydf.deg .> gp.mm.L) .* (mydf.deg .< gp.mm.U)) # u_i dans le papier
     Δ = Int.(mydf.deg .> gp.mm.U)
 

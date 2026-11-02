@@ -46,3 +46,17 @@ end
     @test ismissing(diagnostics.ess[:θ])
     @test all(ismissing, diagnostics.autocorrelation.θ)
 end
+
+@testset "predf with a SubDataFrame" begin
+    gp = GammaProcess()
+    df = DataFrame(tinsp=[1.0, 2.0, 3.0, 4.0], deg=[1.0, 4.0, 2.0, 7.0])
+    df_sub = view(df, 1:3, :)
+
+    mydf = predf(gp, df_sub)
+
+    @test mydf isa DataFrame
+    @test nrow(mydf) == 3
+    @test mydf.um1 == [0, 0, 1]
+    @test mydf.degprec == [0.0, 1.0, 4.0]
+    @test names(df) == ["tinsp", "deg"]
+end

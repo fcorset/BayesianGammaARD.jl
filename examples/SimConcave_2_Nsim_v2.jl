@@ -3,6 +3,10 @@
 # Optimisé pour l'exécution multi-threadée (192 cœurs) sur Kraken-cpu (GRICAD)
 # ==============================================================================
 
+# Force Julia à scanner le répertoire courant et le dossier src pour trouver StructUtils
+if !("." in LOAD_PATH) push!(LOAD_PATH, ".") end
+if !("./src" in LOAD_PATH) push!(LOAD_PATH, "./src") end
+
 using BayesianGammaARD
 using Distributions
 using DataFrames
@@ -84,11 +88,11 @@ Threads.@threads for nsim in 1:N
         # PARTIE B : ESTMATION BAYÉSIENNE MULTI-CHAÎNES
         # ----------------------------------------------------------------------
         w = 1.0
-        # K = 10000
-        K = 100 # Test rapide pour débogage
+        K = 10000
+        # K = 100 # Test rapide pour débogage
 
-        #burn_in = 1001
-        burn_in = 10 # Test rapide pour débogage
+        burn_in = 1001
+        # burn_in = 10 # Test rapide pour débogage
         n_post_burn = K - burn_in + 1
 
         # ======================================================================

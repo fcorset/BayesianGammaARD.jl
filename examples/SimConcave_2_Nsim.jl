@@ -7,7 +7,11 @@ using DataFrames
 using CSV
 using Statistics
 using Plots
+using Base.Threads
+using LinearAlgebra # Indispensable pour contrôler BLAS
+using MCMCDiagnosticTools # Calcule l'ESS et le R-hat de façon robuste
 
+BLAS.set_num_threads(1)
 
 # Vraies valeurs des paramètres
 αtrue = 2.0
@@ -31,24 +35,43 @@ sorties_sim = Vector{DataFrame}(undef, N)
 sorties_Bay = Vector{Vector{DataFrame}}(undef,N)
 sorties_MLE = Vector{DataFrame}(undef,N)
 
+println("Début de la simulation parallèle sur ", Threads.nthreads(), " threads...")
 
 Threads.@threads for nsim in 1:N
     #println("Début de la $nsim ème simulation")
     # Simulation du processus de dégradation
     y, df = rand(gp,tinsp=1:HT,HT=HT)
 
+    sorties_sim[nsim] = df
+
+    local_mle_df = DataFrame(
+        nsim = Int[], n = Int[], 
+        α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[], 
+        ρlow = Float64[]
+    )
+
+    # DataFrame local incluant toutes les colonnes pour les 4 paramètres, y compris les écarts-types (std)
+    local_bayes_df = DataFrame(
+        nsim=Int[], n=Int[], prior_type=String[],
+        α_mean=Float64[], α_std=Float64[], α_q025=Float64[], α_q975=Float64[], α_ess=Float64[], α_rhat=Float64[], α_acc=Float64[],
+        β_mean=Float64[], β_std=Float64[], β_q025=Float64[], β_q975=Float64[], β_ess=Float64[], β_rhat=Float64[], β_acc=Float64[],
+        θ_mean=Float64[], θ_std=Float64[], θ_q025=Float64[], θ_q975=Float64[], θ_ess=Float64[], θ_rhat=Float64[], θ_acc=Float64[],
+        ρ_mean=Float64[], ρ_std=Float64[], ρ_q025=Float64[], ρ_q975=Float64[], ρ_ess=Float64[], ρ_rhat=Float64[], ρ_acc=Float64[]
+    )
+
+
 
     # On génère 10 jeux de données (n croissant) avec nom de variable explicite
-    df10_rho0_2  = df[1:10,:]
-    df20_rho0_2  = df[1:20,:]
-    df30_rho0_2  = df[1:30,:]
-    df50_rho0_2  = df[1:50,:]
-    df75_rho0_2  = df[1:75,:]
-    df100_rho0_2 = df[1:100,:]
-    df125_rho0_2 = df[1:125,:]
-    df150_rho0_2 = df[1:150,:]
-    df175_rho0_2 = df[1:175,:]
-    df200_rho0_2 = df[1:200,:]
+    #df10_rho0_2  = df[1:10,:]
+    #df20_rho0_2  = df[1:20,:]
+    #df30_rho0_2  = df[1:30,:]
+    #df50_rho0_2  = df[1:50,:]
+    #df75_rho0_2  = df[1:75,:]
+    #df100_rho0_2 = df[1:100,:]
+    #df125_rho0_2 = df[1:125,:]
+    #df150_rho0_2 = df[1:150,:]
+    #df175_rho0_2 = df[1:175,:]
+    #df200_rho0_2 = df[1:200,:]
 
     # Cas où l'on veut charger les données depuis des fichiers CSV
     #df10_rho0_2 = CSV.read("examples/Results/Concave/sim_data_full_$rho_label.csv", DataFrame)[1:10,:]
@@ -71,20 +94,25 @@ Threads.@threads for nsim in 1:N
     res_BP_all_rho0_2 = [Vector{DataFrame}(undef,4) for _ in 1:10] # moderately misspecified priors
     res_VBP_all_rho0_2 = [Vector{DataFrame}(undef,4) for _ in 1:10] # strongly misspecified priors
 
-    mle_df_rho_0_2 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[], ρlow = Float64[])
+    # mle_df_rho_0_2 = DataFrame(n = Int[], α = Float64[], β = Float64[], θ = Float64[], ρ = Float64[], ρlow = Float64[])
 
 
     for i in 1:length(ρlow)
-        dfs = [df10_rho0_2, df20_rho0_2, df30_rho0_2, df50_rho0_2, df75_rho0_2,
-               df100_rho0_2, df125_rho0_2, df150_rho0_2, df175_rho0_2, df200_rho0_2]
-        mydf = BayesianGammaARD.predf(gp, dfs[i])
+        n_actuel = n_values[i]
+        
+        # OPTIMISATION : On utilise une vue "view" pour éviter de dupliquer les lignes en mémoire
+        df_sub = view(df, 1:n_actuel, :)
+        
+        #dfs = [df10_rho0_2, df20_rho0_2, df30_rho0_2, df50_rho0_2, df75_rho0_2,
+        #       df100_rho0_2, df125_rho0_2, df150_rho0_2, df175_rho0_2, df200_rho0_2]
+        mydf = BayesianGammaARD.predf(gp, df_sub)
         ρlow[i] = BayesianGammaARD.lowerboundrho(mydf)
         #println("Lower bound for ρ (n=$(nrow(dfs[i]))): $(ρlow[i])")
         x0 = [1.0, 1.5, 1.0, (1+ρlow[i])/2]
 
         EstMLE_rho0_2[i] = MLE(gp, mydf, x0, [1e-2,0.1,0.01,ρlow[i]+0.01], [Inf, Inf, Inf, 1])
         
-        push!(mle_df_rho_0_2, (n_values[i], EstMLE_rho0_2[i]..., ρlow[i]))
+        push!(local_mle_df, (nsim, n_actuel, EstMLE_rho0_2[i]..., ρlow[i]))
 
         
         
@@ -253,10 +281,20 @@ Threads.@threads for nsim in 1:N
         end
     end
     sorties_Bay[nsim] = [res_GP_all_rho0_2, res_BP_all_rho0_2, res_VBP_all_rho0_2]
-    sorties_MLE[nsim] = mle_df_rho_0_2
+    sorties_MLE[nsim] = local_mle_df
     sorties_sim[nsim] = df200_rho0_2
     # Sauver toutes les simus
 end
+
+println("Simulations terminées. Agrégation des résultats...")
+
+df_final_mle = reduce(vcat, sorties_MLE)
+output_path = "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/examples/Results/Nsim/Concave/results_mle_$(rho_label).csv"
+mkpath(dirname(output_path))
+CSV.write(output_path, df_final_mle)
+
+println("Fichier de résultats écrit avec succès dans : ", output_path)
+
 
 res_GP_all_rho0_2_Nsim = sorties_Bay[1][1]
 res_BP_all_rho0_2_Nsim = sorties_Bay[1][2]

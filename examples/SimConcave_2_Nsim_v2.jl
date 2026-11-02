@@ -2,10 +2,11 @@
 # Script de Simulation et d'Estimation (MLE & Bayes multi-priors)
 # Optimisé pour l'exécution multi-threadée (192 cœurs) sur Kraken-cpu (GRICAD)
 # ==============================================================================
-
-# Force Julia à scanner le répertoire courant et le dossier src pour trouver StructUtils
-if !("." in LOAD_PATH) push!(LOAD_PATH, ".") end
-if !("./src" in LOAD_PATH) push!(LOAD_PATH, "./src") end
+# Tout en haut du fichier, avant "using BayesianGammaARD"
+if !("/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl" in LOAD_PATH)
+    push!(LOAD_PATH, "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl")
+    push!(LOAD_PATH, "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/src")
+end
 
 using BayesianGammaARD
 using Distributions

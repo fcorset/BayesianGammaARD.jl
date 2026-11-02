@@ -20,19 +20,22 @@ using MCMCDiagnosticTools
 BLAS.set_num_threads(1)
 
 # Vraies valeurs des paramètres
-const αtrue = 2.0
-const βtrue = 0.6
-const θtrue = 2.0
-const ρtrue = 0.2
-const rho_label = "rho0.2"
+αtrue = 2.0
+βtrue = 0.6
+θtrue = 2.0
+ρtrue = 0.2
+rho_label = "rho0.2"
 
 # Définition du modèle générateur
 mm = MaintenanceModel(ρ=ρtrue)
 gp = GammaProcess(α=αtrue, β=βtrue, θ=θtrue, mm=mm)
 
 HT = 200 # Fenêtre d'observation [0,T]
-n_values = [10, 20, 30, 50, 75, 100, 125, 150, 175, 200]
-N = 200 # Nombre de simulations globales
+# n_values = [10, 20, 30, 50, 75, 100, 125, 150, 175, 200]
+# test en mode rapide pour débogage
+n_values = [10, 20]
+
+N = 1 # Nombre de simulations globales
 
 # Conteneurs globaux pré-alloués (Un élément par simulation)
 # Sécurisé pour le multi-threading car l'index d'écriture 'nsim' est unique par thread.
@@ -81,8 +84,11 @@ Threads.@threads for nsim in 1:N
         # PARTIE B : ESTMATION BAYÉSIENNE MULTI-CHAÎNES
         # ----------------------------------------------------------------------
         w = 1.0
-        K = 10000
-        burn_in = 1001
+        # K = 10000
+        K = 100 # Test rapide pour débogage
+
+        #burn_in = 1001
+        burn_in = 10 # Test rapide pour débogage
         n_post_burn = K - burn_in + 1
 
         # ======================================================================

@@ -40,7 +40,7 @@ HT = 200 # Fenêtre d'observation [0,T]
 # test en mode rapide pour débogage
 #n_values = [10, 20]
 
-N = 200 # Nombre de simulations globales
+N = 5 # Nombre de simulations globales
 
 # Conteneurs globaux pré-alloués (Un élément par simulation)
 # Sécurisé pour le multi-threading car l'index d'écriture 'nsim' est unique par thread.

@@ -2,11 +2,6 @@
 # Script de Simulation et d'Estimation (MLE & Bayes multi-priors), cas concave ρ = 0.7
 # Optimisé pour l'exécution multi-threadée (192 cœurs) sur Kraken-cpu (GRICAD)
 # ==============================================================================
-# Tout en haut du fichier, avant "using BayesianGammaARD"
-if !("/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl" in LOAD_PATH)
-    push!(LOAD_PATH, "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl")
-    push!(LOAD_PATH, "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/src")
-end
 
 using BayesianGammaARD
 using Distributions
@@ -36,11 +31,11 @@ mm = MaintenanceModel(ρ=ρtrue)
 gp = GammaProcess(α=αtrue, β=βtrue, θ=θtrue, mm=mm)
 
 HT = 200 # Fenêtre d'observation [0,T]
- n_values = [10, 20, 30, 50, 75, 100, 125, 150, 175, 200]
+n_values = [10, 25, 50, 75, 100, 150, 200]
 # test en mode rapide pour débogage
 #n_values = [10, 20]
 
-N = 5 # Nombre de simulations globales
+N = 10 # Nombre de simulations globales
 
 # Conteneurs globaux pré-alloués (Un élément par simulation)
 # Sécurisé pour le multi-threading car l'index d'écriture 'nsim' est unique par thread.
@@ -270,7 +265,9 @@ sort!(df_performance_globale, [:prior_type, :n])
 #  EXPORTATION SUR L'ESPACE NVMe DU MÉSOCENTRE (/bettik)
 #------------------------------------------------------------------------------
 dir_out = "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/examples/Results/Nsim/Concave/"
-if !isdir(dir_out) mkdir(dir_out) end
+
+
+mkpath(dir_out)
 CSV.write(joinpath(dir_out, "mle_raw_results_$(rho_label).csv"), df_final_mle)
 CSV.write(joinpath(dir_out, "bayes_raw_results_$(rho_label).csv"), df_final_bayes)
 CSV.write(joinpath(dir_out, "article_performance_metrics_$(rho_label).csv"), df_performance_globale)

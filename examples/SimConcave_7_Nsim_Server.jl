@@ -35,7 +35,7 @@ n_values = [10, 25, 50, 75, 100, 150, 200]
 # test en mode rapide pour débogage
 #n_values = [10, 20]
 
-N = 10 # Nombre de simulations globales
+N = 300 # Nombre de simulations globales
 
 # Conteneurs globaux pré-alloués (Un élément par simulation)
 # Sécurisé pour le multi-threading car l'index d'écriture 'nsim' est unique par thread.

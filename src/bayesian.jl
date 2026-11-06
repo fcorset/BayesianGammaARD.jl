@@ -35,40 +35,45 @@ Paramètres :
 - a : Paramètre chi (> 0).
 - b : Paramètre psi (> 0).
 """
-function rand_gig(p::Real, a::Real, b::Real)::Float64
-    # Conversion et gestion de la symétrie de la GIG si p < 0
+function rand_gig(p::Real, a::Real, b::Real; rng::AbstractRNG=Random.default_rng())::Float64
     _p, _a, _b = Float64(p), Float64(a), Float64(b)
-    inverse = _p < 0.0
+    isfinite(_p) && isfinite(_a) && isfinite(_b) && _a > 0 && _b > 0 ||
+        throw(ArgumentError("p must be finite and a and b must be finite and strictly positive."))
+
+    inverse = _p < 0
     if inverse
         _p = -_p
         _a, _b = _b, _a
     end
 
-    # Algorithme de rejet adaptatif (Dagpunar)
-    # 1. Calcul du mode de la distribution
-    mode = ((_p - 1.0) + sqrt((_p - 1.0)^2 + _a * _b)) / _b
-    
-    alpha = 0.5 * _b
-    beta = 0.5 * _a
-    g_x0 = (_p - 1.0) * log(mode) - alpha * mode - beta / mode
-    
-    # Paramètre de l'enveloppe exponentielle
-    lam = alpha + beta / (mode^2)
-    
+    if _p == 0.5
+        sample = inv(rand(rng, InverseGaussian(sqrt(_a / _b), _a)))
+        return inverse ? inv(sample) : sample
+    end
+
+    # Ratio-of-uniforms sampler; the symmetry above ensures p >= 0.
+    ab = _a * _b
+    mode_term = _p - 1
+    mode_root = sqrt(mode_term^2 + ab)
+    mode = mode_term >= 0 ? (mode_term + mode_root) / _a : _b / (mode_root - mode_term)
+    log_kernel(x) = (_p - 1) * log(x) - 0.5 * (_a * x + _b / x)
+    log_kernel_mode = log_kernel(mode)
+
+    vmax_term = _p + 1
+    vmax_point = (vmax_term + sqrt(vmax_term^2 + ab)) / _a
+    log_vmax = log(vmax_point) + 0.5 * (log_kernel(vmax_point) - log_kernel_mode)
+    log_floatmax = log(floatmax(Float64))
+    log_floatmin = log(floatmin(Float64))
+
     while true
-        u = rand()
-        v = rand()
-        
-        # Génération du candidat x (Loi instrumentale bi-exponentielle)
-        x = u <= 0.5 ? mode + log(v) / lam : mode - log(v) / lam
-        
-        x <= 0.0 && continue
-        
-        # Critère d'acceptation
-        g_x = (_p - 1.0) * log(x) - alpha * x - beta / x
-        
-        if log(rand()) <= (g_x - g_x0 + lam * abs(x - mode))
-            return inverse ? 1.0 / x : x
+        u, v = rand(rng), rand(rng)
+        (u == 0 || v == 0) && continue
+
+        log_x = log(v) + log_vmax - log(u)
+        (log_x < log_floatmin || log_x > log_floatmax) && continue
+        x = exp(log_x)
+        if 2 * log(u) <= log_kernel(x) - log_kernel_mode
+            return inverse ? inv(x) : x
         end
     end
 end
@@ -227,54 +232,54 @@ function logcondpostdistrho(ρ,priors::Vector{ContinuousUnivariateDistribution},
 end
 
 
-#function mcmc_diagnostics(samples::DataFrame; acceptance_rates=nothing, max_lag::Union{Nothing,Integer}=nothing)
-#    n = nrow(samples)
-#    n >= 2 || throw(ArgumentError("Il faut au moins deux itérations pour calculer les diagnostics MCMC."))
-#    max_lag === nothing || max_lag >= 0 ||
-#        throw(ArgumentError("max_lag doit être positif ou nul."))
-#    lag_limit = min(max_lag === nothing ? 1000 : Int(max_lag), n - 1)
+function mcmc_diagnostics(samples::DataFrame; acceptance_rates=nothing, max_lag::Union{Nothing,Integer}=nothing)
+    n = nrow(samples)
+    n >= 2 || throw(ArgumentError("Il faut au moins deux itérations pour calculer les diagnostics MCMC."))
+    max_lag === nothing || max_lag >= 0 ||
+        throw(ArgumentError("max_lag doit être positif ou nul."))
+    lag_limit = min(max_lag === nothing ? 1000 : Int(max_lag), n - 1)
 
-#    parameter_names = (:α, :β, :θ, :ρ)
-#    all(name -> name in propertynames(samples), parameter_names) ||
-#        throw(ArgumentError("La chaîne doit contenir les colonnes α, β, θ et ρ."))
+    parameter_names = (:α, :β, :θ, :ρ)
+    all(name -> name in propertynames(samples), parameter_names) ||
+        throw(ArgumentError("La chaîne doit contenir les colonnes α, β, θ et ρ."))
+    rates = acceptance_rates === nothing ?
+        (α=mean(diff(samples.α) .!= 0), β=mean(diff(samples.β) .!= 0),
+         θ=missing, ρ=mean(diff(samples.ρ) .!= 0)) : acceptance_rates
+    ess = Dict{Symbol,Union{Missing,Float64}}()
+    rhat = Dict{Symbol,Union{Missing,Float64}}(name => missing for name in parameter_names)
+    autocorrelation = DataFrame(lag=collect(0:lag_limit))
 
-#    rates = acceptance_rates === nothing ?
-#        (α=mean(diff(samples.α) .!= 0), β=mean(diff(samples.β) .!= 0),
-#         θ=missing, ρ=mean(diff(samples.ρ) .!= 0)) : acceptance_rates
-#    ess = Dict{Symbol,Union{Missing,Float64}}()
-#    autocorrelation = DataFrame(lag=collect(0:lag_limit))
+    for name in parameter_names
+        x = Float64.(samples[!, name])
+        all(isfinite, x) ||
+            throw(ArgumentError("La chaîne du paramètre $name contient des valeurs non finies."))
+        centered = x .- mean(x)
+        variance_sum = sum(abs2, centered)
 
-#    for name in parameter_names
-#        x = Float64.(samples[!, name])
-#        all(isfinite, x) ||
-#            throw(ArgumentError("La chaîne du paramètre $name contient des valeurs non finies."))
-#        centered = x .- mean(x)
-#        variance_sum = sum(abs2, centered)
+        if variance_sum == 0
+            autocorrelation[!, name] = Union{Missing,Float64}[missing for _ in 0:lag_limit]
+            ess[name] = missing
+            continue
+        end
 
-#        if variance_sum == 0
-#            autocorrelation[!, name] = Union{Missing,Float64}[missing for _ in 0:lag_limit]
-#            ess[name] = missing
-#            continue
-#        end
+        acf = Vector{Float64}(undef, lag_limit + 1)
+        acf[1] = 1.0
+        for lag in 1:lag_limit
+            acf[lag + 1] = sum(centered[1:(n-lag)] .* centered[(lag+1):n]) / variance_sum
+        end
+        autocorrelation[!, name] = acf
 
-#        acf = Vector{Float64}(undef, lag_limit + 1)
-#        acf[1] = 1.0
-#        for lag in 1:lag_limit
-#            acf[lag + 1] = sum(centered[1:(n-lag)] .* centered[(lag+1):n]) / variance_sum
-#        end
-#        autocorrelation[!, name] = acf
+        positive_pairs_sum = 0.0
+        for lag in 1:2:(lag_limit - 1)
+            pair_sum = acf[lag + 1] + acf[lag + 2]
+            pair_sum > 0 || break
+            positive_pairs_sum += pair_sum
+        end
+        ess[name] = clamp(n / (1 + 2 * positive_pairs_sum), 1.0, Float64(n))
+    end
 
-#        positive_pairs_sum = 0.0
-#        for lag in 1:2:(lag_limit - 1)
-#            pair_sum = acf[lag + 1] + acf[lag + 2]
-#            pair_sum > 0 || break
-#            positive_pairs_sum += pair_sum
-#        end
-#        ess[name] = n / (1 + 2 * positive_pairs_sum)
-#    end
-
-#    return (acceptance_rates=rates, ess=ess, autocorrelation=autocorrelation)
-#end
+    return (acceptance_rates=rates, ess=ess, rhat=rhat, autocorrelation=autocorrelation)
+end
 
 function mcmc_diagnostics(chains::AbstractVector{<:DataFrame}; acceptance_rates=nothing, max_lag::Union{Nothing,Integer}=nothing)
     n_chains = length(chains)
@@ -427,4 +432,3 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
     end
     return estpar
 end
-

@@ -262,10 +262,9 @@ df_performance_globale = innerjoin(df_performance_globale, df_perf_ρ, on=[:n, :
 sort!(df_performance_globale, [:prior_type, :n])
 
 #------------------------------------------------------------------------------
-#  EXPORTATION SUR L'ESPACE NVMe DU MÉSOCENTRE (/bettik)
+#  EXPORTATION en local
 #------------------------------------------------------------------------------
-dir_out = "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/examples/Results/Nsim/Concave/"
-
+dir_out = "examples/Results/Nsim/Concave/"
 
 mkpath(dir_out)
 CSV.write(joinpath(dir_out, "mle_raw_results_$(rho_label).csv"), df_final_mle)

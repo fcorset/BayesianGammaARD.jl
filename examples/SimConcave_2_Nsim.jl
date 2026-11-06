@@ -29,7 +29,7 @@ gp = GammaProcess(α=αtrue,β=βtrue,θ=θtrue,mm=mm)
 HT = 200 # Fenêtre d'observation [0,T]
 n_values = [10,20,30,50,75,100,125,150,175,200]
 
-N = 200 # Nb simulations
+N = 16 # Nb simulations
 
 sorties_sim = Vector{DataFrame}(undef, N)
 sorties_Bay = Vector{Vector{DataFrame}}(undef,N)

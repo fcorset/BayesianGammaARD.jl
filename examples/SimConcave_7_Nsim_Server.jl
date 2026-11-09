@@ -31,7 +31,9 @@ mm = MaintenanceModel(ρ=ρtrue)
 gp = GammaProcess(α=αtrue, β=βtrue, θ=θtrue, mm=mm)
 
 HT = 200 # Fenêtre d'observation [0,T]
-n_values = [10, 25, 50, 75, 100, 150, 200]
+#n_values = [10, 25, 50, 75, 100, 150, 200]
+n_values = [10, 25, 50, 100, 200]
+
 # test en mode rapide pour débogage
 #n_values = [10, 20]
 

@@ -39,7 +39,7 @@ n_values = [10, 25, 50, 100, 200]
 # test en mode rapide pour débogage
 #n_values = [10, 20]
 
-N = 190 # Nombre de simulations globales
+N = 10 # Nombre de simulations globales
 
 # Conteneurs globaux pré-alloués (Un élément par simulation)
 # Sécurisé pour le multi-threading car l'index d'écriture 'nsim' est unique par thread.
@@ -87,8 +87,8 @@ Threads.@threads for nsim in 1:(N*length(n_values))
     # ----------------------------------------------------------------------
     x0_mle = [1.0, 1.5, 1.0, (1 + ρlow_i) / 2]
     res_mle = MLE(gp, mydf, x0_mle, [1e-2, 0.1, 0.01, ρlow_i + 0.01], [Inf, Inf, Inf, 1])
-    push!(local_mle_df, (sim_index, n_actuel, res_mle..., ρlow_i))
-
+    sorties_MLE[nsim] = DataFrame(sim_index=sim_index, n_index=n_actuel, α_mle=res_mle[1], β_mle=res_mle[2], θ_mle=res_mle[3], ρ_mle=res_mle[4], ρlow=ρlow_i)
+    
     # ----------------------------------------------------------------------
     # PARTIE B : ESTMATION BAYÉSIENNE MULTI-CHAÎNES
     # ----------------------------------------------------------------------
@@ -218,23 +218,22 @@ Threads.@threads for nsim in 1:(N*length(n_values))
                 mean(mat_θ), std(mat_θ), q_θ[1], q_θ[2], diag_res.ess[3], diag_res.rhat[3], 0.0, # θ est conjugué GIG (acc = 100%)
                 mean(mat_ρ), std(mat_ρ), q_ρ[1], q_ρ[2], diag_res.ess[4], diag_res.rhat[4], mean(acc_ρ_vec)
             ))
+        return local_bayes_df    
     end
     # Exécution séquentielle contrôlée des 3 scénarios de priors
-    executer_et_pousser_mcmc!(priors_GP, "good")
-    executer_et_pousser_mcmc!(priors_BP, "moderate")
-    executer_et_pousser_mcmc!(priors_SBP, "strong")
+    append!(sorties_Bayes[nsim],executer_et_pousser_mcmc!(priors_GP, "good"))
+    append!(sorties_Bayes[nsim],executer_et_pousser_mcmc!(priors_BP, "moderate"))
+    append!(sorties_Bayes[nsim],executer_et_pousser_mcmc!(priors_SBP, "strong"))
 end
 # Sauvegarde des DataFrames locaux dans les conteneurs partagés
-sorties_MLE[nsim] = local_mle_df
-sorties_Bayes[nsim] = local_bayes_df
+df_final_mle = reduce(vcat, sorties_MLE)
+df_final_bayes = reduce(vcat, sorties_Bayes)
 println("Simulations et MCMC terminées. Fusion et post-traitement global des indicateurs...")
 
 #------------------------------------------------------------------------------
 #          POST-TRAITEMENT ET CALCUL DES INDICATEURS D'ARTICLE
 #------------------------------------------------------------------------------
 
-df_final_mle = reduce(vcat, sorties_MLE)
-df_final_bayes = reduce(vcat, sorties_Bayes)
 
 # Fonction d'agrégation statistique sur l'ensemble des N simulations
 
@@ -246,7 +245,7 @@ df_bayes[!, :error] = df_bayes[!, mean_col] .- true_val
 df_bayes[!, :sq_error] = df_bayes[!, :error].^2
 df_bayes[!, :covered] = (df_bayes[!, q025_col] .<= true_val) .& (true_val .<= df_bayes[!, q975_col])
 df_bayes[!, :ic_length] = df_bayes[!, q975_col] .- df_bayes[!, q025_col]
-synthese = combine(groupby(df_bayes, [:n, :prior_type]),
+synthese = combine(groupby(df_bayes, [:n_index, :prior_type]),
 :error => mean => Symbol("Bias_", param_name),
 :sq_error => (x -> sqrt(mean(x))) => Symbol("RMSE_", param_name),
 :covered => mean => Symbol("Coverage_", param_name),
@@ -264,10 +263,10 @@ df_perf_ρ = calculer_metrics_performance(df_final_bayes, "ρ", ρtrue)
 
 # Fusion générale de la table récapitulative
 
-df_performance_globale = innerjoin(df_perf_α, df_perf_β, on=[:n, :prior_type])
-df_performance_globale = innerjoin(df_performance_globale, df_perf_θ, on=[:n, :prior_type])
-df_performance_globale = innerjoin(df_performance_globale, df_perf_ρ, on=[:n, :prior_type])
-sort!(df_performance_globale, [:prior_type, :n])
+df_performance_globale = innerjoin(df_perf_α, df_perf_β, on=[:n_index, :prior_type])
+df_performance_globale = innerjoin(df_performance_globale, df_perf_θ, on=[:n_index, :prior_type])
+df_performance_globale = innerjoin(df_performance_globale, df_perf_ρ, on=[:n_index, :prior_type])
+sort!(df_performance_globale, [:prior_type, :n_index])
 
 #------------------------------------------------------------------------------
 #  EXPORTATION SUR L'ESPACE NVMe DU MÉSOCENTRE (/bettik)

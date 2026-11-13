@@ -221,9 +221,10 @@ Threads.@threads for nsim in 1:(N*length(n_values))
         return local_bayes_df    
     end
     # Exécution séquentielle contrôlée des 3 scénarios de priors
-    append!(sorties_Bayes[nsim],executer_et_pousser_mcmc!(priors_GP, "good"))
-    append!(sorties_Bayes[nsim],executer_et_pousser_mcmc!(priors_BP, "moderate"))
-    append!(sorties_Bayes[nsim],executer_et_pousser_mcmc!(priors_SBP, "strong"))
+    executer_et_pousser_mcmc!(priors_GP, "good")
+    executer_et_pousser_mcmc!(priors_BP, "moderate")
+    executer_et_pousser_mcmc!(priors_SBP, "strong")
+    sorties_Bayes[nsim] = local_bayes_df
 end
 # Sauvegarde des DataFrames locaux dans les conteneurs partagés
 df_final_mle = reduce(vcat, sorties_MLE)

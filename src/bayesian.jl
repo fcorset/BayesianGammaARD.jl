@@ -379,8 +379,8 @@ function algoMCMC(gp::GammaProcess,df::DataFrame, priors::Vector{ContinuousUniva
                 total_shape = sum(deltaeta(mydf, estpar[k-1,1], estpar[k-1,2]))
                 total_rate = sum(mydf.deg .- exp.(mydf.um1 .* log(1-estpar[k-1,4])) .* (1 .- mydf.Δm1) .* mydf.degprec)
                 p1 = alpha_shape - theta_shape - total_shape
-                p3 = 2 * estpar[k-1,1] * w^(estpar[k-1,2]) / alpha_scale
-                p2 = 2 * (theta_scale + total_rate)
+                p2 = 2 * estpar[k-1,1] * w^(estpar[k-1,2]) / alpha_scale
+                p3 = 2 * (theta_scale + total_rate)
                 #println("p = $p1, a = $p2, b = $p3")
                 estpar[k,j] = rand_gig(p1, p2, p3)
                 #println(estpar[k,j])

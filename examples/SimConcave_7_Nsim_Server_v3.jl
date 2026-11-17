@@ -285,7 +285,7 @@ sort!(df_performance_globale, [:prior_type, :n_index])
 #------------------------------------------------------------------------------
 #  EXPORTATION SUR L'ESPACE NVMe DU MÉSOCENTRE (/bettik)
 #------------------------------------------------------------------------------
-dir_out = "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/examples/Results/Nsim/Concave/V2"
+dir_out = "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/examples/Results/Nsim/Concave/V3"
 
 
 mkpath(dir_out)

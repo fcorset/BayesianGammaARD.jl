@@ -51,7 +51,7 @@ Threads.@threads for i in 1:N
     # On stocke la DataFrame de chaque simulation dans le conteneur global
     sorties_sim[i] = df
     # On écrit la DataFrame de chaque simulation sur le bettik
-    dir_out_sim = "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/examples/Results/Nsim/Concave/V3"
+    dir_out_sim = "/bettik/PROJECTS/pr-baydeg/fcorset/V2/BayesianGammaARD.jl/examples/Results/Nsim/Concave/"
     mkpath(dir_out_sim)
     CSV.write(joinpath(dir_out_sim, "sim_$(i)_$(rho_label).csv"), df)
 end
@@ -285,7 +285,7 @@ sort!(df_performance_globale, [:prior_type, :n_index])
 #------------------------------------------------------------------------------
 #  EXPORTATION SUR L'ESPACE NVMe DU MÉSOCENTRE (/bettik)
 #------------------------------------------------------------------------------
-dir_out = "/bettik/PROJECTS/pr-baydeg/fcorset/BayesianGammaARD.jl/examples/Results/Nsim/Concave/V3"
+dir_out = "/bettik/PROJECTS/pr-baydeg/fcorset/V2/BayesianGammaARD.jl/examples/Results/Nsim/Concave/"
 
 
 mkpath(dir_out)
